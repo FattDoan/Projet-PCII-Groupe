@@ -1,3 +1,5 @@
+package model;
+
 /**
  * Énumération des différents types de cases possibles dans la grille.
  * Chaque case de la grille possède un type qui détermine son contenu.

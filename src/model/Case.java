@@ -1,13 +1,15 @@
+package model;
+
 /**
  * Représente une case de la grille de jeu.
  * Chaque case possède des coordonnées (x, y) et un type (vide, minerai).
  */
 public class Case {
    /** Coordonnée horizontale de la case dans la grille */
-   private int x;
+   private final int x;
    
    /** Coordonnée verticale de la case dans la grille */
-   private int y;
+   private final int y;
    
    /** Type de la case (VIDE, MINERAI) */
    private TypeCase type;

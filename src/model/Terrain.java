@@ -1,3 +1,5 @@
+package model;
+
 /**
  * Représente la grille de jeu carrée.
  * La grille contient toutes les cases du jeu et gère leur placement.
