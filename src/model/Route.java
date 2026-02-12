@@ -12,11 +12,14 @@ public class Route extends Batiment {
     /**
      * Crée une nouvelle route avec la direction spécifiée.
      * La capacité est fixée à 1 (un minerai en transit à la fois).
+     * Note : La direction ne peut pas être nulle.
      * 
-     * @param direction la direction d'acheminement des minerais
+     * @param direction la direction d'acheminement des minerais, ne doit pas être null
      */
     public Route(Direction direction) {
         super(1);
+        // Validation : la direction ne peut pas être nulle
+        assert direction != null : "direction=null";
         this.direction = direction;
     }
 }
