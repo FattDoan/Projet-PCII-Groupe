@@ -15,7 +15,7 @@ public class Case {
    private TypeCase type;
 
    /** Bâtiment présent sur la case */
-   // a faire : private Batiment batiment;
+   private Batiment batiment;
    
    /**
     * Crée une nouvelle case vide aux coordonnées spécifiées.
@@ -32,5 +32,6 @@ public class Case {
       this.x = x;
       this.y = y;
       this.type = TypeCase.VIDE;
+      this.batiment = null;
    }
 }
