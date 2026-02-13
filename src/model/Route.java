@@ -7,7 +7,7 @@ package model;
  */
 public class Route extends Batiment {
     /** Direction dans laquelle la route achemine les minerais */
-    private Direction direction;
+    private final Direction direction;
 
     /**
      * Crée une nouvelle route avec la direction spécifiée.
