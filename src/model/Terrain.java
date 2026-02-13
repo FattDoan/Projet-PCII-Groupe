@@ -7,10 +7,10 @@ package model;
  */
 public class Terrain {
    /** Taille de la grille (nombre de cases par côté) */
-   private int taille;
+   private final int taille;
    
    /** Tableau 2D contenant toutes les cases de la grille */
-   private Case[][] grille;
+   private final Case[][] grille;
 
    /** Liste des unités présentes sur le terrain */
    // a faire : private List<Unite> unites;
@@ -21,6 +21,7 @@ public class Terrain {
     * Note : La taille doit être strictement positive.
     * 
     * @param taille la dimension de la grille (taille x taille), doit être > 0
+    * @throws AssertionError si taille <= 0
     */
    public Terrain(int taille) {
       // Validation : la taille doit être strictement positive
@@ -33,8 +34,17 @@ public class Terrain {
       // IMPORTANT : grille[i][j] a pour coordonnées (i, j)
       for(int i = 0; i < taille; ++i) {
          for(int j = 0; j < taille; ++j) {
-            this.grille[i][j] = new Case(i, j);
+            this.grille[i][j] = new Case(i, j, TypeCase.VIDE); // a faire : initialiser les cases avec des minerais selon une configuration prédéfinie ou aléatoire
          }
       }
+   }
+   
+   /**
+    * Retourne la taille de la grille (nombre de cases par côté).
+    * 
+    * @return la dimension de la grille carrée
+    */
+   public int getTaille() {
+      return taille;
    }
 }
