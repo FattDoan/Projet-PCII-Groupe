@@ -23,4 +23,9 @@ public class Route extends Batiment {
         assert direction != null : "direction=null";
         this.direction = direction;
     }
+
+    @Override
+    public TypeBatiment type() {
+        return TypeBatiment.ROUTE;
+    }
 }

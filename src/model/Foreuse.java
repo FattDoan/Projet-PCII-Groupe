@@ -14,4 +14,10 @@ public class Foreuse extends Batiment {
     public Foreuse() {
         super(1);
     }
+
+    @Override
+    public TypeBatiment type() {
+        return TypeBatiment.FOREUSE;
+    }
+
 }
