@@ -47,4 +47,26 @@ public class Terrain {
    public int getTaille() {
       return taille;
    }
+
+    /**
+     * Retourne la case située aux coordonnées spécifiées.
+     * Précondition : Les coordonnées doivent être valides et dans les limites de la grille.
+     * @return la case à la position (x, y)
+     */
+
+    public Case getCase(int x, int y) {
+        // Validation : les coordonnées doivent être dans les limites de la grille
+        assert x >= 0 && y >= 0 : "Coordonnées négatives: x=" + x + ", y=" + y;
+        assert x < taille && y < taille : "Coordonnées hors limites: x=" + x + ", y=" + y + ", taille=" + taille;
+        return grille[x][y];
+    }
+
+
+
+
+
+
+
+
+
 }

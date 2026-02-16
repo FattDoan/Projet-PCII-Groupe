@@ -16,7 +16,7 @@ public class Case {
 
    /** Bâtiment présent sur la case */
    private Batiment batiment;
-   
+  
    /**
     * Crée une nouvelle case vide aux coordonnées spécifiées.
     * Par défaut, la case est de type VIDE.
@@ -40,11 +40,52 @@ public class Case {
    }
    
    /**
-    * Retourne le bâtiment présent sur la case.
-    * 
+    * Retourne le bâtiment présent sur la case. 
     * @return le bâtiment présent sur cette case, ou null si aucun bâtiment
     */
    public Batiment getBatiment() {
       return batiment;
    }
+
+   /**
+    * Retourne les coordonnées horizontales (x) de la case.
+    * @return la coordonnée x de la case
+    */
+   public int getX() {
+      return x;
+    }
+   
+   /**
+    * Retourne les coordonnées verticales (y) de la case.
+    * @return la coordonnée y de la case
+    */
+    public int getY() {
+      return y;
+    }
+
+    /**
+     * Predicat qui vérifie si la case contient un bâtiment. 
+     * @return true si la case contient un bâtiment, false sinon
+     */
+    public boolean aBatiment() {
+        return batiment != null;
+    }
+    
+    /**
+     * Predicat qui vérifie si la case est vide (ne contient ni bâtiment ni minerai).
+     * @return true si la case est vide, false sinon
+     */
+    public boolean estVide() {
+        return type == TypeCase.VIDE;
+    }
+    
+    /**
+     * Predicat qui vérifie si la case contient un minerai.
+     * @return true si la case contient un minerai, false sinon
+     */
+    public boolean aMinerai() {
+        return type == TypeCase.MINERAI;
+    } 
+
+
 }
