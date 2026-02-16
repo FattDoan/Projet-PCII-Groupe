@@ -27,6 +27,25 @@ public abstract class Batiment {
 
     public abstract TypeBatiment type();
 
+    /** 
+     * Retourne la quantité de minerai actuellement stockée dans le bâtiment.
+     * 
+     * @return la quantité de minerai stockée
+     */
+    public int getQuantiteStockee() {
+        return stockage;
+    }
+
+    /**
+     * Retourne la capacité maximale de stockage du bâtiment.
+     * 
+     * @return la capacité maximale de stockage
+     */
+    public int getCapaciteMax() {
+        return capacite;
+    }
+
+
     /**
      * Vérifie si le bâtiment est vide (aucun minerai stocké).
      * 
@@ -47,24 +66,28 @@ public abstract class Batiment {
     
     /**
      * Ajoute un minerai au stockage.
-     * Précondition : le bâtiment ne doit pas être plein.
+     * Précondition : le stokage actuel plus la quantité ajoutée 
+     * ne doit pas dépasser la capacité maximale du bâtiment.
      * 
      * @throws AssertionError si le bâtiment est déjà plein
      */
-    public void ajouterMinerai() {
-        assert !estPlein() : "Bâtiment plein: stockage=" + stockage + ", capacite=" + capacite;
-        stockage++;
+
+    public void ajouterMinerai(int quantite) {
+        assert getQuantiteStockee() + quantite <= getCapaciteMax()
+            : "Bâtiment plein: stockage=" + stockage + ", ajouter quantite=" + quantite + ", capacite=" + capacite;
+        stockage += quantite;
     }
     
     /**
      * Retire un minerai du stockage.
-     * Précondition : le bâtiment ne doit pas être vide.
+     * Précondition : le stockage actuel doit être suffisant pour retirer la quantité demandée.
      * 
      * @throws AssertionError si le bâtiment est déjà vide
      */
-    public void retirerMinerai() {
-        assert !estVide() : "Bâtiment vide: stockage=" + stockage;
-        stockage--;
+    public void retirerMinerai(int quantite) {
+        assert getQuantiteStockee() >= quantite 
+            : "Bâtiment vide: stockage=" + stockage + ", retirer quantite=" + quantite;
+        stockage -= quantite;
     }
 
 }
