@@ -4,7 +4,7 @@ package model;
  * Représente un bâtiment sur la grille.
  * Les bâtiments peuvent stocker des minerais (foreuse, bâtiment maître, route).
  */
-public class Batiment {
+public abstract class Batiment {
     /** Quantité actuelle de minerai stocké */
     private int stockage;
     
@@ -24,7 +24,9 @@ public class Batiment {
         this.capacite = capacite;
         this.stockage = 0;
     }
-    
+
+    public abstract TypeBatiment type();
+
     /**
      * Vérifie si le bâtiment est vide (aucun minerai stocké).
      * 
@@ -64,4 +66,5 @@ public class Batiment {
         assert !estVide() : "Bâtiment vide: stockage=" + stockage;
         stockage--;
     }
+
 }

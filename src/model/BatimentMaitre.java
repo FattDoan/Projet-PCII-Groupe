@@ -21,4 +21,9 @@ public class BatimentMaitre extends Batiment {
     BatimentMaitre() {
         super(CAPACITE);
     }
+
+    @Override
+    public TypeBatiment type() {
+        return TypeBatiment.BATIMENT_MAITRE;
+    }
 }
