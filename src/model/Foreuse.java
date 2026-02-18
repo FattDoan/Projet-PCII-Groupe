@@ -34,7 +34,7 @@ public class Foreuse extends Batiment implements Runnable {
                 
                 // Extraction du minerai
                 if (!estPlein()) {
-                    this.ajouterMinerai();
+                    this.ajouterMinerai(1);
                 } else {
                 }
             } catch (InterruptedException e) {

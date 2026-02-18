@@ -16,7 +16,7 @@ public class ForeuseThreadTest {
             if (!foreuse.estVide()) {
                 System.out.println("[AVANT RETRAIT] Stockage foreuse = " + getStockage(foreuse));
                 System.out.println("[ACTION] Retrait d'un minerai...");
-                foreuse.retirerMinerai();
+                foreuse.retirerMinerai(1);
                 System.out.println("[APRES RETRAIT] Stockage foreuse = " + getStockage(foreuse));
             } else {
                 // Si la foreuse est vide, on affiche une information
