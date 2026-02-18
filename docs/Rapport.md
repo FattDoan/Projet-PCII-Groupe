@@ -290,8 +290,6 @@ L'ensemble des tâches est présenté sous la forme d'un diagramme de Gantt, don
 
 Ce diagramme met en avant la relation d’héritage et les méthodes principales pour la gestion de l’extraction automatique.
 
-
-
 ## 4.2 Debut: Gestion des clics et contrôleur de l’interface
 
 ### Structures de données principales et constantes
@@ -341,9 +339,9 @@ classDiagram
     %% Model
     class Terrain {
     }
-    
+
     %% View
-    class Affichage {
+   class Affichage {
     }
 
     %% Controller
@@ -367,7 +365,7 @@ classDiagram
     ReactionClic --> Terrain : lit l'état des cases
     EventHandler --> Terrain : lit/modifie l'état des cases
     EventHandler --> Affichage : met à jour la vue pour un retour visuel
-    Affichage --> Terrain : rend la grille
+    Affichage <-- Terrain : rend la grille
 ```
 
-# 
+Ce diagramme représente l'essentiel de la logique du jeu et suit le patron **MVC** (Model-View-Controller). Le modèle (`Terrain`) contient les données du jeu, la vue (`Affichage`) gère l'affichage en fonction du modèle, et le contrôleur (`ReactionClic` + `EventHandler`) gère le modèle tout en mettant également à jour directement la vue pour fournir un retour visuel.
