@@ -1,5 +1,7 @@
 package controller;
 
+import model.Case;
+
 public class EventHandler {
     
 

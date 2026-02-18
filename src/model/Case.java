@@ -49,11 +49,6 @@ public class Case {
       return batiment;
    }
 
-   /** Renvoie vrai si la case est vide, faux sinon */
-   public boolean estVide() {
-      return this.type == TypeCase.VIDE && this.batiment == null;
-   }
-
    /** Renvoie le type de la case (VIDE, MINERAI) */
    public TypeCase getType() {
       return type;
@@ -67,6 +62,22 @@ public class Case {
    /** Renvoie la coordonnée y de la case */
    public int getY() {
       return y;
+   }
+
+
+   /** Renvoie vrai si la case est vide, faux sinon */
+   public boolean estVide() {
+      return this.type == TypeCase.VIDE && this.batiment == null;
+   }
+
+   /** Renvoie vrai si la case contient du minerai, faux sinon */
+   public boolean aMinerai() {
+      return this.type == TypeCase.MINERAI;
+   }
+
+   /** Renvoie vrai si la case contient un bâtiment, faux sinon */
+   public boolean aBatiment() {
+      return this.batiment != null;
    }
 
 

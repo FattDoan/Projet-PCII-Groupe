@@ -28,12 +28,8 @@ public class TestView {
         BatimentMaitre batimentMaitre1 = new BatimentMaitre();
         BatimentMaitre batimentMaitre2 = new BatimentMaitre();
         BatimentMaitre batimentMaitre3 = new BatimentMaitre();
-        for (int i=0; i<10; ++i) {
-            batimentMaitre2.ajouterMinerai();
-        }
-        for (int i=0; i<100; ++i) {
-            batimentMaitre3.ajouterMinerai();
-        }
+        batimentMaitre2.ajouterMinerai(10);
+        batimentMaitre3.ajouterMinerai(100);
         terrain.getCase(1, 1).setBatiment(batimentMaitre1);
         terrain.getCase(2, 1).setBatiment(batimentMaitre2);
         terrain.getCase(3, 1).setBatiment(batimentMaitre3);
@@ -41,7 +37,7 @@ public class TestView {
         // une foreuse avec 0 et 1 minerai
         Foreuse foreuse1 = new Foreuse();
         Foreuse foreuse2 = new Foreuse();
-        foreuse2.ajouterMinerai();
+        foreuse2.ajouterMinerai(1);
         terrain.getCase(1, 3).setBatiment(foreuse1);
         terrain.getCase(2, 3).setBatiment(foreuse2);
 
