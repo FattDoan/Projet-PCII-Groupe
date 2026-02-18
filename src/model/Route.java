@@ -24,6 +24,13 @@ public class Route extends Batiment {
         this.direction = direction;
     }
 
+    /**** GETTERS ****/
+
+    /** Renvoie la direction d'acheminement des minerais sur cette route */
+    public Direction getDirection() {
+        return this.direction;
+    }
+
     @Override
     public TypeBatiment type() {
         return TypeBatiment.ROUTE;

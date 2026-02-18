@@ -5,5 +5,6 @@ public enum TypeBatiment {
     BATIMENT_MAITRE,
     ROUTE,
     FOREUSE,
-    STOCKAGE
+    STOCKAGE, 
+    USINE
 };

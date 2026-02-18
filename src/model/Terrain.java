@@ -13,7 +13,7 @@ public class Terrain {
    private final Case[][] grille;
 
    /** Liste des unités présentes sur le terrain */
-   // a faire : private List<Unite> unites;
+   // TODO : private List<Unite> unites;
 
    /**
     * Crée une nouvelle grille carrée de la taille spécifiée.
@@ -38,10 +38,13 @@ public class Terrain {
          }
       }
    }
-   
+
+
+
+   /***** GETTER *****/
+
    /**
     * Retourne la taille de la grille (nombre de cases par côté).
-    * 
     * @return la dimension de la grille carrée
     */
    public int getTaille() {
@@ -62,11 +65,12 @@ public class Terrain {
     }
 
 
+   /***** SETTER *****/
 
-
-
-
-
-
-
+   /** Modifie la case située à la position (x, y) dans la grille 
+    * /!\ uniquement utilisée pour les tests, à supprimer ou rendre privée dans la version finale du projet /!\
+   */
+   public void setCase(int x, int y, Case c) {
+      this.grille[x][y] = c;
+   }
 }

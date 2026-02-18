@@ -25,22 +25,18 @@ public abstract class Batiment {
         this.stockage = 0;
     }
 
+    /** Renvoie le type de bâtiment (USINE, FOREUSE, STOCKAGE, BATIMENT_MAITRE, ROUTE) */
     public abstract TypeBatiment type();
 
-    /** 
-     * Retourne la quantité de minerai actuellement stockée dans le bâtiment.
-     * 
-     * @return la quantité de minerai stockée
-     */
-    public int getQuantiteStockee() {
+
+    /****** GETTERS ******/
+
+    /** Renvoie la quantité de minerai stockée actuellement */
+    public int getStockage() {
         return stockage;
     }
 
-    /**
-     * Retourne la capacité maximale de stockage du bâtiment.
-     * 
-     * @return la capacité maximale de stockage
-     */
+    /** Renvoie la capacité maximale de stockage du bâtiment */
     public int getCapaciteMax() {
         return capacite;
     }
@@ -54,7 +50,7 @@ public abstract class Batiment {
     public boolean estVide() {
         return stockage == 0;
     }
-    
+
     /**
      * Vérifie si le bâtiment est plein (capacité maximale atteinte).
      * 
@@ -63,7 +59,10 @@ public abstract class Batiment {
     public boolean estPlein() {
         return stockage >= capacite;
     }
-    
+
+
+
+
     /**
      * Ajoute un minerai au stockage.
      * Précondition : le stokage actuel plus la quantité ajoutée 
@@ -73,11 +72,11 @@ public abstract class Batiment {
      */
 
     public void ajouterMinerai(int quantite) {
-        assert getQuantiteStockee() + quantite <= getCapaciteMax()
+        assert getStockage() + quantite <= getCapaciteMax()
             : "Bâtiment plein: stockage=" + stockage + ", ajouter quantite=" + quantite + ", capacite=" + capacite;
         stockage += quantite;
     }
-    
+
     /**
      * Retire un minerai du stockage.
      * Précondition : le stockage actuel doit être suffisant pour retirer la quantité demandée.
@@ -85,7 +84,7 @@ public abstract class Batiment {
      * @throws AssertionError si le bâtiment est déjà vide
      */
     public void retirerMinerai(int quantite) {
-        assert getQuantiteStockee() >= quantite 
+        assert getStockage() >= quantite 
             : "Bâtiment vide: stockage=" + stockage + ", retirer quantite=" + quantite;
         stockage -= quantite;
     }
