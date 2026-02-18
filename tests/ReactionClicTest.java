@@ -1,19 +1,25 @@
-package view;
+package tests;
 
-import model.BatimentMaitre;
-import model.Case;
-import model.Direction;
-import model.Foreuse;
-import model.Route;
-import model.Terrain;
-import model.TypeCase;
+import model.*;
+import view.*;
+import controller.*;
 
-/** Classe de tests pour l'affichage */
-public class TestView {
+/**
+ * Classe de tests pour ReactionClic et EventHandler.
+ * 
+ * Pour tester le contrôleur, nous réutilisons la fenêtre de test de la classe TestView
+ * fournie par notre camarade (Emilie) en charge de l'affichage. 
+ * 
+ * Pour l'instant, les tests actuels se limitent à vérifier que les clics sont bien détectés :
+ *  - Clics sur la grille : affiche les coordonnées de la case et le type de bâtiment présent.
+ *  - Clics sur le menu latéral (à droite) : affiche les coordonnées du clic dans le menu.
+ * 
+ */
+public class ReactionClicTest {
 
     public static void main(String[] args) {
         // on créé un terrain de test 
-        Terrain terrain = new Terrain(10); // TODO : remplacer les dimensions par celles souhaitées pour le test
+        Terrain terrain = new Terrain(10); 
 
         //et une fenêtre pour l'afficher
         Fenetre fenetre = new Fenetre("Test d'affichage", terrain);
@@ -53,10 +59,15 @@ public class TestView {
 
         // minerais
         Case caseMinerai1 = new Case(5, 1, TypeCase.MINERAI);
-        terrain.setCase(5, 1, caseMinerai1); // on utilise le setter pour remplacer la case vide par une case contenant un minerai car on ne peut pas modifier le type d'une case déjà créée (le type est final), on doit donc créer une nouvelle case et la placer à la place de l'ancienne
-        // c'est une solution temporaire pour les tests, en attendant que les minerais soient générés aléatoirement lors de la création du terrain
-         
-        // TODO : ajouter les tests pour les autres types de bâtiments une fois qu'ils seront implémentés
-    }
+        terrain.setCase(5, 1, caseMinerai1); 
 
+       
+        //---------------------------------------------------------------------------------------------//
+        // Ajout du contrôleur de clic pour tester les interactions avec les bâtiments
+        // pour l'instant, il n'y a pas d'interactions définies, juste les affichages du console
+        ReactionClic reactionClic = new ReactionClic(fenetre.getAffichage(), 
+                                                     terrain, 
+                                                     new EventHandler(fenetre.getAffichage(), terrain));
+         //---------------------------------------------------------------------------------------------// 
+    }
 }

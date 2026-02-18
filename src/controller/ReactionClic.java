@@ -9,60 +9,82 @@ public class ReactionClic implements MouseListener {
     private final EventHandler eventHandler;
     private final Terrain terrain;
 
-    private final int terrainScreenSize;
-    
-    // menu à droite de la grille, pour les boutons d'action 
-    // ou les infos sur les cases
-    private final int menuScreenWidth; 
-    // menuScreenHeight = getScreenHeight() = terrainScreenSize
-    private final int menuScreenHeight;
-
-
     public ReactionClic(Affichage affichage, Terrain terrain, EventHandler eventHandler) {
         this.affichage = affichage;
-        this.affichage.addMouseListener(this);
         this.eventHandler = eventHandler;
         this.terrain = terrain;
-        this.terrainScreenSize = getCaseSize() * terrain.getTaille();
-        this.menuScreenWidth = getScreenWidth() - terrainScreenSize;
-        this.menuScreenHeight = getScreenHeight();
+        this.affichage.addMouseListener(this);
     }
 
-    // pour l'instant, on suppose les tailles fixes
-    // au lieu de appeler les fonctions de Affichage
-    private int getScreenWidth() {
-        return 1200;
-    }
-    private int getScreenHeight() {
-        return 800;
-    }
+
     private int getCaseSize() {
-        return 10; 
+        return Affichage.TAILLE_CASE; 
     }
-    
-    private int getGridX(int screenX) {
-        return screenX / getCaseSize();
+
+    private int getTerrainWidth() {
+        return terrain.getTaille() * getCaseSize();
     }
-    private int getGridY(int screenY) {
-        return screenY / getCaseSize();
+
+    private int getTerrainHeight() {
+        return terrain.getTaille() * getCaseSize();
     }
+
+    private int getMenuWidth() {
+        return affichage.getWidth() - getTerrainWidth();
+    }
+
+    // Conversion des coordonnées de la souris en coordonnées de la grille
+    private int getGridX(int pixelX) {
+        return pixelX / getCaseSize();
+    }
+
+    private int getGridY(int pixelY) {
+        return pixelY / getCaseSize();
+    }
+
+    private enum ClickContext {
+        GRID,
+        MENU
+    }
+
+
+    private ClickContext getClickContext(int x, int y) {
+        assert x >= 0 && y >= 0 : "Coordonnées de clic négatives: x=" + x + ", y=" + y; 
+        // Clic dans le menu à droite de la grille
+        if (x > getTerrainWidth()) {
+            return ClickContext.MENU;
+        }
+        // Clic dans la grille
+        else {
+            return ClickContext.GRID;
+        }
+    }
+
+
 
     @Override 
     public void mouseClicked(MouseEvent e) {
-        if (e.getX() >= terrainScreenSize) {
-            System.out.println("[Controller] Clic dans le menu: x=" + e.getX() + ", y=" + e.getY());
-            eventHandler.handleClicDansMenu(e.getX() - terrainScreenSize, e.getY()); 
-            return;
+        int x = e.getX();
+        int y = e.getY();
+
+        ClickContext ctx = getClickContext(x, y);
+        switch(ctx) {
+            case GRID : 
+                int gridX = getGridX(x);
+                int gridY = getGridY(y);
+                assert gridX < terrain.getTaille() && gridY < terrain.getTaille() : "Clic hors de la grille: gridX=" + gridX + ", gridY=" + gridY;
+                System.out.println("[ReactionClic] Clic dans la grille: x=" + x + ", y=" + y + " => gridX=" + gridX + ", gridY=" + gridY);
+                eventHandler.handleClicSurCase(terrain.getCase(gridX, gridY));
+                break;
+
+            case MENU :
+                System.out.println("[ReactionClic] Clic dans le menu: x=" + x + ", y=" + y);
+                eventHandler.handleClicDansMenu(x - getTerrainWidth(), y);
+                break;
+
         }
 
-        int gridX = getGridX(e.getX());
-        int gridY = getGridY(e.getY());
-        if (gridX >= 0 && gridX < terrain.getTaille() && gridY >= 0 && gridY < terrain.getTaille()) {
-            eventHandler.handleClicSurCase(terrain.getCase(gridX, gridY)); 
-        }
-        else {
-            System.out.println("[Controller] Clic hors de la grille: x=" + gridX + ", y=" + gridY);
-        }
+
     }
 
     @Override

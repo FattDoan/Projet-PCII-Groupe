@@ -1,12 +1,14 @@
 package controller;
 
-import model.Case;
+import model.*;
+import view.Affichage;
 
 public class EventHandler {
-    
-
-
-    public EventHandler() {
+    private Terrain terrain;
+    private Affichage affichage;
+    public EventHandler(Affichage affichage, Terrain terrain) {
+        this.affichage = affichage;
+        this.terrain = terrain;
     }
     
     // Méthode utilitaire pour convertir les énumérations en chaînes lisibles
@@ -16,20 +18,18 @@ public class EventHandler {
 
 
 
-    public void handleClicSurCase(Case c) {
-        System.out.println("[EventHandler] Clic sur la case: " + c.getX() + ", " + c.getY());
-    
+    public void handleClicSurCase(Case c) { 
         // TODO: A implementer les comportements spécifiques selon le type de la case
         // par ex: affiche le menu a droite avec les options disponibles pour cette case, 
         // ou les informations sur le contenu de la case
         if (c.aBatiment()) {
-            System.out.println("  - La case contient un bâtiment: " + toString(c.getBatiment().type()));
+            System.out.println("[EventHandler] La case contient un bâtiment: " + toString(c.getBatiment().type()));
         }
         else if (c.aMinerai()) {
-            System.out.println("  - La case contient du minerai");
+            System.out.println("[EventHandler] La case contient du minerai");
         }
         else if (c.estVide()) {
-            System.out.println("  - La case est vide");
+            System.out.println("[EventHandler] La case est vide");
         }
     }
 
@@ -38,7 +38,7 @@ public class EventHandler {
      * et non pas à la grille ou à l'écran global.
      *
      */
-    public void handleClicDansMenu(int x, int y) {
-        System.out.println("[EventHandler] Clic dans le menu: x=" + x + ", y=" + y);
+    public void handleClicDansMenu(int menuX, int menuY) {
+        System.out.println("[EventHandler] Clic dans le menu: menuX=" + menuX + ", menuY=" + menuY);
     }
 }

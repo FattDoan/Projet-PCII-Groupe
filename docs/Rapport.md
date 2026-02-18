@@ -100,10 +100,12 @@ Les bâtiments forment l'infrastructure principale permettant l'extraction, le s
     — Difficulté : Facile
     — Priorité : 2
     — Temps estimé : 30 min
+
 3. **Mine (stockage temporaire des minerais collectés)**
     — Difficulté : Moyenne
     — Priorité : 2
     — Temps estimé : 45 min
+
 4. **Déplacement des minerais via routes**
     — Difficulté : Moyenne
     — Priorité : 5
@@ -121,10 +123,12 @@ Les ennemis constituent un élément de pression continue qui oblige le joueur �
     — Difficulté : Moyenne
     — Priorité : 4
     — Temps estimé : 45 min
+
 3. **Actions des ennemis (destruction des bâtiments et unités à portée)**
     — Difficulté : Élevée
     — Priorité : 4
     — Temps estimé : 1h30
+
 4. **Mort des ennemis au contact des unités de défense**
     — Difficulté : Moyenne
     — Priorité : 4
@@ -142,6 +146,7 @@ La génération du terrain établit l'état initial du jeu en positionnant les r
     — Difficulté : Facile
     — Priorité : 3
     — Temps estimé : 15 min
+
 3. **Création de l'unité de base initiale**
     — Difficulté : Facile
     — Priorité : 2
@@ -159,14 +164,17 @@ Les unités assurent l'exécution des ordres du joueur : récolte du minerai, co
     — Difficulté : Moyenne
     — Priorité : 3
     — Temps estimé : 30 min
+
 3. **Transport du minerai**
     — Difficulté : Moyenne
     — Priorité : 2
     — Temps estimé : 30 min
+
 4. **Défense (tourelle)**
     — Difficulté : Élevée
     — Priorité : 3
     — Temps estimé : 1h
+
 5. **Attribution d'ordres aux unités**
     — Difficulté : Moyenne
     — Priorité : 2
@@ -184,6 +192,7 @@ L'interface utilisateur permet d'afficher les informations relatives aux ressour
     — Difficulté : Moyenne
     — Priorité : 3
     — Temps estimé : 30 min
+
 3. **Vue d'ensemble des données (minerais, unités, bâtiments) (optionnel)**
     — Difficulté : Faible
     — Priorité : 5
@@ -223,13 +232,13 @@ L'ensemble des tâches est présenté sous la forme d'un diagramme de Gantt, don
 
 - Classe `Foreuse` (hérite de `Batiment`, implémente `Runnable`) : gère l’extraction automatique du minerai.
 - Attributs :
-    - `DELAI_EXTRACTION` (constante, délai entre deux extractions)
-    - `running` (flag d’arrêt du thread)
-    - stockage (hérité de `Batiment`, capacité 1)
+  - `DELAI_EXTRACTION` (constante, délai entre deux extractions)
+  - `running` (flag d’arrêt du thread)
+  - stockage (hérité de `Batiment`, capacité 1)
 - Méthodes :
-    - `run()` (boucle d’extraction)
-    - `arreter()` (arrêt du thread)
-    - `ajouterMinerai(int)` (hérité)
+  - `run()` (boucle d’extraction)
+  - `arreter()` (arrêt du thread)
+  - `ajouterMinerai(int)` (hérité)
 
 ### Algorithme abstrait
 
@@ -280,3 +289,85 @@ L'ensemble des tâches est présenté sous la forme d'un diagramme de Gantt, don
 ```
 
 Ce diagramme met en avant la relation d’héritage et les méthodes principales pour la gestion de l’extraction automatique.
+
+
+
+## 4.2 Debut: Gestion des clics et contrôleur de l’interface
+
+### Structures de données principales et constantes
+
+**Classe**`ReactionClic` (implémente `MouseListener`) : capte les clics de souris sur la fenêtre et délègue les actions au `EventHandler`.
+
+- Attributs : `affichage` (JPanel avec la grille et le menu), `terrain` (grille de jeu), `eventHandler` (gestionnaire des actions).
+
+- Enum `ClickContext` : distingue les clics sur la **grille** ou le **menu** .
+
+**Classe** `EventHandler` : encapsule la logique du jeu déclenchée par les clics.
+
+- Attribut : 
+  
+  * `terrain: Terrain` → pour lire/modifier l’état des cases.
+  
+  * `affichage: Affichage` → pour fournir un *retour visuel immédiat* (par ex. surligner la case sélectionnée, mettre à jour un bouton, etc.).
+
+### Algorithme abstrait
+
+1) `ReactionClic` reçoit un clic `(x, y)` via `mouseClicked`.
+
+2) `getClickContext(x, y)` détermine si le clic est sur la **grille** ou le **menu** et selon l’endroit cliqué , il délègue au `EventHandler`. 
+
+3) `EventHandler`: 
+   
+   * Lit ou modifie l’état du modèle (`Terrain` / `Case`).
+   
+   * Met à jour la vue (`Affichage`) pour refléter visuellement le résultat du clic.
+
+### Conditions limites à respecter
+
+- **Grille carrée** : le nombre de cases en largeur = nombre de cases en hauteur.
+
+- **Dimensions de la grille** : largeur et hauteur en pixels = `taille_grille * TAILLE_CASE`.
+
+- **Clics dans la grille** : les coordonnées `(gridX, gridY)` doivent rester dans `[0, taille_grille]`.
+
+- **Menu à droite** : le menu doit commencer exactement après la largeur de la grille (`x > taille_grille`) et ne pas empiéter sur la grille.
+
+- **Coordonnées de clic non négatives** : `x >= 0`, `y >= 0`.
+
+### Diagramme de classes simplifié
+
+```mermaid
+classDiagram
+    %% Model
+    class Terrain {
+    }
+    
+    %% View
+    class Affichage {
+    }
+
+    %% Controller
+    class ReactionClic {
+        -affichage: Affichage
+        -terrain: Terrain
+        -eventHandler: EventHandler
+        +mouseClicked(MouseEvent)
+    }
+
+    class EventHandler {
+        -terrain: Terrain
+        -affichage: Affichage
+        +handleClicSurCase(Case)
+        +handleClicDansMenu(int, int)
+    }
+
+    %% Relations
+    ReactionClic <-- Affichage : écoute les clics
+    ReactionClic --> EventHandler : délègue le traitement des clics
+    ReactionClic --> Terrain : lit l'état des cases
+    EventHandler --> Terrain : lit/modifie l'état des cases
+    EventHandler --> Affichage : met à jour la vue pour un retour visuel
+    Affichage --> Terrain : rend la grille
+```
+
+# 
