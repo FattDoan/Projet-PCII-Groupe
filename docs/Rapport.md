@@ -214,3 +214,69 @@ Environ **50 heures** sont consacrées au développement des fonctionnalités du
 ### 3.3 Diagramme de Gantt
 
 L'ensemble des tâches est présenté sous la forme d'un diagramme de Gantt, dont les ressources correspondent aux trois membres du groupe projet. Ce diagramme permet de visualiser la planification temporelle et le suivi de l'avancement du projet.
+
+## 4. Fonctionnalité détaillée
+
+## 4.1 Debut : Foreuse threadée (extraction automatique de minerai)
+
+### Structures de données principales et constantes
+
+- Classe `Foreuse` (hérite de `Batiment`, implémente `Runnable`) : gère l’extraction automatique du minerai.
+- Attributs :
+    - `DELAI_EXTRACTION` (constante, délai entre deux extractions)
+    - `running` (flag d’arrêt du thread)
+    - stockage (hérité de `Batiment`, capacité 1)
+- Méthodes :
+    - `run()` (boucle d’extraction)
+    - `arreter()` (arrêt du thread)
+    - `ajouterMinerai(int)` (hérité)
+
+### Algorithme abstrait
+
+1. Lorsqu’une foreuse est placée sur une case MINERAI, un thread est lancé (méthode `run`).
+2. Tant que le flag `running` est vrai, la foreuse attend `DELAI_EXTRACTION` millisecondes.
+3. Si le stockage n’est pas plein, elle ajoute 1 minerai à son stockage (méthode héritée de `Batiment`).
+4. Si le stockage est plein, elle attend le prochain cycle.
+5. Le thread peut être arrêté proprement via la méthode `arreter()` (flag `running` mis à false).
+
+### Conditions limites à respecter
+
+- Le stockage ne doit jamais dépasser 1 (capacité fixée à la création).
+- La foreuse ne doit extraire que si la case contient du minerai.
+- Le thread doit pouvoir être arrêté proprement (interruption, flag `running`).
+- Les accès concurrents au stockage doivent être sûrs (pas de bug de synchronisation, ici géré par la simplicité du modèle).
+
+### Utilisation par les autres fonctionnalités
+
+- Les routes peuvent venir vider le stockage de la foreuse pour transporter le minerai.
+- L’interface peut afficher l’état du stockage en temps réel.
+- Les tests automatisés (`ForeuseThreadTest`) vérifient le comportement asynchrone et la synchronisation.
+
+### Diagramme de classes simplifié
+
+```
+         +--------------------------+
+         |        Foreuse           |
+         +--------------------------+
+         | - DELAI_EXTRACTION:int   |
+         | - running:boolean        |
+         |--------------------------|
+         | +run()                   |
+         | +arreter()               |
+         +--------------------------+
+                ^
+                |
+         +-------------------+
+         |    Batiment       |
+         +-------------------+
+         | - stockage:int    |
+         | - capacite:int    |
+         +-------------------+
+         | +ajouterMinerai() |
+         | +retirerMinerai() |
+         | +estVide()        |
+         | +estPlein()       |
+         +-------------------+
+```
+
+Ce diagramme met en avant la relation d’héritage et les méthodes principales pour la gestion de l’extraction automatique.
