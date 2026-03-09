@@ -180,8 +180,13 @@ Les unités assurent l'exécution des ordres du joueur : récolte du minerai, co
     — Priorité : 2
     — Temps estimé : 45 min
 
-**2.2.7. Menus et interface utilisateur** – 2h15 (+30 min optionnel)
+**2.2.7. Menus et interface utilisateur** – 3h15 (+30 min optionnel)
 L'interface utilisateur permet d'afficher les informations relatives aux ressources et aux bâtiments, ainsi que de commander les actions des unités de manière interactive.
+
+1. **Gestion des clics de l'utilisateur**
+    — Difficulté : Moyenne
+    — Priorité : 1
+    — Temps estimé : 1h
 
 1. **Menu pour les unités**
     — Difficulté : Moyenne
@@ -226,153 +231,43 @@ L'ensemble des tâches est présenté sous la forme d'un diagramme de Gantt, don
 
 ## 4. Fonctionnalité détaillée
 
-## 4.1 Debut : Foreuse threadée (extraction automatique de minerai)
+## 4.1 : Gestion des coordonnées (grille discrète vs mouvement continu)
 
-### Structures de données principales et constantes
+### 4.1.1 : Gestion des collisions entre ennemis/unités et bâtiments
 
-- Classe `Foreuse` (hérite de `Batiment`, implémente `Runnable`) : gère l’extraction automatique du minerai.
-- Attributs :
-  - `DELAI_EXTRACTION` (constante, délai entre deux extractions)
-  - `running` (flag d’arrêt du thread)
-  - stockage (hérité de `Batiment`, capacité 1)
-- Méthodes :
-  - `run()` (boucle d’extraction)
-  - `arreter()` (arrêt du thread)
-  - `ajouterMinerai(int)` (hérité)
+TODO
 
-### Algorithme abstrait
+### 4.1.2 : Coordonnées sur la grille (bâtiments et minerais)
 
-1. Lorsqu’une foreuse est placée sur une case MINERAI, un thread est lancé (méthode `run`).
-2. Tant que le flag `running` est vrai, la foreuse attend `DELAI_EXTRACTION` millisecondes.
-3. Si le stockage n’est pas plein, elle ajoute 1 minerai à son stockage (méthode héritée de `Batiment`).
-4. Si le stockage est plein, elle attend le prochain cycle.
-5. Le thread peut être arrêté proprement via la méthode `arreter()` (flag `running` mis à false).
+La classe `Case` représente une case de la grille de jeu. Elle contient des coordonnées discrètes (x, y) qui correspondent à sa position sur la grille. Les bâtiments et les minerais sont placés sur ces cases, et leurs coordonnées sont donc alignées avec la grille.
 
-### Conditions limites à respecter
-
-- Le stockage ne doit jamais dépasser 1 (capacité fixée à la création).
-- La foreuse ne doit extraire que si la case contient du minerai.
-- Le thread doit pouvoir être arrêté proprement (interruption, flag `running`).
-- Les accès concurrents au stockage doivent être sûrs (pas de bug de synchronisation, ici géré par la simplicité du modèle).
-
-### Utilisation par les autres fonctionnalités
-
-- Les routes peuvent venir vider le stockage de la foreuse pour transporter le minerai.
-- L’interface peut afficher l’état du stockage en temps réel.
-- Les tests automatisés (`ForeuseThreadTest`) vérifient le comportement asynchrone et la synchronisation.
-
-### Diagramme de classes simplifié
-
-```
-         +--------------------------+
-         |        Foreuse           |
-         +--------------------------+
-         | - DELAI_EXTRACTION:int   |
-         | - running:boolean        |
-         |--------------------------|
-         | +run()                   |
-         | +arreter()               |
-         +--------------------------+
-                ^
-                |
-         +-------------------+
-         |    Batiment       |
-         +-------------------+
-         | - stockage:int    |
-         | - capacite:int    |
-         +-------------------+
-         | +ajouterMinerai() |
-         | +retirerMinerai() |
-         | +estVide()        |
-         | +estPlein()       |
-         +-------------------+
-```
-
-Ce diagramme met en avant la relation d’héritage et les méthodes principales pour la gestion de l’extraction automatique.
-
-## 4.2 Debut: Gestion des clics et contrôleur de l’interface
-
-### Structures de données principales et constantes
-
-**Classe**`ReactionClic` (implémente `MouseListener`) : capte les clics de souris sur la fenêtre et délègue les actions au `EventHandler`.
-
-- Attributs : `affichage` (JPanel avec la grille et le menu), `terrain` (grille de jeu), `eventHandler` (gestionnaire des actions).
-
-- Enum `ClickContext` : distingue les clics sur la **grille** ou le **menu** .
-
-**Classe** `EventHandler` : encapsule la logique du jeu déclenchée par les clics.
-
-- Attribut : 
-  
-  * `terrain: Terrain` → pour lire/modifier l’état des cases.
-  
-  * `affichage: Affichage` → pour fournir un *retour visuel immédiat* (par ex. surligner la case sélectionnée, mettre à jour un bouton, etc.).
-
-### Algorithme abstrait
-
-1) `ReactionClic` reçoit un clic `(x, y)` via `mouseClicked`.
-
-2) `getClickContext(x, y)` détermine si le clic est sur la **grille** ou le **menu** et selon l’endroit cliqué , il délègue au `EventHandler`. 
-
-3) `EventHandler`: 
-   
-   * Lit ou modifie l’état du modèle (`Terrain` / `Case`).
-   
-   * Met à jour la vue (`Affichage`) pour refléter visuellement le résultat du clic.
-
-### Conditions limites à respecter
-
-- **Grille carrée** : le nombre de cases en largeur = nombre de cases en hauteur.
-
-- **Dimensions de la grille** : largeur et hauteur en pixels = `taille_grille * TAILLE_CASE`.
-
-- **Clics dans la grille** : les coordonnées `(gridX, gridY)` doivent rester dans `[0, taille_grille]`.
-
-- **Menu à droite** : le menu doit commencer exactement après la largeur de la grille (`x > taille_grille`) et ne pas empiéter sur la grille.
-
-- **Coordonnées de clic non négatives** : `x >= 0`, `y >= 0`.
-
-### Diagramme de classes simplifié
+Pour pouvoir manipuler plus facilement ces coordonnées, on utilise une classe `PositionGrille` qui encapsule les coordonnées (x, y) d'une case.
 
 ```mermaid
 classDiagram
-    %% Model
-    class Terrain {
+    class Case {
+        -x: int
+        -y: int
+        +Case(int x, int y)
+        +getX( ): int
+        +getY( ): int
     }
-
-    %% View
-   class Affichage {
+    class PositionGrille {
+        -x: int
+        -y: int
+        +PositionGrille(int x, int y)
+        +getX( ): int
+        +getY( ): int
     }
-
-    %% Controller
-    class ReactionClic {
-        -affichage: Affichage
-        -terrain: Terrain
-        -eventHandler: EventHandler
-        +mouseClicked(MouseEvent)
-    }
-
-    class EventHandler {
-        -terrain: Terrain
-        -affichage: Affichage
-        +handleClicSurCase(Case)
-        +handleClicDansMenu(int, int)
-    }
-
-    %% Relations
-    ReactionClic <-- Affichage : écoute les clics
-    ReactionClic --> EventHandler : délègue le traitement des clics
-    ReactionClic --> Terrain : lit l'état des cases
-    EventHandler --> Terrain : lit/modifie l'état des cases
-    EventHandler --> Affichage : met à jour la vue pour un retour visuel
-    Affichage <-- Terrain : rend la grille
 ```
 
-Ce diagramme représente l'essentiel de la logique du jeu et suit le patron **MVC** (Model-View-Controller). Le modèle (`Terrain`) contient les données du jeu, la vue (`Affichage`) gère l'affichage en fonction du modèle, et le contrôleur (`ReactionClic` + `EventHandler`) gère le modèle tout en mettant également à jour directement la vue pour fournir un retour visuel.
+### 4.1.3 : Coordonnées des unités et ennemis (mouvement continu)
+
+TODO
 
 
+## 4.2 : Affichage des objets (unités, minerai, bâtiments)
 
-## 4.2 : Affichage des objets (unités, minerai, bâtiments) 
 ### 4.2.1 : Fenêtre principale avec grille de jeu
 
 - Classe `Fenetre` : classe principale d'affichage, hérite de `JFrame`
@@ -442,6 +337,104 @@ TODO
 TODO
 
 
+## 4.3 : Gestion des bâtiments (usine, stockage, mine, routes)
+
+### 4.3.1 : Usine
+
+TODO
+
+### 4.3.2 : Stockage des minerais
+
+TODO
+
+### 4.3.3 : Mine (extraction automatique de minerai via des threads)
+
+#### Structures de données principales et constantes
+
+- Classe `Foreuse` (hérite de `Batiment`, implémente `Runnable`) : gère l’extraction automatique du minerai.
+- Attributs :
+  - `DELAI_EXTRACTION` (constante, délai entre deux extractions)
+  - `running` (flag d’arrêt du thread)
+  - stockage (hérité de `Batiment`, capacité 1)
+- Méthodes :
+  - `run()` (boucle d’extraction)
+  - `arreter()` (arrêt du thread)
+  - `ajouterMinerai(int)` (hérité)
+
+#### Algorithme abstrait
+
+1. Lorsqu’une foreuse est placée sur une case MINERAI, un thread est lancé (méthode `run`).
+2. Tant que le flag `running` est vrai, la foreuse attend `DELAI_EXTRACTION` millisecondes.
+3. Si le stockage n’est pas plein, elle ajoute 1 minerai à son stockage (méthode héritée de `Batiment`).
+4. Si le stockage est plein, elle attend le prochain cycle.
+5. Le thread peut être arrêté proprement via la méthode `arreter()` (flag `running` mis à false).
+
+#### Conditions limites à respecter
+
+- Le stockage ne doit jamais dépasser 1 (capacité fixée à la création).
+- La foreuse ne doit extraire que si la case contient du minerai.
+- Le thread doit pouvoir être arrêté proprement (interruption, flag `running`).
+- Les accès concurrents au stockage doivent être sûrs (pas de bug de synchronisation, ici géré par la simplicité du modèle).
+
+#### Utilisation par les autres fonctionnalités
+
+- Les routes peuvent venir vider le stockage de la foreuse pour transporter le minerai.
+- L’interface peut afficher l’état du stockage en temps réel.
+- Les tests automatisés (`ForeuseThreadTest`) vérifient le comportement asynchrone et la synchronisation.
+
+#### Diagramme de classe simplifié
+
+```
+         +--------------------------+
+         |        Foreuse           |
+         +--------------------------+
+         | - DELAI_EXTRACTION:int   |
+         | - running:boolean        |
+         |--------------------------|
+         | +run()                   |
+         | +arreter()               |
+         +--------------------------+
+                ^
+                |
+         +-------------------+
+         |    Batiment       |
+         +-------------------+
+         | - stockage:int    |
+         | - capacite:int    |
+         +-------------------+
+         | +ajouterMinerai() |
+         | +retirerMinerai() |
+         | +estVide()        |
+         | +estPlein()       |
+         +-------------------+
+```
+
+Ce diagramme met en avant la relation d’héritage et les méthodes principales pour la gestion de l’extraction automatique.
+
+### 4.3.4 : Déplacement des minerais via routes
+
+TODO
+
+
+
+## 4.4 : Création, déplacements et actions des ennemis
+
+### 4.4.1 : Génération automatique des ennemis par vagues
+
+TODO
+
+### 4.4.2 : Déplacement des ennemis vers le bâtiment maître
+
+TODO
+
+### 4.4.3 : Actions des ennemis (destruction des bâtiments et unités à portée)
+
+TODO
+
+### 4.4.4 : Mort des ennemis au contact des unités de défense
+
+TODO
+
 
 ## 4.5 : Génération du terrain en début de partie
 
@@ -480,3 +473,129 @@ classDiagram
     Terrain --> Case : composé de
     Case --> BatimentMaitre : peut contenir
 ```
+
+### 4.5.3 Création de l'unité de base initiale
+
+TODO
+
+
+
+## 4.6 : Actions et déplacements des unités
+
+### 4.6.1 : Miner
+
+TODO
+
+### 4.6.2 : Construction de bâtiments
+
+TODO
+
+### 4.6.3 : Transport du minerai
+
+TODO
+
+### 4.6.4 : Défense (tourelle)
+
+TODO
+
+### 4.6.5 : Attribution d'ordres aux unités
+
+TODO
+
+
+## 4.7 : Menus et interface utilisateur
+
+### 4.7.1 : Gestion des clics de l'utilisateur
+
+#### Structures de données principales et constantes
+
+**Classe** `ReactionClic` (implémente `MouseListener`) : capte les clics de souris sur la fenêtre et délègue les actions au `EventHandler`.
+
+- Attributs : `affichage` (JPanel avec la grille et le menu), `terrain` (grille de jeu), `eventHandler` (gestionnaire des actions).
+
+- Enum `ClickContext` : distingue les clics sur la **grille** ou le **menu** .
+
+**Classe** `EventHandler` : encapsule la logique du jeu déclenchée par les clics.
+
+- Attribut : 
+  
+  * `terrain: Terrain` → pour lire/modifier l’état des cases.
+  
+  * `affichage: Affichage` → pour fournir un *retour visuel immédiat* (par ex. surligner la case sélectionnée, mettre à jour un bouton, etc.).
+
+#### Algorithme abstrait
+
+1) `ReactionClic` reçoit un clic `(x, y)` via `mouseClicked`.
+
+2) `getClickContext(x, y)` détermine si le clic est sur la **grille** ou le **menu** et selon l’endroit cliqué , il délègue au `EventHandler`. 
+
+3) `EventHandler`: 
+   
+   * Lit ou modifie l’état du modèle (`Terrain` / `Case`).
+   
+   * Met à jour la vue (`Affichage`) pour refléter visuellement le résultat du clic.
+
+#### Conditions limites à respecter
+
+- **Grille carrée** : le nombre de cases en largeur = nombre de cases en hauteur.
+
+- **Dimensions de la grille** : largeur et hauteur en pixels = `taille_grille * TAILLE_CASE`.
+
+- **Clics dans la grille** : les coordonnées `(gridX, gridY)` doivent rester dans `[0, taille_grille]`.
+
+- **Menu à droite** : le menu doit commencer exactement après la largeur de la grille (`x > taille_grille`) et ne pas empiéter sur la grille.
+
+- **Coordonnées de clic non négatives** : `x >= 0`, `y >= 0`.
+
+#### Diagramme de classes simplifié
+
+```mermaid
+classDiagram
+    %% Model
+    class Terrain {
+    }
+
+    %% View
+   class Affichage {
+    }
+
+    %% Controller
+    class ReactionClic {
+        -affichage: Affichage
+        -terrain: Terrain
+        -eventHandler: EventHandler
+        +mouseClicked(MouseEvent)
+    }
+
+    class EventHandler {
+        -terrain: Terrain
+        -affichage: Affichage
+        +handleClicSurCase(Case)
+        +handleClicDansMenu(int, int)
+    }
+
+    %% Relations
+    ReactionClic <-- Affichage : écoute les clics
+    ReactionClic --> EventHandler : délègue le traitement des clics
+    ReactionClic --> Terrain : lit l'état des cases
+    EventHandler --> Terrain : lit/modifie l'état des cases
+    EventHandler --> Affichage : met à jour la vue pour un retour visuel
+    Affichage <-- Terrain : rend la grille
+```
+
+Ce diagramme représente l'essentiel de la logique du jeu et suit le patron **MVC** (Model-View-Controller). Le modèle (`Terrain`) contient les données du jeu, la vue (`Affichage`) gère l'affichage en fonction du modèle, et le contrôleur (`ReactionClic` + `EventHandler`) gère le modèle tout en mettant également à jour directement la vue pour fournir un retour visuel.
+
+### 4.7.2 : Menu pour les unités
+
+TODO
+
+### 4.7.3 : Menu des bâtiments (affichage des quantités de minerai)
+
+TODO
+
+### 4.7.4 : Vue d'ensemble des données (minerais, unités, bâtiments) (optionnel)
+
+TODO
+
+
+## 5\. Conclusion
