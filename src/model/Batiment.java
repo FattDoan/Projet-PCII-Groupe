@@ -4,7 +4,10 @@ package model;
  * Représente un bâtiment sur la grille.
  * Les bâtiments peuvent stocker des minerais (foreuse, bâtiment maître, route).
  */
-public abstract class Batiment {
+public abstract class Batiment{
+    /** Coordonnées du bâtiment sur la grille (peuvent être utilisées pour la position du bâtiment) */
+    protected int x;
+    protected int y;
     /** Quantité actuelle de minerai stocké */
     private int stockage;
     
