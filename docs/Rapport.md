@@ -370,7 +370,81 @@ classDiagram
 
 Ce diagramme représente l'essentiel de la logique du jeu et suit le patron **MVC** (Model-View-Controller). Le modèle (`Terrain`) contient les données du jeu, la vue (`Affichage`) gère l'affichage en fonction du modèle, et le contrôleur (`ReactionClic` + `EventHandler`) gère le modèle tout en mettant également à jour directement la vue pour fournir un retour visuel.
 
+
+
+## 4.2 : Affichage des objets (unités, minerai, bâtiments) 
+### 4.2.1 : Fenêtre principale avec grille de jeu
+
+- Classe `Fenetre` : classe principale d'affichage, hérite de `JFrame`
+  - Constructeur `Fenetre(String titre, Terrain terrain)` : initialise la fenêtre, ajoute les composants graphiques nécessaires (comme l'affichage du terrain) et rend la fenêtre visible.
+
+- Classe `Affichage` : responsable de l'affichage du terrain de jeu, hérite de `JPanel`
+  - Attribut : `terrain` (référence au terrain à afficher)
+  - Méthode `paintComponent(Graphics g)` : surcharge pour dessiner les éléments du terrain (minerais, bâtiments, etc.) en fonction de leur position et de leur type. Appelle les fonctions d'affichage spécifiques dans `AffichageMinerais` et `AffichageBâtiments`. Garde un espace pour afficher le menu à droite de la grille.
+
+
+### 4.2.3 : Affichage des filons de minerai et des bâtiments
+
+La classe `AffichageCases` contient des méthodes statiques pour afficher les différents types de cases (vide, minerai, bâtiment) à une position donnée sur la fenêtre. Chaque méthode prend en paramètre un objet Graphics et une Case pour dessiner l'élément correspondant à la position de la case sur la grille. Les coordonnées de la case sont converties en pixels pour l'affichage, et différentes couleurs sont utilisées pour différencier les types de cases.
+
+Chaque case a sa propre méthode d'affichage, ce qui permet de facilement ajouter de nouveaux types de cases et facilement modifier l'apparence de chaque type de case sans affecter les autres.
+
+- Méthodes statiques :
+  - `afficheCase(Graphics g, Case c)` : affiche une case en fonction de son type (vide, minerai, bâtiment) en appelant la méthode d'affichage correspondante.
+  - `afficheCaseVide(Graphics g, Case c)` : affiche une case vide à la position de la case sur la fenêtre.
+  - `afficheMinerai(Graphics g, Case c)` : affiche un minerai à la position de la case sur la fenêtre.
+
+La classe `AffichageBatiments` contient des méthodes pour afficher les différents types de bâtiments (route, foreuse, etc.) à une position donnée sur la fenêtre. Chaque méthode prendra en paramètre un objet `Graphics` et une `Case` pour dessiner le bâtiment correspondant à la position de la case sur la grille. Ses méthodes sont appelées depuis `AffichageCases` en fonction du contenu de la case à afficher.
+
+- Méthodes statiques :
+  - `afficheBatiment(Graphics g, Case c)` : affiche un bâtiment en fonction de son type (route, foreuse, etc.) à la position de la case sur la fenêtre.
+  - `afficheRoute(Graphics g, Case c)` : affiche une route à la position de la case sur la fenêtre.
+  - `afficheForeuse(Graphics g, Case c)` : affiche une foreuse à la position de la case sur la fenêtre.
+  - de même pour les autres types de bâtiments.
+
+```mermaid
+classDiagram
+
+    class Fenetre {
+        +Fenetre(String titre, Terrain terrain)
+    }
+
+    class Affichage {
+        -terrain: Terrain
+        +paintComponent(Graphics g)
+    }
+
+    class AffichageCases {
+        +afficheCase(Graphics g, Case c)
+        +afficheCaseVide(Graphics g, Case c)
+        +afficheMinerai(Graphics g, Case c)
+    }
+
+    class AffichageBatiments {
+        +afficheBatiment(Graphics g, Case c)
+        +afficheRoute(Graphics g, Case c)
+        +afficheForeuse(Graphics g, Case c)
+    }
+
+    JFrame <|-- Fenetre : hérite de
+    JPanel <|-- Affichage : hérite de
+    Fenetre --> Affichage : contient
+    Affichage --> AffichageCases : utilisé pour afficher les cases
+    AffichageCases --> AffichageBatiments : utilisé pour afficher les bâtiments
+```
+
+### 4.2.2 : Affichage des unités
+
+TODO
+
+### 4.2.4 : Animation du minerai sur les routes (effet visuel)
+
+TODO
+
+
+
 ## 4.5 : Génération du terrain en début de partie
+
 ### Structures de données principales et constantes
 
 - Classe `Terrain` : représente la grille de jeu, contient les cases et gère la génération du terrain.
@@ -382,11 +456,27 @@ Ce diagramme représente l'essentiel de la logique du jeu et suit le patron **MV
   - `Terrain()` : constructeur qui créé le terrain.
 
 ### Algorithme abstrait
+
 1. Déterminer le nombre de cases contenant un minerai : `nombreMinerais = (int)(taille * taille * RATIO_MINERAIS)`.
-2. Générer une liste contenant `nombreMinerais` positions aléatoires différentes les unes des autres.
-3. Initialiser la matrice `cases` en remplissant les positions générées avec des cases de type MINERAI, et les autres positions avec des cases de type VIDE.
-4. Placer le bâtiment maître au centre de la grille : `cases[taille/2][taille/2] = new Case(taille/2, taille/2, TypeCase.VIDE)` pour retirer un minerai s'il est présent, puis créé et place un bâtiment maître sur la case.
+2. Générer une liste contenant `nombreMinerais` positions aléatoires différentes les unes des autres et différentes de la position du bâtiment maître.
+3. Pour chaque case dans la matrice `cases`, si sa position est contenue dans la liste on y place une case MINERAI, sinon une case VIDE.
+4. Crée un nouveau `BatimentMaitre` et le place au centre de la grille.
 
-### Diagramme de classes simplifié
+### Diagramme de classe
 
-![Diagramme de classes : Génération du terrain](image1.jpg)
+```mermaid
+classDiagram
+    class Terrain {
+        -taille: int
+        -cases: Case[][]
+        -RATIO_MINERAIS: double
+        +Terrain( )
+    }
+    class Case {
+        -type: TypeCase
+        +Case(TypeCase type)
+    }
+
+    Terrain --> Case : composé de
+    Case --> BatimentMaitre : peut contenir
+```

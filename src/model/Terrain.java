@@ -45,6 +45,8 @@ public class Terrain {
       this.taille = taille;
       this.grille = new Case[taille][taille];
 
+      int centre = taille / 2;
+
       // Génération aléatoire des minerais sur la grille
       int nombreMinerais = (int)(taille * taille * RATIO_MINERAIS);
       // On génère la liste des positions de minerais aléatoirement
@@ -53,7 +55,8 @@ public class Terrain {
          int x = (int)(Math.random() * taille);
          int y = (int)(Math.random() * taille);
          PositionGrille pos = new PositionGrille(x, y);
-         if (!positionsMinerais.contains(pos)) {
+         // s'il n'y a ni minerai ni bâtiment maître à cette position, on l'ajoute à la liste des positions de minerais
+         if (!positionsMinerais.contains(pos) && !(x == centre && y == centre)) {
             positionsMinerais.add(pos);
          }
       }
@@ -72,11 +75,6 @@ public class Terrain {
       }
 
       // On place le bâtiment maître au centre de la grille
-      int centre = taille / 2;
-      // Si la case centrale contient un minerai, on le remplace par une case vide avant de placer le bâtiment maître dessus
-      if (this.grille[centre][centre].getType() == TypeCase.MINERAI) {
-         this.grille[centre][centre] = new Case(centre, centre, TypeCase.VIDE);
-      }
       this.grille[centre][centre].setBatiment(new BatimentMaitre());
 
    }
