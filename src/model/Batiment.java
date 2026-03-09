@@ -13,6 +13,11 @@ public abstract class Batiment{
     
     /** Capacité maximale de stockage du bâtiment */
     private final int capacite;
+    private Terrain terrain;
+    /** Getter pour le terrain */
+    public Terrain getTerrain() {
+        return terrain;
+    }
 
     /**
      * Crée un nouveau bâtiment avec une capacité de stockage définie.
@@ -21,11 +26,14 @@ public abstract class Batiment{
      * @param capacite la capacité maximale de stockage, doit être >= 0
      * @throws AssertionError si capacite < 0
      */
-    protected Batiment(int capacite) {
+    protected Batiment(int capacite, int x, int y, Terrain terrain) {
         // Validation : la capacité doit être positive
         assert capacite >= 0 : "capacite=" + capacite;
         this.capacite = capacite;
         this.stockage = 0;
+        this.terrain = terrain; // le terrain doit être assigné après la création du bâtiment, par ex via un setter ou lors de l'ajout à une case du terrain
+        this.x = x;
+        this.y = y;
     }
 
     /** Renvoie le type de bâtiment (USINE, FOREUSE, STOCKAGE, BATIMENT_MAITRE, ROUTE) */

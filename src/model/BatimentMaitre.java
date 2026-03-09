@@ -18,8 +18,8 @@ public class BatimentMaitre extends Batiment {
      * Crée un nouveau bâtiment maître avec la capacité par défaut de 100 minerais.
      * Ce constructeur est utilisé une seule fois lors de la génération initiale du terrain. 
      */
-    protected BatimentMaitre() {
-        super(CAPACITE);
+    protected BatimentMaitre(int x, int y, Terrain terrain) {
+        super(CAPACITE, x, y, terrain); // Le bâtiment maître est initialement positionné au centre du terrain, mais le terrain doit être assigné après la création du bâtiment
     }
 
     @Override

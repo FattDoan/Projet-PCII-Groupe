@@ -42,17 +42,17 @@ public class ReactionClicTest {
         // terrain.getCase(3, 1).setBatiment(batimentMaitre3);
 
         // une foreuse avec 0 et 1 minerai
-        Foreuse foreuse1 = new Foreuse();
-        Foreuse foreuse2 = new Foreuse();
+        Foreuse foreuse1 = new Foreuse(1, 3, terrain);
+        Foreuse foreuse2 = new Foreuse(2, 3, terrain);
         foreuse2.ajouterMinerai(1);
         terrain.getCase(1, 3).setBatiment(foreuse1);
         terrain.getCase(2, 3).setBatiment(foreuse2);
 
         // routes qui vont dans 4 directions différentes
-        Route routeHaut = new Route(Direction.NORD);
-        Route routeBas = new Route(Direction.SUD);
-        Route routeGauche = new Route(Direction.OUEST);
-        Route routeDroite = new Route(Direction.EST);
+        Route routeHaut = new Route(Direction.NORD, 5, 4, terrain);
+        Route routeBas = new Route(Direction.SUD, 5, 6, terrain);
+        Route routeGauche = new Route(Direction.OUEST, 4, 5, terrain);
+        Route routeDroite = new Route(Direction.EST, 6, 5, terrain);
         terrain.getCase(5, 4).setBatiment(routeHaut);
         terrain.getCase(5, 6).setBatiment(routeBas);
         terrain.getCase(4, 5).setBatiment(routeGauche);

@@ -4,7 +4,9 @@ import model.Foreuse;
 public class ForeuseThreadTest {
     public static void main(String[] args) throws InterruptedException {
         // Création d'une foreuse et lancement dans un thread séparé pour simuler le fonctionnement asynchrone
-        Foreuse foreuse = new Foreuse();
+        // Création d'un terrain fictif pour le test
+        model.Terrain terrain = new model.Terrain(5);
+        Foreuse foreuse = new Foreuse(0, 0, terrain);
         Thread t = new Thread(foreuse);
         t.start();
 

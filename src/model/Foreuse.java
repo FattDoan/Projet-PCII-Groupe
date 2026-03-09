@@ -9,19 +9,19 @@ package model;
 public class Foreuse extends Batiment implements Runnable {
     private int DELAI_EXTRACTION = 1000; // Délai d'extraction en millisecondes (1 seconde)
     private volatile boolean running = true; // Indique si le thread doit continuer à fonctionner
-    private Terrain terrain;
 
 
     /**
      * Crée une nouvelle foreuse.
      * La capacité de stockage est fixée à 1 (un minerai extrait en attente).
      */
-    public Foreuse() {
-        super(1);
+    public Foreuse(int x, int y, Terrain terrain) {
+        super(1, x, y, terrain);
     }
 
-    public void setTerrain(Terrain terrain) {
-        this.terrain = terrain;
+    // Le terrain est déjà transmis au constructeur via Batiment
+    public Terrain getTerrain() {
+        return super.getTerrain();
     }
 
     @Override
@@ -40,8 +40,8 @@ public class Foreuse extends Batiment implements Runnable {
                 // Extraction du minerai
                 if (!estPlein()) {
                     this.ajouterMinerai(1);
-                    if (terrain != null) {
-                        new Minerai(this.x, this.y, terrain).start(); // Crée et démarre un thread pour le minerai extrait
+                    if (getTerrain() != null) {
+                        new Minerai(this.x, this.y, getTerrain()).start(); // Crée et démarre un thread pour le minerai extrait
                     }
                 }
             } catch (InterruptedException e) {

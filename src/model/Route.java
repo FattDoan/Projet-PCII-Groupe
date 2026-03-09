@@ -17,8 +17,8 @@ public class Route extends Batiment {
      * @param direction la direction d'acheminement des minerais, ne doit pas être null
      * @throws AssertionError si direction est null
      */
-    public Route(Direction direction) {
-        super(1);
+    public Route(Direction direction, int x, int y, Terrain terrain) {
+        super(1, x, y, terrain);
         // Validation : la direction ne peut pas être nulle
         assert direction != null : "direction=null";
         this.direction = direction;

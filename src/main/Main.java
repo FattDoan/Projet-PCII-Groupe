@@ -24,8 +24,7 @@ public class Main {
             // on place un minerai à la position (x, y) si ce n'est pas déjà le cas, pour pouvoir y placer la foreuse
             terrain.setCase(x, y, new Case(x, y, TypeCase.MINERAI));
         }
-        Foreuse foreuse = new Foreuse();
-        foreuse.setTerrain(terrain);
+        Foreuse foreuse = new Foreuse(x, y, terrain);
         terrain.getCase(x, y).setBatiment(foreuse);
 
         // Démarrage automatique de la foreuse
@@ -34,11 +33,11 @@ public class Main {
         // route vers le bâtiment maître
         int positionMaitre = terrain.getTaille() / 2; // position du bâtiment maître au centre de la grille
         for (int i = x+1; i < positionMaitre; i++) {
-            Route route = new Route(Direction.EST);
+            Route route = new Route(Direction.EST, i, y, terrain);
             terrain.getCase(i, y).setBatiment(route);
         }
         for (int j = y; j < positionMaitre; j++) {
-            Route route = new Route(Direction.SUD);
+            Route route = new Route(Direction.SUD, positionMaitre, j, terrain);
             terrain.getCase(positionMaitre, j).setBatiment(route);
         }
 

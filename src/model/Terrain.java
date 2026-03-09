@@ -75,7 +75,7 @@ public class Terrain {
       }
 
       // On place le bâtiment maître au centre de la grille
-      this.grille[centre][centre].setBatiment(new BatimentMaitre());
+      this.grille[centre][centre].setBatiment(new BatimentMaitre(centre, centre, this));
 
    }
 

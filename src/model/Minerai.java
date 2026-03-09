@@ -56,9 +56,7 @@ public class Minerai extends Thread {
                 Case currentCase = terrain.getCase(x, y);
                 if (surForeuse && currentCase.aBatiment() && currentCase.getBatiment() instanceof Foreuse) {
                     Foreuse foreuse = (Foreuse) currentCase.getBatiment();
-                    if (!foreuse.estVide()) {
-                        foreuse.retirerMinerai(1);
-                    }
+                    foreuse.retirerMinerai(1);
                     surForeuse = false;
                 }
                 // Déplacement selon la direction de la route
@@ -94,7 +92,7 @@ public class Minerai extends Thread {
                         // Retirer le minerai de la route précédente
                         if (currentCase.aBatiment() && currentCase.getBatiment() instanceof Route) {
                             Route routePrec = (Route) currentCase.getBatiment();
-                            if (!routePrec.estVide()) routePrec.retirerMinerai(1);
+                            routePrec.retirerMinerai(1);
                         }
                         this.x = nextX;
                         this.y = nextY;
@@ -104,7 +102,7 @@ public class Minerai extends Thread {
                         // Retirer le minerai de la route précédente
                         if (currentCase.aBatiment() && currentCase.getBatiment() instanceof Route) {
                             Route routePrec = (Route) currentCase.getBatiment();
-                            if (!routePrec.estVide()) routePrec.retirerMinerai(1);
+                            routePrec.retirerMinerai(1);
                         }
                         this.x = nextX;
                         this.y = nextY;
