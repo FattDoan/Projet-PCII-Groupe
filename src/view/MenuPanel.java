@@ -3,8 +3,7 @@ package view;
 import javax.swing.*;
 import java.awt.*;
 
-import model.Case;
-import model.TypeCase;
+import model.*;
 
 public class MenuPanel extends JPanel {
     private JLabel title;
@@ -32,13 +31,42 @@ public class MenuPanel extends JPanel {
             info.setText("No case selected.");
             return;
         }
+        // TODO more detailed information about the case
+
 
         StringBuilder text = new StringBuilder();
         text.append("Position: (" + c.getX() + ", " + c.getY() + ")\n");
         text.append("Type: " + c.getType() + "\n");
 
         if (c.getBatiment() != null) {
-            text.append("Batiment: " + c.getBatiment().getClass().getSimpleName() + "\n");
+            switch (c.getBatiment().type()) {
+                case USINE:
+                    text.append("Usine de production\n");
+                    text.append("Stockage actuel: " + c.getBatiment().getStockage() + "\n");
+                    break;
+                case FOREUSE:
+                    text.append("Foreuse d'extraction\n");
+                    text.append("Stockage actuel: " + c.getBatiment().getStockage() + "\n");
+                    break;
+                case STOCKAGE:
+                    text.append("Stockage de minerais\n");
+                    text.append("Stockage actuel: " + c.getBatiment().getStockage() + "\n");
+                    break;
+                case BATIMENT_MAITRE:
+                    text.append("Bâtiment maître\n");
+                    text.append("Stockage actuel: " + c.getBatiment().getStockage() + "\n");
+                    break;
+                case ROUTE:
+                    text.append("Route de transport\n");
+                    text.append("Stockage actuel: " + c.getBatiment().getStockage() + "\n");
+                    Batiment b = c.getBatiment();
+                    if (b instanceof Route) {
+                        Route route = (Route) c.getBatiment();
+                        text.append("Direction: " + route.getDirection() + "\n");
+                    }
+                    break;
+            }
+
         }
 
         if (c.getType() == TypeCase.MINERAI) {
