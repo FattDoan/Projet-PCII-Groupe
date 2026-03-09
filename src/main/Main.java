@@ -19,7 +19,6 @@ public class Main {
         new TimerView(fenetre);
 
         // On créé une foreuse sur un minerai, puis une route vers le bâtiment maître pour tester les affichages de ces éléments sur la grille
-
         int x = 1, y = 2; // coordonnées de la foreuse à placer, à ajuster selon les besoins du test
         if (!terrain.getCase(x, y).aMinerai()) {
             // on place un minerai à la position (x, y) si ce n'est pas déjà le cas, pour pouvoir y placer la foreuse

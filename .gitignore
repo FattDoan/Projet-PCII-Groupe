@@ -5,5 +5,6 @@
 .settings/
 .bloop/
 .metals/
+.vscode/
 pom.xml
 DOTO.md

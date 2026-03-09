@@ -3,6 +3,10 @@ package controller;
 import model.*;
 import view.Affichage;
 
+/**
+ * Cette classe gère les événements de clics sur la grille et dans le menu.
+ * Elle doit être appelée par la classe ReactionClic pour traiter les clics de souris.
+ */
 public class EventHandler {
     private Terrain terrain;
     private Affichage affichage;
@@ -17,7 +21,7 @@ public class EventHandler {
     }
 
 
-
+    // Méthode pour gérer les clics sur la grille de jeu
     public void handleClicSurCase(Case c) { 
         // TODO: A implementer les comportements spécifiques selon le type de la case
         // par ex: affiche le menu a droite avec les options disponibles pour cette case, 
@@ -32,6 +36,10 @@ public class EventHandler {
             System.out.println("[EventHandler] La case est vide");
         }
 
+        // En ce moment, on se contente d'afficher les informations sur la case 
+        // dans le menu à droite, 
+        // mais on pourrait aussi ajouter des options d'interaction 
+        // (par ex: construire une route, extraire du minerai, etc.)
         affichage.updateMenu(c);
     }
 

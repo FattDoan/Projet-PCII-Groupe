@@ -4,7 +4,14 @@ import java.awt.event.*;
 import model.*;
 import view.*;
 
+/**
+ * Cette classe gère les clics de souris sur la fenêtre de jeu. 
+ * Elle doit déterminer si le clic a eu lieu sur la grille ou dans le menu, 
+ * et appeler les méthodes appropriées de EventHandler en fonction du contexte du clic.
+ */
+
 public class ReactionClic implements MouseListener {
+    // Références aux composants nécessaires pour gérer les clics
     private final Affichage affichage;
     private final EventHandler eventHandler;
     private final Terrain terrain;
@@ -16,7 +23,7 @@ public class ReactionClic implements MouseListener {
         this.affichage.addMouseListener(this);
     }
 
-
+    // Les getters utiles 
     private int getCaseSize() {
         return Affichage.TAILLE_CASE; 
     }
@@ -42,12 +49,13 @@ public class ReactionClic implements MouseListener {
         return pixelY / getCaseSize();
     }
 
+    // Enum pour différencier les contextes de clic (grille vs menu)
     private enum ClickContext {
         GRID,
         MENU
     }
 
-
+    // Méthode pour déterminer le contexte du clic en fonction des coordonnées de la souris
     private ClickContext getClickContext(int x, int y) {
         assert x >= 0 && y >= 0 : "Coordonnées de clic négatives: x=" + x + ", y=" + y; 
         // Clic dans le menu à droite de la grille
@@ -62,6 +70,8 @@ public class ReactionClic implements MouseListener {
 
 
 
+    // Méthode appelée lors d'un clic de souris. 
+    // Elle détermine le contexte du clic et appelle les méthodes appropriées de EventHandler.
     @Override 
     public void mouseClicked(MouseEvent e) {
         int x = e.getX();
@@ -83,8 +93,6 @@ public class ReactionClic implements MouseListener {
                 break;
 
         }
-
-
     }
 
     @Override
