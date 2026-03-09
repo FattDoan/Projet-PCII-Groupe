@@ -9,6 +9,7 @@ package model;
 public class Foreuse extends Batiment implements Runnable {
     private int DELAI_EXTRACTION = 1000; // Délai d'extraction en millisecondes (1 seconde)
     private volatile boolean running = true; // Indique si le thread doit continuer à fonctionner
+    private Terrain terrain;
 
 
     /**
@@ -17,6 +18,10 @@ public class Foreuse extends Batiment implements Runnable {
      */
     public Foreuse() {
         super(1);
+    }
+
+    public void setTerrain(Terrain terrain) {
+        this.terrain = terrain;
     }
 
     @Override
@@ -35,8 +40,9 @@ public class Foreuse extends Batiment implements Runnable {
                 // Extraction du minerai
                 if (!estPlein()) {
                     this.ajouterMinerai(1);
-                    new Minerai(this.x, this.y).start(); // Crée et démarre un thread pour le minerai extrait
-                } else {
+                    if (terrain != null) {
+                        new Minerai(this.x, this.y, terrain).start(); // Crée et démarre un thread pour le minerai extrait
+                    }
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();

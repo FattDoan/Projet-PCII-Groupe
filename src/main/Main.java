@@ -25,7 +25,11 @@ public class Main {
             terrain.setCase(x, y, new Case(x, y, TypeCase.MINERAI));
         }
         Foreuse foreuse = new Foreuse();
+        foreuse.setTerrain(terrain);
         terrain.getCase(x, y).setBatiment(foreuse);
+
+        // Démarrage automatique de la foreuse
+        new Thread(foreuse).start();
 
         // route vers le bâtiment maître
         int positionMaitre = terrain.getTaille() / 2; // position du bâtiment maître au centre de la grille
