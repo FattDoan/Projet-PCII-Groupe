@@ -1,12 +1,25 @@
 package model;
 
+import java.util.ArrayList;
+
 /**
  * Représente la grille de jeu carrée.
  * La grille contient toutes les cases du jeu et gère leur placement.
  * Les bâtiments et minerais sont positionnés sur cette grille.
  */
 public class Terrain {
+
+   // CONSTANTES
+
+   // La taille n'est pas une constante, mais on définit le nombre de minerai en fonction de la taille
+   // Donc on définit un ratio minerai/(taille*taille) pour ajuster le nombre de minerai en fonction de la taille du terrain
+   public static final double RATIO_MINERAIS = 0.1; // 10% des cases contiendront des minerais, à ajuster selon les besoins du jeu
+
+
+   // ATTRIBUTS
+
    /** Taille de la grille (nombre de cases par côté) */
+   // Pas une constante car on veut pouvoir définir la taille du terrain en début de partie
    private final int taille;
    
    /** Tableau 2D contenant toutes les cases de la grille */
@@ -14,6 +27,7 @@ public class Terrain {
 
    /** Liste des unités présentes sur le terrain */
    // TODO : private List<Unite> unites;
+
 
    /**
     * Crée une nouvelle grille carrée de la taille spécifiée.
@@ -26,15 +40,34 @@ public class Terrain {
    public Terrain(int taille) {
       // Validation : la taille doit être strictement positive
       assert taille > 0 : "taille=" + taille;
-      
+
+      // Initialisation des attributs
       this.taille = taille;
       this.grille = new Case[taille][taille];
+
+      // Génération aléatoire des minerais sur la grille
+      int nombreMinerais = (int)(taille * taille * RATIO_MINERAIS);
+      // On génère la liste des positions de minerais aléatoirement
+      ArrayList<PositionGrille> positionsMinerais = new ArrayList<PositionGrille>();
+      while (positionsMinerais.size() < nombreMinerais) {
+         int x = (int)(Math.random() * taille);
+         int y = (int)(Math.random() * taille);
+         PositionGrille pos = new PositionGrille(x, y);
+         if (!positionsMinerais.contains(pos)) {
+            positionsMinerais.add(pos);
+         }
+      }
 
       // Initialisation de toutes les cases de la grille
       // IMPORTANT : grille[i][j] a pour coordonnées (i, j)
       for(int i = 0; i < taille; ++i) {
          for(int j = 0; j < taille; ++j) {
-            this.grille[i][j] = new Case(i, j, TypeCase.VIDE); // a faire : initialiser les cases avec des minerais selon une configuration prédéfinie ou aléatoire
+            PositionGrille pos = new PositionGrille(i, j);
+            if (positionsMinerais.contains(pos)) {
+               this.grille[i][j] = new Case(i, j, TypeCase.MINERAI); // Case contenant un minerai
+            } else {
+               this.grille[i][j] = new Case(i, j, TypeCase.VIDE); // Case vide
+            }
          }
       }
    }
@@ -67,10 +100,10 @@ public class Terrain {
 
    /***** SETTER *****/
 
-   /** Modifie la case située à la position (x, y) dans la grille 
-    * /!\ uniquement utilisée pour les tests, à supprimer ou rendre privée dans la version finale du projet /!\
-   */
-   public void setCase(int x, int y, Case c) {
-      this.grille[x][y] = c;
-   }
+   // /** Modifie la case située à la position (x, y) dans la grille 
+   //  * /!\ uniquement utilisée pour les tests, à supprimer ou rendre privée dans la version finale du projet /!\
+   // */
+   // public void setCase(int x, int y, Case c) {
+   //    this.grille[x][y] = c;
+   // }
 }

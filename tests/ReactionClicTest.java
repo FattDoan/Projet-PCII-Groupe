@@ -57,14 +57,10 @@ public class ReactionClicTest {
         terrain.getCase(4, 5).setBatiment(routeGauche);
         terrain.getCase(6, 5).setBatiment(routeDroite);
 
-        // minerais
-        Case caseMinerai1 = new Case(5, 1, TypeCase.MINERAI);
-        terrain.setCase(5, 1, caseMinerai1); 
 
-       
         //---------------------------------------------------------------------------------------------//
         // Ajout du contrôleur de clic pour tester les interactions avec les bâtiments
-        // pour l'instant, il n'y a pas d'interactions définies, juste les affichages du console
+        // pour l'instant, il n'y a pas d'interactions définies, juste les affichages de la console
         ReactionClic reactionClic = new ReactionClic(fenetre.getAffichage(), 
                                                      terrain, 
                                                      new EventHandler(fenetre.getAffichage(), terrain));

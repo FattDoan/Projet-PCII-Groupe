@@ -8,14 +8,15 @@ public class AffichageCases {
 
     /** Fonction de base à partir de laquelle on appelle toutes les autres fonctions d'affichage */
     public static void afficheCase(Graphics g, Case c) {
+        // si une case contient un bâtiment et un minerai, on affiche le bâtiment (le minerai est caché dessous)
         if (c.estVide()) {
             afficheCaseVide(g, c);
         }
-        else if (c.getType() == model.TypeCase.MINERAI) {
-            afficheMinerai(g, c);
-        }
-        else {
+        else if (c.aBatiment()) {
             AffichageBatiments.afficheBatiment(g, c);
+        }
+        else { // si la case contient un minerai mais pas de bâtiment
+            afficheMinerai(g, c);
         }
     }
 

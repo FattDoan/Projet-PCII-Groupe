@@ -1,4 +1,4 @@
-package view;
+package tests;
 
 import model.BatimentMaitre;
 import model.Case;
@@ -7,13 +7,15 @@ import model.Foreuse;
 import model.Route;
 import model.Terrain;
 import model.TypeCase;
+import view.Fenetre;
+import view.TimerView;
 
 /** Classe de tests pour l'affichage */
 public class TestView {
 
     public static void main(String[] args) {
         // on créé un terrain de test 
-        Terrain terrain = new Terrain(10); // TODO : remplacer les dimensions par celles souhaitées pour le test
+        Terrain terrain = new Terrain(10); 
 
         //et une fenêtre pour l'afficher
         Fenetre fenetre = new Fenetre("Test d'affichage", terrain);
@@ -51,11 +53,9 @@ public class TestView {
         terrain.getCase(4, 5).setBatiment(routeGauche);
         terrain.getCase(6, 5).setBatiment(routeDroite);
 
-        // minerais
-        Case caseMinerai1 = new Case(5, 1, TypeCase.MINERAI);
-        terrain.setCase(5, 1, caseMinerai1); // on utilise le setter pour remplacer la case vide par une case contenant un minerai car on ne peut pas modifier le type d'une case déjà créée (le type est final), on doit donc créer une nouvelle case et la placer à la place de l'ancienne
-        // c'est une solution temporaire pour les tests, en attendant que les minerais soient générés aléatoirement lors de la création du terrain
-         
+        // les minerais sont déjà placés aléatoirement dans le constructeur du terrain, 
+        // on n'a pas besoin d'en ajouter manuellement
+
         // TODO : ajouter les tests pour les autres types de bâtiments une fois qu'ils seront implémentés
     }
 
