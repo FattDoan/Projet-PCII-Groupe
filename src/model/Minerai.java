@@ -61,10 +61,31 @@ public class Minerai extends Thread {
                     }
                     surForeuse = false;
                 }
-                // Chercher la case suivante à l'est
-                int nextX = x + 1;
+                // Déplacement selon la direction de la route
+                int nextX = x;
                 int nextY = y;
-                if (nextX >= terrain.getTaille()) break;
+                if (currentCase.aBatiment() && currentCase.getBatiment() instanceof Route) {
+                    Route route = (Route) currentCase.getBatiment();
+                    switch (route.getDirection()) {
+                        case NORD:
+                            nextY = y - 1;
+                            break;
+                        case SUD:
+                            nextY = y + 1;
+                            break;
+                        case EST:
+                            nextX = x + 1;
+                            break;
+                        case OUEST:
+                            nextX = x - 1;
+                            break;
+                    }
+                } else {
+                    // Par défaut, avancer vers l'est
+                    nextX = x + 1;
+                }
+                // Vérification des limites
+                if (nextX < 0 || nextX >= terrain.getTaille() || nextY < 0 || nextY >= terrain.getTaille()) break;
                 Case nextCase = terrain.getCase(nextX, nextY);
                 if (nextCase.aBatiment()) {
                     if (nextCase.getBatiment() instanceof Route && !nextCase.getBatiment().estPlein()) {

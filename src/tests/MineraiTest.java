@@ -11,16 +11,11 @@ public class MineraiTest {
         // Ajout d'une foreuse en (2,2)
         Foreuse foreuse = new Foreuse();
         terrain.getCase(2, 2).setBatiment(foreuse);
-        // Ajout de trois routes vers l'est
-        Route route1 = new Route(Direction.EST);
-        Route route2 = new Route(Direction.EST);
-        Route route3 = new Route(Direction.EST);
+        // Ajout d'une seule route vers le sud pour atteindre (3,3)
+        Route route1 = new Route(Direction.SUD);
         terrain.getCase(3, 2).setBatiment(route1);
-        terrain.getCase(4, 2).setBatiment(route2);
-        terrain.getCase(5, 2).setBatiment(route3);
-        // Ajout d'un bâtiment maître à la fin
-        BatimentMaitre batimentMaitre = new BatimentMaitre();
-        terrain.getCase(6, 2).setBatiment(batimentMaitre);
+        // Récupération du bâtiment maître déjà placé sur le terrain (3, 3)
+        BatimentMaitre batimentMaitre = (BatimentMaitre) terrain.getCase(3, 3).getBatiment();
         // Création d'un minerai sur la foreuse
         Minerai minerai = new Minerai(2, 2, terrain);
         // Ajout du minerai à la foreuse
@@ -37,9 +32,7 @@ public class MineraiTest {
         // Vérification
         System.out.println("Stockage foreuse (2,2): " + foreuse.getStockage());
         System.out.println("Stockage route1 (3,2): " + route1.getStockage());
-        System.out.println("Stockage route2 (4,2): " + route2.getStockage());
-        System.out.println("Stockage route3 (5,2): " + route3.getStockage());
-        System.out.println("Stockage batiment maitre (6,2): " + batimentMaitre.getStockage());
+        System.out.println("Stockage batiment maitre (3,3): " + batimentMaitre.getStockage());
         if (batimentMaitre.getStockage() == 0) {
             System.out.println("Position minerai: x=" + minerai.getX() + ", y=" + minerai.getY());
         } else {
@@ -54,9 +47,7 @@ public class MineraiTest {
         // Vérification
         System.out.println("Stockage foreuse (2,2): " + foreuse.getStockage());
         System.out.println("Stockage route1 (3,2): " + route1.getStockage());
-        System.out.println("Stockage route2 (4,2): " + route2.getStockage());
-        System.out.println("Stockage route3 (5,2): " + route3.getStockage());
-        System.out.println("Stockage batiment maitre (6,2): " + batimentMaitre.getStockage());
+        System.out.println("Stockage batiment maitre (3,3): " + batimentMaitre.getStockage());
         System.out.println("Position minerai: x=" + minerai.getX() + ", y=" + minerai.getY());
         try {
             Thread.sleep(500); // Attendre 5 secondes pour laisser le temps au minerai de se déplacer
@@ -67,9 +58,7 @@ public class MineraiTest {
         // Vérification
         System.out.println("Stockage foreuse (2,2): " + foreuse.getStockage());
         System.out.println("Stockage route1 (3,2): " + route1.getStockage());
-        System.out.println("Stockage route2 (4,2): " + route2.getStockage());
-        System.out.println("Stockage route3 (5,2): " + route3.getStockage());
-        System.out.println("Stockage batiment maitre (6,2): " + batimentMaitre.getStockage());
+        System.out.println("Stockage batiment maitre (3,3): " + batimentMaitre.getStockage());
         System.out.println("Position minerai: x=" + minerai.getX() + ", y=" + minerai.getY());
         try {
             Thread.sleep(500); // Attendre 5 secondes pour laisser le temps au minerai de se déplacer
@@ -80,9 +69,7 @@ public class MineraiTest {
         // Vérification
         System.out.println("Stockage foreuse (2,2): " + foreuse.getStockage());
         System.out.println("Stockage route1 (3,2): " + route1.getStockage());
-        System.out.println("Stockage route2 (4,2): " + route2.getStockage());
-        System.out.println("Stockage route3 (5,2): " + route3.getStockage());
-        System.out.println("Stockage batiment maitre (6,2): " + batimentMaitre.getStockage());
+        System.out.println("Stockage batiment maitre (3,3): " + batimentMaitre.getStockage());
         System.out.println("Position minerai: x=" + minerai.getX() + ", y=" + minerai.getY());
         try {
             Thread.sleep(500); // Attendre 5 secondes pour laisser le temps au minerai de se déplacer
@@ -93,48 +80,22 @@ public class MineraiTest {
         // Vérification
         System.out.println("Stockage foreuse (2,2): " + foreuse.getStockage());
         System.out.println("Stockage route1 (3,2): " + route1.getStockage());
-        System.out.println("Stockage route2 (4,2): " + route2.getStockage());
-        System.out.println("Stockage route3 (5,2): " + route3.getStockage());
-        System.out.println("Stockage batiment maitre (6,2): " + batimentMaitre.getStockage());
+        System.out.println("Stockage batiment maitre (3,3): " + batimentMaitre.getStockage());
         System.out.println("Position minerai: x=" + minerai.getX() + ", y=" + minerai.getY());
         try {
             Thread.sleep(500); // Attendre 5 secondes pour laisser le temps au minerai de se déplacer
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
         // Vérification
         System.out.println("Stockage foreuse (2,2): " + foreuse.getStockage());
         System.out.println("Stockage route1 (3,2): " + route1.getStockage());
-        System.out.println("Stockage route2 (4,2): " + route2.getStockage());
-        System.out.println("Stockage route3 (5,2): " + route3.getStockage());
-        System.out.println("Stockage batiment maitre (6,2): " + batimentMaitre.getStockage());
+        System.out.println("Stockage batiment maitre (3,3): " + batimentMaitre.getStockage());
         System.out.println("Position minerai: x=" + minerai.getX() + ", y=" + minerai.getY());
         try {
             Thread.sleep(500); // Attendre 5 secondes pour laisser le temps au minerai de se déplacer
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
-        // Vérification
-        System.out.println("Stockage foreuse (2,2): " + foreuse.getStockage());
-        System.out.println("Stockage route1 (3,2): " + route1.getStockage());
-        System.out.println("Stockage route2 (4,2): " + route2.getStockage());
-        System.out.println("Stockage route3 (5,2): " + route3.getStockage());
-        System.out.println("Stockage batiment maitre (6,2): " + batimentMaitre.getStockage());
-        System.out.println("Position minerai: x=" + minerai.getX() + ", y=" + minerai.getY());
-        try {
-            Thread.sleep(500); // Attendre 5 secondes pour laisser le temps au minerai de se déplacer
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        // Vérification
-        System.out.println("Stockage foreuse (2,2): " + foreuse.getStockage());
-        System.out.println("Stockage route1 (3,2): " + route1.getStockage());
-        System.out.println("Stockage route2 (4,2): " + route2.getStockage());
-        System.out.println("Stockage route3 (5,2): " + route3.getStockage());
-        System.out.println("Stockage batiment maitre (6,2): " + batimentMaitre.getStockage());
-        System.out.println("Position minerai: x=" + minerai.getX() + ", y=" + minerai.getY());
     }
 }
