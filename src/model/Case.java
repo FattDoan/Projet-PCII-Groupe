@@ -92,8 +92,8 @@ public class Case {
     * @throws AssertionError si la case n'est pas vide ou si le bâtiment est null
     */
    public void setBatiment(Batiment batiment) {
-      // Validation : la case doit être vide pour placer un bâtiment
-      assert this.estVide() : "La case (" + x + ", " + y + ") n'est pas vide";
+      // Validation : la case ne doit pas déjà contenir de bâtiment
+      assert !this.aBatiment() : "La case (" + x + ", " + y + ") n'est pas vide";
       // Validation : le bâtiment ne peut pas être nul
       assert batiment != null : "batiment=null";
       this.batiment = batiment;

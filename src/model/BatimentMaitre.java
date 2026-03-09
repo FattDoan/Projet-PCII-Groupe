@@ -16,10 +16,9 @@ public class BatimentMaitre extends Batiment {
 
     /**
      * Crée un nouveau bâtiment maître avec la capacité par défaut de 100 minerais.
-     * Ce constructeur est utilisé une seule lors de la génération initiale du terrain. 
-     * TODO : ajouter ça dans Terrain puis rendre le constructeur package-private
+     * Ce constructeur est utilisé une seule fois lors de la génération initiale du terrain. 
      */
-    public BatimentMaitre() {
+    protected BatimentMaitre() {
         super(CAPACITE);
     }
 

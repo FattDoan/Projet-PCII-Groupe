@@ -369,3 +369,24 @@ classDiagram
 ```
 
 Ce diagramme représente l'essentiel de la logique du jeu et suit le patron **MVC** (Model-View-Controller). Le modèle (`Terrain`) contient les données du jeu, la vue (`Affichage`) gère l'affichage en fonction du modèle, et le contrôleur (`ReactionClic` + `EventHandler`) gère le modèle tout en mettant également à jour directement la vue pour fournir un retour visuel.
+
+## 4.5 : Génération du terrain en début de partie
+### Structures de données principales et constantes
+
+- Classe `Terrain` : représente la grille de jeu, contient les cases et gère la génération du terrain.
+- Attributs :
+  - `taille` (int) : taille de la grille (ex: 20x20).
+  - `cases` (Case[][]) : matrice représentant les cases du terrain.
+  - `RATIO_MINERAIS` (double) : pourcentage de cases contenant du minerai (ex: 0.1 pour 10%).
+- Méthodes :
+  - `Terrain()` : constructeur qui créé le terrain.
+
+### Algorithme abstrait
+1. Déterminer le nombre de cases contenant un minerai : `nombreMinerais = (int)(taille * taille * RATIO_MINERAIS)`.
+2. Générer une liste contenant `nombreMinerais` positions aléatoires différentes les unes des autres.
+3. Initialiser la matrice `cases` en remplissant les positions générées avec des cases de type MINERAI, et les autres positions avec des cases de type VIDE.
+4. Placer le bâtiment maître au centre de la grille : `cases[taille/2][taille/2] = new Case(taille/2, taille/2, TypeCase.VIDE)` pour retirer un minerai s'il est présent, puis créé et place un bâtiment maître sur la case.
+
+### Diagramme de classes simplifié
+
+![Diagramme de classes : Génération du terrain](image1.jpg)

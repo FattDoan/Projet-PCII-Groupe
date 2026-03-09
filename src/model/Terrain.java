@@ -70,6 +70,15 @@ public class Terrain {
             }
          }
       }
+
+      // On place le bâtiment maître au centre de la grille
+      int centre = taille / 2;
+      // Si la case centrale contient un minerai, on le remplace par une case vide avant de placer le bâtiment maître dessus
+      if (this.grille[centre][centre].getType() == TypeCase.MINERAI) {
+         this.grille[centre][centre] = new Case(centre, centre, TypeCase.VIDE);
+      }
+      this.grille[centre][centre].setBatiment(new BatimentMaitre());
+
    }
 
 
@@ -100,10 +109,10 @@ public class Terrain {
 
    /***** SETTER *****/
 
-   // /** Modifie la case située à la position (x, y) dans la grille 
-   //  * /!\ uniquement utilisée pour les tests, à supprimer ou rendre privée dans la version finale du projet /!\
-   // */
-    public void setCase(int x, int y, Case c) {
-       this.grille[x][y] = c;
-    }
+   /** Modifie la case située à la position (x, y) dans la grille 
+    * TODO : /!\ uniquement utilisée pour les tests, à supprimer ou rendre privée dans la version finale du projet /!\
+   */
+   public void setCase(int x, int y, Case c) {
+      this.grille[x][y] = c;
+   }
 }

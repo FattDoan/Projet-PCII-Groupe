@@ -27,14 +27,15 @@ public class TestView {
         // on ajoute des éléments de test sur le terrain pour vérifier leur affichage
 
         // batiment maître avec 0, 10 et 100 minerais
-        BatimentMaitre batimentMaitre1 = new BatimentMaitre();
-        BatimentMaitre batimentMaitre2 = new BatimentMaitre();
-        BatimentMaitre batimentMaitre3 = new BatimentMaitre();
-        batimentMaitre2.ajouterMinerai(10);
-        batimentMaitre3.ajouterMinerai(100);
-        terrain.getCase(1, 1).setBatiment(batimentMaitre1);
-        terrain.getCase(2, 1).setBatiment(batimentMaitre2);
-        terrain.getCase(3, 1).setBatiment(batimentMaitre3);
+        // TODO : à remplacer par des bâtiments basiques de stockage, le bâtiment maître ne doit pas être créé manuellement
+        // BatimentMaitre batimentMaitre1 = new BatimentMaitre();
+        // BatimentMaitre batimentMaitre2 = new BatimentMaitre();
+        // BatimentMaitre batimentMaitre3 = new BatimentMaitre();
+        // batimentMaitre2.ajouterMinerai(10);
+        // batimentMaitre3.ajouterMinerai(100);
+        // terrain.getCase(1, 1).setBatiment(batimentMaitre1);
+        // terrain.getCase(2, 1).setBatiment(batimentMaitre2);
+        // terrain.getCase(3, 1).setBatiment(batimentMaitre3);
 
         // une foreuse avec 0 et 1 minerai
         Foreuse foreuse1 = new Foreuse();

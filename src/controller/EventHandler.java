@@ -23,7 +23,12 @@ public class EventHandler {
         // par ex: affiche le menu a droite avec les options disponibles pour cette case, 
         // ou les informations sur le contenu de la case
         if (c.aBatiment()) {
-            System.out.println("[EventHandler] La case contient un bâtiment: " + toString(c.getBatiment().type()));
+            if (c.aMinerai()) {
+                System.out.println("[EventHandler] La case contient un bâtiment: " + toString(c.getBatiment().type()) + " et du minerai");
+            }
+            else {
+                System.out.println("[EventHandler] La case contient un bâtiment: " + toString(c.getBatiment().type()));
+            }
         }
         else if (c.aMinerai()) {
             System.out.println("[EventHandler] La case contient du minerai");
