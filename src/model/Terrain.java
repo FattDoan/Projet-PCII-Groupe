@@ -103,7 +103,7 @@ public class Terrain {
    // /** Modifie la case située à la position (x, y) dans la grille 
    //  * /!\ uniquement utilisée pour les tests, à supprimer ou rendre privée dans la version finale du projet /!\
    // */
-   // public void setCase(int x, int y, Case c) {
-   //    this.grille[x][y] = c;
-   // }
+    public void setCase(int x, int y, Case c) {
+       this.grille[x][y] = c;
+    }
 }
