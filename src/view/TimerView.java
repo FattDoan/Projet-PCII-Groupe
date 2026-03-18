@@ -16,5 +16,4 @@ public class TimerView extends Timer {
         // Démarrage du timer pour les threads d'affichage
         this.scheduleAtFixedRate(new TaskRedessine(fenetre), 0, TaskRedessine.DELAI);
     }
-
 }

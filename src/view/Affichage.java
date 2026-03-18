@@ -12,10 +12,10 @@ public class Affichage extends JPanel {
 
     // les dimensions relatives à la grille de jeu
     // taille d'une case en pixels, définit la taille de la fenêtre
-    public static final int TAILLE_CASE = 30;
+    public static final int TAILLE_CASE = 40;
 
     // les dimensions du menu latéral par rapport à la largeur de la grille
-    public static final double RATIO_LARGEUR_MENU = 1.0 / 3.0; // le menu occupe 1/3 de la largeur totale de la fenêtre
+    public static final double RATIO_LARGEUR_MENU = 1.0 / 2.0; // le menu occupe 1/3 de la largeur totale de la fenêtre
 
 
     /** Variables relatives à la taille de la grille (inconnue avant exécution) */
@@ -67,9 +67,16 @@ public class Affichage extends JPanel {
     public MenuPanel getMenuPanel() {
         return menuPanel;
     }
+  
+    private Case selectedCase = null;
 
-    public void updateMenu(Case c) {
-        menuPanel.updateCase(c);
-    } 
+    public void setSelectedCase(Case c) {
+        this.selectedCase = c;
+        refreshMenuIfSelected();  // immediate update on click
+    }
 
+    public void refreshMenuIfSelected() {
+        if (selectedCase != null)
+            menuPanel.updateCase(selectedCase);  // reads current model state, no threading needed
+    }
 }

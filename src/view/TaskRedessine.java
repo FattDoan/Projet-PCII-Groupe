@@ -17,6 +17,7 @@ public class TaskRedessine extends java.util.TimerTask {
     public void run() {
         SwingUtilities.invokeLater(() -> {
             this.fenetre.repaint();
+            this.fenetre.getAffichage().refreshMenuIfSelected();
         });
     }
 

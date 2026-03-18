@@ -40,7 +40,7 @@ public class EventHandler {
         // dans le menu à droite, 
         // mais on pourrait aussi ajouter des options d'interaction 
         // (par ex: construire une route, extraire du minerai, etc.)
-        affichage.updateMenu(c);
+        affichage.setSelectedCase(c);
     }
 
     /**

@@ -9,7 +9,7 @@ import view.*;
  * Elle doit déterminer si le clic a eu lieu sur la grille ou dans le menu, 
  * et appeler les méthodes appropriées de EventHandler en fonction du contexte du clic.
  */
-
+// TODO optional add mouseOnHover -> outline the case under the mouse cursor
 public class ReactionClic implements MouseListener {
     // Références aux composants nécessaires pour gérer les clics
     private final Affichage affichage;
