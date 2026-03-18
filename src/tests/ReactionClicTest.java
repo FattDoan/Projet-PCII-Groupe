@@ -62,9 +62,9 @@ public class ReactionClicTest {
         //---------------------------------------------------------------------------------------------//
         // Ajout du contrôleur de clic pour tester les interactions avec les bâtiments
         // pour l'instant, il n'y a pas d'interactions définies, juste les affichages de la console
-        ReactionClic reactionClic = new ReactionClic(fenetre.getAffichage(), 
-                                                     terrain, 
-                                                     new EventHandler(fenetre.getAffichage(), terrain));
+        new ReactionClic(fenetre.getAffichage(), 
+                         terrain, 
+                         new EventHandler(fenetre.getAffichage()));
          //---------------------------------------------------------------------------------------------// 
     }
 }

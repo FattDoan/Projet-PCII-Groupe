@@ -19,7 +19,7 @@ public class BatimentMaitre extends Batiment {
      * Ce constructeur est utilisé une seule fois lors de la génération initiale du terrain. 
      */
     protected BatimentMaitre(int x, int y, Terrain terrain) {
-        super(CAPACITE, x, y, terrain); // Le bâtiment maître est initialement positionné au centre du terrain, mais le terrain doit être assigné après la création du bâtiment
+        super(CAPACITE, x, y, terrain); // Le terrain est fourni directement au constructeur.
     }
 
     @Override

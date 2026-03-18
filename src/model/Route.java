@@ -1,5 +1,7 @@
 package model;
 
+import common.Validation;
+
 /**
  * Représente une route pour acheminer les minerais.
  * Une route hérite de Batiment car elle peut contenir un minerai en transit.
@@ -15,12 +17,12 @@ public class Route extends Batiment {
      * Note : La direction ne peut pas être nulle.
      * 
      * @param direction la direction d'acheminement des minerais, ne doit pas être null
-     * @throws AssertionError si direction est null
+     * @throws IllegalArgumentException si direction est null (en validation stricte)
      */
     public Route(Direction direction, int x, int y, Terrain terrain) {
         super(1, x, y, terrain);
         // Validation : la direction ne peut pas être nulle
-        assert direction != null : "direction=null";
+        Validation.requireArgument(direction != null, "direction=null");
         this.direction = direction;
     }
 

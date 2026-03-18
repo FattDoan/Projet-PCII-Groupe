@@ -1,6 +1,7 @@
 package controller;
 
 import java.awt.event.*;
+import common.Validation;
 import model.*;
 import view.*;
 
@@ -9,7 +10,7 @@ import view.*;
  * Elle doit déterminer si le clic a eu lieu sur la grille ou dans le menu, 
  * et appeler les méthodes appropriées de EventHandler en fonction du contexte du clic.
  */
-// TODO optional add mouseOnHover -> outline the case under the mouse cursor
+// TODO : ajouter un survol de souris pour surligner la case sous le curseur.
 public class ReactionClic implements MouseListener {
     // Références aux composants nécessaires pour gérer les clics
     private final Affichage affichage;
@@ -57,9 +58,9 @@ public class ReactionClic implements MouseListener {
 
     // Méthode pour déterminer le contexte du clic en fonction des coordonnées de la souris
     private ClickContext getClickContext(int x, int y) {
-        assert x >= 0 && y >= 0 : "Coordonnées de clic négatives: x=" + x + ", y=" + y; 
+        Validation.requireArgument(x >= 0 && y >= 0, "Coordonnées de clic négatives: x=" + x + ", y=" + y);
         // Clic dans le menu à droite de la grille
-        if (x > getTerrainWidth()) {
+        if (x >= getTerrainWidth()) {
             return ClickContext.MENU;
         }
         // Clic dans la grille
@@ -82,7 +83,10 @@ public class ReactionClic implements MouseListener {
             case GRID : 
                 int gridX = getGridX(x);
                 int gridY = getGridY(y);
-                assert gridX < terrain.getTaille() && gridY < terrain.getTaille() : "Clic hors de la grille: gridX=" + gridX + ", gridY=" + gridY;
+                Validation.requireArgument(
+                    gridX < terrain.getTaille() && gridY < terrain.getTaille(),
+                    "Clic hors de la grille: gridX=" + gridX + ", gridY=" + gridY
+                );
                 System.out.println("[ReactionClic] Clic dans la grille: x=" + x + ", y=" + y + " => gridX=" + gridX + ", gridY=" + gridY);
                 eventHandler.handleClicSurCase(terrain.getCase(gridX, gridY));
                 break;

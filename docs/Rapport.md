@@ -241,7 +241,7 @@ TODO
 
 La classe `Case` représente une case de la grille de jeu. Elle contient des coordonnées discrètes (x, y) qui correspondent à sa position sur la grille. Les bâtiments et les minerais sont placés sur ces cases, et leurs coordonnées sont donc alignées avec la grille.
 
-Pour pouvoir manipuler plus facilement ces coordonnées, on utilise une classe `PositionGrille` qui encapsule les coordonnées (x, y) d'une case.
+Pour manipuler plus facilement ces coordonnées, on utilise `PositionGrille` sous forme de *record* immuable, ce qui garantit notamment une comparaison correcte par valeur (`equals`/`hashCode`) pour les collections.
 
 ```mermaid
 classDiagram
@@ -253,9 +253,11 @@ classDiagram
         +getY( ): int
     }
     class PositionGrille {
-        -x: int
-        -y: int
-        +PositionGrille(int x, int y)
+        <<record>>
+        +x: int
+        +y: int
+        +x( ): int
+        +y( ): int
         +getX( ): int
         +getY( ): int
     }
@@ -264,7 +266,6 @@ classDiagram
 ### 4.1.3 : Coordonnées des unités et ennemis (mouvement continu)
 
 TODO
-
 
 ## 4.2 : Affichage des objets (unités, minerai, bâtiments)
 
@@ -336,7 +337,6 @@ TODO
 
 TODO
 
-
 ## 4.3 : Gestion des bâtiments (usine, stockage, mine, routes)
 
 ### 4.3.1 : Usine
@@ -352,6 +352,8 @@ TODO
 #### Structures de données principales et constantes
 
 - Classe `Foreuse` (hérite de `Batiment`, implémente `Runnable`) : gère l’extraction automatique du minerai.
+- Classe `Minerai` (implémente `Runnable`) : transporte une unité de minerai le long des routes.
+- Classe `AsyncExecutor` : centralise l'exécution asynchrone via un `ExecutorService`.
 - Attributs :
   - `DELAI_EXTRACTION` (constante, délai entre deux extractions)
   - `running` (flag d’arrêt du thread)
@@ -360,62 +362,142 @@ TODO
   - `run()` (boucle d’extraction)
   - `arreter()` (arrêt du thread)
   - `ajouterMinerai(int)` (hérité)
+    - `AsyncExecutor.runAsync(...)` (lancement centralisé des tâches)
 
 #### Algorithme abstrait
 
-1. Lorsqu’une foreuse est placée sur une case MINERAI, un thread est lancé (méthode `run`).
+1. Lorsqu’une foreuse est placée sur une case MINERAI, une tâche asynchrone est lancée (méthode `run`).
 2. Tant que le flag `running` est vrai, la foreuse attend `DELAI_EXTRACTION` millisecondes.
 3. Si le stockage n’est pas plein, elle ajoute 1 minerai à son stockage (méthode héritée de `Batiment`).
-4. Si le stockage est plein, elle attend le prochain cycle.
-5. Le thread peut être arrêté proprement via la méthode `arreter()` (flag `running` mis à false).
+4. À chaque extraction, une tâche `Minerai` est lancée via `AsyncExecutor` pour le transport.
+5. Si le stockage est plein, elle attend le prochain cycle.
+6. Le thread peut être arrêté proprement via la méthode `arreter()` (flag `running` mis à false).
 
 #### Conditions limites à respecter
 
 - Le stockage ne doit jamais dépasser 1 (capacité fixée à la création).
 - La foreuse ne doit extraire que si la case contient du minerai.
-- Le thread doit pouvoir être arrêté proprement (interruption, flag `running`).
+- Le thread doit pouvoir être arrêté proprement (interruption, flag `running` volatile).
 - Les accès concurrents au stockage doivent être sûrs (pas de bug de synchronisation, ici géré par la simplicité du modèle).
 
 #### Utilisation par les autres fonctionnalités
 
 - Les routes peuvent venir vider le stockage de la foreuse pour transporter le minerai.
 - L’interface peut afficher l’état du stockage en temps réel.
-- Les tests automatisés (`ForeuseThreadTest`) vérifient le comportement asynchrone et la synchronisation.
+- Les tests de threads (`ForeuseThreadTest`, `MineraiTest`) vérifient le comportement asynchrone et la synchronisation.
 
 #### Diagramme de classe simplifié
 
-```
-         +--------------------------+
-         |        Foreuse           |
-         +--------------------------+
-         | - DELAI_EXTRACTION:int   |
-         | - running:boolean        |
-         |--------------------------|
-         | +run()                   |
-         | +arreter()               |
-         +--------------------------+
-                ^
-                |
-         +-------------------+
-         |    Batiment       |
-         +-------------------+
-         | - stockage:int    |
-         | - capacite:int    |
-         +-------------------+
-         | +ajouterMinerai() |
-         | +retirerMinerai() |
-         | +estVide()        |
-         | +estPlein()       |
-         +-------------------+
+```mermaid
+classDiagram
+    class Batiment {
+        -stockage: int
+        -capacite: int
+        +ajouterMinerai(int)
+        +retirerMinerai(int)
+        +estVide()
+        +estPlein()
+    }
+
+    class Foreuse {
+        -DELAI_EXTRACTION: int
+        -running: boolean
+        +run()
+        +arreter()
+    }
+
+    Batiment <|-- Foreuse
 ```
 
 Ce diagramme met en avant la relation d’héritage et les méthodes principales pour la gestion de l’extraction automatique.
 
+#### Côté Minerai
+
+La classe `Minerai` modélise le transport d'une unité de ressource sur la carte.
+
+- `Minerai` implémente `Runnable`.
+- La position courante est stockée via `x` et `y`.
+- Le déplacement s'exécute par pas temporels (`DELAI_TRANSPORT`).
+- Le drapeau `running` est `volatile` pour permettre un arrêt propre depuis un autre thread.
+
+Le transport est lancé de manière asynchrone par la foreuse via l'exécuteur centralisé, puis le minerai avance case par case jusqu'à atteindre une route valide, le bâtiment maître, ou une condition d'arrêt.
+
 ### 4.3.4 : Déplacement des minerais via routes
 
-TODO
+#### Structures de données principales
 
+- `Minerai` : unité mobile de transport sur la grille.
+- `Route` : bâtiment intermédiaire avec direction (`NORD`, `SUD`, `EST`, `OUEST`).
+- `BatimentMaitre` : destination finale du minerai.
+- `Case` : accès à l'état local (présence d'un bâtiment, type de case).
 
+#### Algorithme abstrait
+
+1. Le minerai démarre sur la position de la foreuse.
+2. À chaque cycle, le minerai lit la case courante.
+3. Si la case courante est une route, il calcule la prochaine case selon la direction de la route.
+4. Sinon, il applique une stratégie par défaut (avancée vers l'est).
+5. Si la prochaine case est hors limites, le transport s'arrête.
+6. Si la prochaine case contient une route non pleine, le minerai est transféré sur cette route.
+7. Si la prochaine case contient le bâtiment maître, le minerai est stocké et le transport se termine.
+8. Dans tous les autres cas (case non exploitable), le transport s'arrête.
+
+#### Conditions limites à respecter
+
+- Une route ne peut contenir qu'un seul minerai à la fois.
+- Le retrait du minerai depuis la case précédente doit rester cohérent avec l'ajout sur la case suivante.
+- Le déplacement ne doit jamais sortir des bornes de la grille.
+- L'arrêt doit être sûr même en contexte concurrent (flag `running` + interruption).
+
+#### Complexité
+
+Pour un minerai donné, la complexité temporelle est linéaire par rapport au nombre de cases parcourues jusqu'à la destination ou l'arrêt.
+
+#### Utilisation par les autres fonctionnalités
+
+- Alimente le bâtiment maître en ressources.
+- Reflète l'état logistique du réseau de routes.
+- Sert de base pour les futures animations visuelles du transport dans la vue.
+
+#### Diagramme de classe simplifié
+
+```mermaid
+classDiagram
+    class Foreuse {
+        +run()
+    }
+
+    class Minerai {
+        -x: int
+        -y: int
+        -running: boolean
+        +run()
+        +arreter()
+    }
+
+    class Route {
+        +getDirection()
+    }
+
+    class BatimentMaitre {
+        +ajouterMinerai(int)
+    }
+
+    class Case {
+        +aBatiment()
+        +getBatiment()
+    }
+
+    class AsyncExecutor {
+        +runAsync(Runnable)
+    }
+
+    Foreuse --> AsyncExecutor : lance
+    Foreuse --> Minerai : cree
+    Minerai --> Case : lit les cases
+    Minerai --> Route : suit la direction
+    Minerai --> BatimentMaitre : depose le minerai
+```
 
 ## 4.4 : Création, déplacements et actions des ennemis
 
@@ -434,7 +516,6 @@ TODO
 ### 4.4.4 : Mort des ennemis au contact des unités de défense
 
 TODO
-
 
 ## 4.5 : Génération du terrain en début de partie
 
@@ -478,8 +559,6 @@ classDiagram
 
 TODO
 
-
-
 ## 4.6 : Actions et déplacements des unités
 
 ### 4.6.1 : Miner
@@ -502,7 +581,6 @@ TODO
 
 TODO
 
-
 ## 4.7 : Menus et interface utilisateur
 
 ### 4.7.1 : Gestion des clics de l'utilisateur
@@ -513,7 +591,39 @@ TODO
 
 - Attributs : `affichage` (JPanel avec la grille et le menu), `terrain` (grille de jeu), `eventHandler` (gestionnaire des actions).
 
-- Enum `ClickContext` : distingue les clics sur la **grille** ou le **menu** .
+- Enum `ClickContext` : distingue les clics sur la **#### Diagramme de classe simplifié
+
+```mermaid
+classDiagram
+    class Batiment {
+        -stockage: int
+        -capacite: int
+        +ajouterMinerai(int)
+        +retirerMinerai(int)
+        +estVide()
+        +estPlein()
+    }
+
+    class Foreuse {
+        -DELAI_EXTRACTION: int
+        -running: boolean
+        +run()
+        +arreter()
+    }
+
+    Batiment <|-- Foreuse
+```
+
+Ce diagramme met en avant la relation d’héritage et les méthodes principales pour la gestion de l’extraction automatique.
+
+#### Côté Minerai
+
+La classe `Minerai` modélise le transport d'une unité de ressource sur la carte.
+
+- `Minerai` implémente `Runnable`.
+- La position courante est stockée via `x` et `y`.
+- Le déplacement s'exécute par pas temporels (`DELAI_TRANSPORT`).
+- Le grille** ou le **menu** .
 
 **Classe** `EventHandler` : encapsule la logique du jeu déclenchée par les clics.
 
@@ -541,9 +651,9 @@ TODO
 
 - **Dimensions de la grille** : largeur et hauteur en pixels = `taille_grille * TAILLE_CASE`.
 
-- **Clics dans la grille** : les coordonnées `(gridX, gridY)` doivent rester dans `[0, taille_grille]`.
+- **Clics dans la grille** : les coordonnées `(gridX, gridY)` doivent rester dans `[0, taille_grille[`.
 
-- **Menu à droite** : le menu doit commencer exactement après la largeur de la grille (`x > taille_grille`) et ne pas empiéter sur la grille.
+- **Menu à droite** : le menu commence à la frontière de la grille (`x >= largeur_grille_en_pixels`).
 
 - **Coordonnées de clic non négatives** : `x >= 0`, `y >= 0`.
 
@@ -596,6 +706,5 @@ TODO
 ### 4.7.4 : Vue d'ensemble des données (minerais, unités, bâtiments) (optionnel)
 
 TODO
-
 
 ## 5\. Conclusion

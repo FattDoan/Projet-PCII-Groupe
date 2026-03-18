@@ -72,11 +72,11 @@ public class Affichage extends JPanel {
 
     public void setSelectedCase(Case c) {
         this.selectedCase = c;
-        refreshMenuIfSelected();  // immediate update on click
+        refreshMenuIfSelected();  // Mise a jour immediate apres un clic.
     }
 
     public void refreshMenuIfSelected() {
         if (selectedCase != null)
-            menuPanel.updateCase(selectedCase);  // reads current model state, no threading needed
+            menuPanel.updateCase(selectedCase);  // Lit l'etat courant du modele.
     }
 }

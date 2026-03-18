@@ -1,5 +1,6 @@
 package main;
 
+import common.AsyncExecutor;
 import controller.*;
 import model.*;
 import view.Fenetre;
@@ -28,7 +29,7 @@ public class Main {
         terrain.getCase(x, y).setBatiment(foreuse);
 
         // Démarrage automatique de la foreuse
-        new Thread(foreuse).start();
+        AsyncExecutor.runAsync(foreuse);
 
         // route vers le bâtiment maître
         int positionMaitre = terrain.getTaille() / 2; // position du bâtiment maître au centre de la grille
@@ -55,13 +56,15 @@ public class Main {
         // terrain.getCase(3, 1).setBatiment(batimentMaitre3);
 
         initController(fenetre, terrain);
+
+        Runtime.getRuntime().addShutdownHook(new Thread(AsyncExecutor::shutdown));
     }
 
     // TODO: maybe a wrapper class for controllers class?
     private static ReactionClic initController(Fenetre fenetre, Terrain terrain) {
         ReactionClic reactionClic = new ReactionClic(fenetre.getAffichage(), 
                                                      terrain, 
-                                                     new EventHandler(fenetre.getAffichage(), terrain));
+                                                     new EventHandler(fenetre.getAffichage()));
 
         return reactionClic;
     }

@@ -2,6 +2,8 @@ package model;
 
 import java.util.ArrayList;
 
+import common.Validation;
+
 /**
  * Représente la grille de jeu carrée.
  * La grille contient toutes les cases du jeu et gère leur placement.
@@ -35,11 +37,11 @@ public class Terrain {
     * Note : La taille doit être strictement positive.
     * 
     * @param taille la dimension de la grille (taille x taille), doit être > 0
-    * @throws AssertionError si taille <= 0
+   * @throws IllegalArgumentException si la taille est invalide (en validation stricte)
     */
    public Terrain(int taille) {
       // Validation : la taille doit être strictement positive
-      assert taille > 0 : "taille=" + taille;
+      Validation.requireArgument(taille > 0, "taille=" + taille);
 
       // Initialisation des attributs
       this.taille = taille;
@@ -49,13 +51,13 @@ public class Terrain {
 
       // Génération aléatoire des minerais sur la grille
       int nombreMinerais = (int)(taille * taille * RATIO_MINERAIS);
-      // On génère la liste des positions de minerais aléatoirement
+      // On génère la liste des positions de minerais aléatoirement.
       ArrayList<PositionGrille> positionsMinerais = new ArrayList<PositionGrille>();
       while (positionsMinerais.size() < nombreMinerais) {
          int x = (int)(Math.random() * taille);
          int y = (int)(Math.random() * taille);
          PositionGrille pos = new PositionGrille(x, y);
-         // s'il n'y a ni minerai ni bâtiment maître à cette position, on l'ajoute à la liste des positions de minerais
+         // S'il n'y a ni minerai ni bâtiment maître à cette position, on l'ajoute à la liste.
          if (!positionsMinerais.contains(pos) && !(x == centre && y == centre)) {
             positionsMinerais.add(pos);
          }
@@ -99,8 +101,8 @@ public class Terrain {
 
     public Case getCase(int x, int y) {
         // Validation : les coordonnées doivent être dans les limites de la grille
-        assert x >= 0 && y >= 0 : "Coordonnées négatives: x=" + x + ", y=" + y;
-        assert x < taille && y < taille : "Coordonnées hors limites: x=" + x + ", y=" + y + ", taille=" + taille;
+      Validation.requireArgument(x >= 0 && y >= 0, "Coordonnées négatives: x=" + x + ", y=" + y);
+      Validation.requireArgument(x < taille && y < taille, "Coordonnées hors limites: x=" + x + ", y=" + y + ", taille=" + taille);
         return grille[x][y];
     }
 

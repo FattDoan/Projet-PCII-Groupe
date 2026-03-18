@@ -1,49 +1,43 @@
 package model;
 
-/***** A FAIRE *****/
-/** * Représente un minerai extrait par une foreuse.
+import java.util.Objects;
+
+/**
+ * Représente un minerai extrait par une foreuse.
  * Un minerai est un objet simple qui peut être transporté par une unité de transport vers une route ou un stockage.
  * Il n'a pas de propriétés spécifiques pour l'instant, mais peut être étendu à l'avenir pour inclure des types de minerais, des valeurs, etc.
  */
-public class Minerai extends Thread {
-        // Référence vers le terrain pour accéder aux cases
-        private Terrain terrain;
+public class Minerai implements Runnable {
+    // Référence vers le terrain pour accéder aux cases
+    private final Terrain terrain;
     // Coordonnées du minerai sur la grille
     private int x;
     private int y;
 
     // Indique si le thread doit continuer à fonctionner
-    private boolean running = true;
+    private volatile boolean running = true;
 
     // Délai de transport du minerai en millisecondes (modifiable selon les besoins)
     private int DELAI_TRANSPORT = 1000;
 
-        /**
-         * Retourne la coordonnée X du minerai.
-         */
-        public int getX() {
-            return x;
-        }
+    /**
+     * Retourne la coordonnée X du minerai.
+     */
+    public int getX() {
+        return x;
+    }
 
-        /**
-         * Retourne la coordonnée Y du minerai.
-         */
-        public int getY() {
-            return y;
-        }
-
-    public Minerai(int x, int y) {
-        // Constructeur : initialise les coordonnées du minerai
-        this.x = x;
-        this.y = y;
-        // terrain à fournir lors de la création du minerai
-        // (à adapter selon votre architecture, ici on suppose un setter ou constructeur étendu)
+    /**
+     * Retourne la coordonnée Y du minerai.
+     */
+    public int getY() {
+        return y;
     }
 
     public Minerai(int x, int y, Terrain terrain) {
         this.x = x;
         this.y = y;
-        this.terrain = terrain;
+        this.terrain = Objects.requireNonNull(terrain, "terrain ne doit pas etre null");
     }
 
     @Override
@@ -83,7 +77,10 @@ public class Minerai extends Thread {
                     nextX = x + 1;
                 }
                 // Vérification des limites
-                if (nextX < 0 || nextX >= terrain.getTaille() || nextY < 0 || nextY >= terrain.getTaille()) break;
+                if (nextX < 0 || nextX >= terrain.getTaille() || nextY < 0 || nextY >= terrain.getTaille()) {
+                    // Le minerai sort de la carte : le transport s'arrete.
+                    break;
+                }
                 Case nextCase = terrain.getCase(nextX, nextY);
                 if (nextCase.aBatiment()) {
                     if (nextCase.getBatiment() instanceof Route && !nextCase.getBatiment().estPlein()) {

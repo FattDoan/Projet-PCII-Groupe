@@ -1,5 +1,7 @@
 package model;
 
+import common.AsyncExecutor;
+
 /**
  * Représente une foreuse qui extrait automatiquement les minerais.
  * Une foreuse doit être placée sur une case contenant un filon de minerai.
@@ -41,7 +43,7 @@ public class Foreuse extends Batiment implements Runnable {
                 if (!estPlein()) {
                     this.ajouterMinerai(1);
                     if (getTerrain() != null) {
-                        new Minerai(this.x, this.y, getTerrain()).start(); // Crée et démarre un thread pour le minerai extrait
+                        AsyncExecutor.runAsync(new Minerai(this.x, this.y, getTerrain())); // Crée et démarre une tache pour le minerai extrait
                     }
                 }
             } catch (InterruptedException e) {

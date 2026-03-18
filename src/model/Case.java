@@ -1,5 +1,7 @@
 package model;
 
+import common.Validation;
+
 /**
  * Représente une case de la grille de jeu.
  * Chaque case possède des coordonnées (x, y) et un type (vide, minerai).
@@ -24,13 +26,13 @@ public class Case {
     * @param x la coordonnée horizontale (colonne), doit être >= 0
     * @param y la coordonnée verticale (ligne), doit être >= 0
     * @param type le type de case, ne doit pas être null
-    * @throws AssertionError si x < 0 ou y < 0 ou type est null
+   * @throws IllegalArgumentException si x < 0, y < 0 ou type est null (en validation stricte)
     */
    public Case(int x, int y, TypeCase type) {
       // Validation : les coordonnées ne peuvent pas être négatives
-      assert x >= 0 && y >= 0 : "x=" + x + ", y=" + y;
+      Validation.requireArgument(x >= 0 && y >= 0, "x=" + x + ", y=" + y);
       // Validation : le type ne peut pas être nul
-      assert type != null : "type=null";
+      Validation.requireArgument(type != null, "type=null");
       
       this.x = x;
       this.y = y;
@@ -89,13 +91,14 @@ public class Case {
     * Note : Un bâtiment ne peut être placé que sur une case vide.
     * 
     * @param batiment le bâtiment à placer, ne doit pas être null
-    * @throws AssertionError si la case n'est pas vide ou si le bâtiment est null
+   * @throws IllegalStateException si la case n'est pas vide (en validation stricte)
+   * @throws IllegalArgumentException si le bâtiment est null (en validation stricte)
     */
    public void setBatiment(Batiment batiment) {
       // Validation : la case ne doit pas déjà contenir de bâtiment
-      assert !this.aBatiment() : "La case (" + x + ", " + y + ") n'est pas vide";
+      Validation.requireState(!this.aBatiment(), "La case (" + x + ", " + y + ") n'est pas vide");
       // Validation : le bâtiment ne peut pas être nul
-      assert batiment != null : "batiment=null";
+      Validation.requireArgument(batiment != null, "batiment=null");
       this.batiment = batiment;
    }
 

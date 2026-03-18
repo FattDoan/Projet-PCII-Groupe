@@ -7,15 +7,8 @@ package model;
  * @param x coordonnée horizontale (colonne)
  * @param y coordonnée verticale (ligne)
  */
-public class PositionGrille {
-    private final int x;
-    private final int y;
-
-    public PositionGrille(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
-
+public record PositionGrille(int x, int y) {
+    // Compatibilite avec le code existant utilisant getX/getY.
     public int getX() {
         return x;
     }

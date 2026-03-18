@@ -8,11 +8,9 @@ import view.Affichage;
  * Elle doit être appelée par la classe ReactionClic pour traiter les clics de souris.
  */
 public class EventHandler {
-    private Terrain terrain;
     private Affichage affichage;
-    public EventHandler(Affichage affichage, Terrain terrain) {
+    public EventHandler(Affichage affichage) {
         this.affichage = affichage;
-        this.terrain = terrain;
     }
     
     // Méthode utilitaire pour convertir les énumérations en chaînes lisibles

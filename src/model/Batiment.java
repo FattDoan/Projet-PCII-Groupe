@@ -1,5 +1,7 @@
 package model;
 
+import common.Validation;
+
 /**
  * Représente un bâtiment sur la grille.
  * Les bâtiments peuvent stocker des minerais (foreuse, bâtiment maître, route).
@@ -24,14 +26,14 @@ public abstract class Batiment{
      * Note : La capacité doit être positive.
      * 
      * @param capacite la capacité maximale de stockage, doit être >= 0
-     * @throws AssertionError si capacite < 0
+        * @throws IllegalArgumentException si capacite < 0 (en validation stricte)
      */
     protected Batiment(int capacite, int x, int y, Terrain terrain) {
         // Validation : la capacité doit être positive
-        assert capacite >= 0 : "capacite=" + capacite;
+        Validation.requireArgument(capacite >= 0, "capacite=" + capacite);
         this.capacite = capacite;
         this.stockage = 0;
-        this.terrain = terrain; // le terrain doit être assigné après la création du bâtiment, par ex via un setter ou lors de l'ajout à une case du terrain
+        this.terrain = terrain; // Le terrain est fourni directement au constructeur.
         this.x = x;
         this.y = y;
     }
@@ -43,7 +45,7 @@ public abstract class Batiment{
     /****** GETTERS ******/
 
     /** Renvoie la quantité de minerai stockée actuellement */
-    public int getStockage() {
+    public synchronized int getStockage() {
         return stockage;
     }
 
@@ -58,7 +60,7 @@ public abstract class Batiment{
      * 
      * @return true si aucun minerai stocké, false sinon
      */
-    public boolean estVide() {
+    public synchronized boolean estVide() {
         return stockage == 0;
     }
 
@@ -67,7 +69,7 @@ public abstract class Batiment{
      * 
      * @return true si la capacité maximale est atteinte, false sinon
      */
-    public boolean estPlein() {
+    public synchronized boolean estPlein() {
         return stockage >= capacite;
     }
 
@@ -79,12 +81,14 @@ public abstract class Batiment{
      * Précondition : le stokage actuel plus la quantité ajoutée 
      * ne doit pas dépasser la capacité maximale du bâtiment.
      * 
-     * @throws AssertionError si le bâtiment est déjà plein
+    * @throws IllegalStateException si le bâtiment est déjà plein (en validation stricte)
      */
 
-    public void ajouterMinerai(int quantite) {
-        assert getStockage() + quantite <= getCapaciteMax()
-            : "Bâtiment plein: stockage=" + stockage + ", ajouter quantite=" + quantite + ", capacite=" + capacite;
+    public synchronized void ajouterMinerai(int quantite) {
+        Validation.requireState(
+            getStockage() + quantite <= getCapaciteMax(),
+            "Bâtiment plein: stockage=" + stockage + ", ajouter quantite=" + quantite + ", capacite=" + capacite
+        );
         stockage += quantite;
     }
 
@@ -92,11 +96,13 @@ public abstract class Batiment{
      * Retire un minerai du stockage.
      * Précondition : le stockage actuel doit être suffisant pour retirer la quantité demandée.
      * 
-     * @throws AssertionError si le bâtiment est déjà vide
+    * @throws IllegalStateException si le bâtiment est déjà vide (en validation stricte)
      */
-    public void retirerMinerai(int quantite) {
-        assert getStockage() >= quantite 
-            : "Bâtiment vide: stockage=" + stockage + ", retirer quantite=" + quantite;
+    public synchronized void retirerMinerai(int quantite) {
+        Validation.requireState(
+            getStockage() >= quantite,
+            "Bâtiment vide: stockage=" + stockage + ", retirer quantite=" + quantite
+        );
         stockage -= quantite;
     }
 
