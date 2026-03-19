@@ -106,4 +106,20 @@ public abstract class Batiment{
         stockage -= quantite;
     }
 
+
+    public synchronized boolean essayerAjouterMinerai(int quantite) {
+        if (getStockage() + quantite <= getCapaciteMax()) {
+            stockage += quantite;
+            return true;
+        }
+        return false;
+    }
+
+     public synchronized boolean essayerRetirerMinerai(int quantite) {
+        if (getStockage() >= quantite) {
+            stockage -= quantite;
+            return true;
+        }
+        return false;
+    }
 }
