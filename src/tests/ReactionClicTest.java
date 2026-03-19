@@ -18,7 +18,7 @@ import controller.*;
 public class ReactionClicTest {
 
     public static void main(String[] args) {
-        // on créé un terrain de test 
+/*         // on créé un terrain de test 
         Terrain terrain = new Terrain(10); 
 
         //et une fenêtre pour l'afficher
@@ -66,5 +66,6 @@ public class ReactionClicTest {
                          terrain, 
                          new EventHandler(fenetre.getAffichage()));
          //---------------------------------------------------------------------------------------------// 
+    */
     }
 }

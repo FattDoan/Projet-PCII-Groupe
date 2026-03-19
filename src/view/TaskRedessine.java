@@ -4,20 +4,18 @@ import javax.swing.SwingUtilities;
 
 /** Une TimerTask qui redessine la fenêtre principale */
 public class TaskRedessine extends java.util.TimerTask {
-
-    public static final int DELAI = 50; // délai en millisecondes entre chaque redessin
+    public static final int DELAI = 16; // délai en millisecondes entre chaque redessin
     
-    private Fenetre fenetre;
-
+    private Affichage aff;
     public TaskRedessine(Fenetre fenetre) {
-        this.fenetre = fenetre;
+        this.aff = fenetre.getAffichage();
     }
 
     @Override
     public void run() {
         SwingUtilities.invokeLater(() -> {
-            this.fenetre.repaint();
-            this.fenetre.getAffichage().refreshMenuIfSelected();
+            aff.repaint();
+            aff.refreshMenuIfSelected();
         });
     }
 

@@ -1,82 +1,70 @@
 package view;
-
-import javax.swing.*;
-import java.awt.*;
-
+ 
+import model.Camera;
 import model.Case;
 import model.Terrain;
-
-/** JPanel qui affiche le jeu (la grille et le menu) */
+import javax.swing.*;
+import java.awt.*;
+ 
 public class Affichage extends JPanel {
-    /** CONSTANTES */
-
-    // les dimensions relatives à la grille de jeu
-    // taille d'une case en pixels, définit la taille de la fenêtre
-    public static final int TAILLE_CASE = 40;
-
-    // les dimensions du menu latéral par rapport à la largeur de la grille
-    public static final double RATIO_LARGEUR_MENU = 1.0 / 2.0; // le menu occupe 1/3 de la largeur totale de la fenêtre
-
-
-    /** Variables relatives à la taille de la grille (inconnue avant exécution) */
-
-    // les dimensions de la grille en pixels
-    public static int LARGEUR_GRILLE;
-    public static int HAUTEUR_GRILLE;
-
-    // les dimensions de la fenêtre
-    public static int LARGEUR;
-    public static int HAUTEUR;
-
-
-    /** VARIABLES DU JEU */
-
-    private Terrain terrain;
-
-    // les composants graphiques de la fenêtre
-    private AffichageTerrain affichageTerrain;
-    private MenuPanel menuPanel;
-
+ 
+    public static final int    MAX_VIEW_W         = 1300;
+    public static final int    MAX_VIEW_H         = 700;
+    public static final int    TAILLE_CASE        = 40;
+    public static final double RATIO_LARGEUR_MENU = 0.30;
+ 
+    public static int LARGEUR_GRILLE, HAUTEUR_GRILLE, LARGEUR, HAUTEUR;
+ 
+    private final AffichageTerrain affichageTerrain;
+    private final MenuPanel        menuPanel;
+    private final int              menuW;
+ 
+    private Camera camera = null;
+ 
     public Affichage(Terrain terrain) {
-        super();
-
-        this.terrain = terrain;
-
-        // calcul des dimensions de la grille et de la fenêtre en fonction de la taille du terrain
+        super(null);
+ 
         LARGEUR_GRILLE = terrain.getTaille() * TAILLE_CASE;
         HAUTEUR_GRILLE = terrain.getTaille() * TAILLE_CASE;
-        LARGEUR = (int) (LARGEUR_GRILLE * (1 + RATIO_LARGEUR_MENU)); // largeur totale = largeur de la grille + largeur du menu
-        HAUTEUR = HAUTEUR_GRILLE; // la hauteur de la fenêtre est égale à la hauteur de la grille
-
-        // initialisation de la fenêtre
-        this.setPreferredSize(new java.awt.Dimension(LARGEUR, HAUTEUR));
-
+        LARGEUR = Math.min(LARGEUR_GRILLE, MAX_VIEW_W);
+        HAUTEUR = Math.min(HAUTEUR_GRILLE, MAX_VIEW_H);
+        menuW   = (int)(LARGEUR * RATIO_LARGEUR_MENU);
+ 
+        setPreferredSize(new Dimension(LARGEUR, HAUTEUR));
+ 
         affichageTerrain = new AffichageTerrain(terrain);
-        menuPanel = new MenuPanel();
+        affichageTerrain.setBounds(0, 0, LARGEUR, HAUTEUR);
+        add(affichageTerrain);
+ 
+        menuPanel = new MenuPanel(menuW, HAUTEUR, this);
+        menuPanel.setBounds(LARGEUR - menuW, 0, menuW, HAUTEUR);
+        menuPanel.setVisible(false);
+        add(menuPanel);
 
-        setLayout(new BorderLayout());
-        this.add(affichageTerrain, BorderLayout.CENTER);
-        this.add(menuPanel, BorderLayout.EAST);
-
-    }
-
-    public AffichageTerrain getAffichageTerrain() {
-        return affichageTerrain;
-    }
-
-    public MenuPanel getMenuPanel() {
-        return menuPanel;
+        setComponentZOrder(menuPanel, 0);
+        setComponentZOrder(affichageTerrain, 1);
     }
   
-    private Case selectedCase = null;
-
-    public void setSelectedCase(Case c) {
-        this.selectedCase = c;
-        refreshMenuIfSelected();  // Mise a jour immediate apres un clic.
+    public void setCamera(Camera c) { this.camera = c; affichageTerrain.setCamera(c); }
+    public Camera           getCamera()           { return camera; }
+    public AffichageTerrain getAffichageTerrain() { return affichageTerrain; }
+    public MenuPanel        getMenuPanel()        { return menuPanel; }
+ 
+    public void showMenu(Case c) {
+        menuPanel.setSelectedCase(c);
+        menuPanel.refresh();
+        menuPanel.setVisible(true);
     }
+ 
+    public void hideMenu() {
+        menuPanel.setVisible(false);
+    }
+ 
+    public boolean isMenuVisible()      { return menuPanel.isVisible(); }
+    public void refreshMenuIfSelected() { if (menuPanel.isVisible()) menuPanel.refresh(); }
 
-    public void refreshMenuIfSelected() {
-        if (selectedCase != null)
-            menuPanel.updateCase(selectedCase);  // Lit l'etat courant du modele.
+    @Override
+    public boolean isOptimizedDrawingEnabled() {
+        return false; // Tells Swing: "My children overlap, please calculate Z-order correctly!"
     }
 }

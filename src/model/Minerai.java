@@ -4,6 +4,8 @@ import java.util.Objects;
 
 /**
  * Représente un minerai extrait par une foreuse.
+/***** A FAIRE *****/
+/** * Représente un minerai extrait par une foreuse.
  * Un minerai est un objet simple qui peut être transporté par une unité de transport vers une route ou un stockage.
  * Il n'a pas de propriétés spécifiques pour l'instant, mais peut être étendu à l'avenir pour inclure des types de minerais, des valeurs, etc.
  */
@@ -48,11 +50,6 @@ public class Minerai implements Runnable {
             try {
                 Thread.sleep(DELAI_TRANSPORT);
                 Case currentCase = terrain.getCase(x, y);
-                if (surForeuse && currentCase.aBatiment() && currentCase.getBatiment() instanceof Foreuse) {
-                    Foreuse foreuse = (Foreuse) currentCase.getBatiment();
-                    foreuse.retirerMinerai(1);
-                    surForeuse = false;
-                }
                 // Déplacement selon la direction de la route
                 int nextX = x;
                 int nextY = y;
@@ -72,9 +69,35 @@ public class Minerai implements Runnable {
                             nextX = x - 1;
                             break;
                     }
-                } else {
-                    // Par défaut, avancer vers l'est
-                    nextX = x + 1;
+                } else {    // minerai dans la foreuse
+                    // Priorite en fonction de l'ordre de Direction.java
+                    Direction dir = trouverMeilleurDirection();
+                    if (dir == null) {
+                        // Aucune direction valide trouvée (pour l'instant), 
+                        // on attends
+                        continue;
+                    }
+                    // On DOIT verifier si il exist au moins une routes adjacente qui n'est pas pleine et valide
+                    // avant de retirer le minerai de la foreuse
+                    if (surForeuse && currentCase.aBatiment() && currentCase.getBatiment() instanceof Foreuse) {
+                        Foreuse foreuse = (Foreuse) currentCase.getBatiment();
+                        foreuse.retirerMinerai(1);
+                        surForeuse = false;
+                    }
+                    switch (dir) {
+                        case NORD:
+                            nextY = y - 1;
+                            break;
+                        case SUD:
+                            nextY = y + 1;
+                            break;
+                        case EST:
+                            nextX = x + 1;
+                            break;
+                        case OUEST:
+                            nextX = x - 1;
+                            break;
+                    }
                 }
                 // Vérification des limites
                 if (nextX < 0 || nextX >= terrain.getTaille() || nextY < 0 || nextY >= terrain.getTaille()) {
@@ -93,18 +116,24 @@ public class Minerai implements Runnable {
                         }
                         this.x = nextX;
                         this.y = nextY;
-                    } else if (nextCase.getBatiment() instanceof BatimentMaitre) {
-                        BatimentMaitre maitre = (BatimentMaitre) nextCase.getBatiment();
-                        maitre.ajouterMinerai(1);
-                        // Retirer le minerai de la route précédente
-                        if (currentCase.aBatiment() && currentCase.getBatiment() instanceof Route) {
-                            Route routePrec = (Route) currentCase.getBatiment();
-                            routePrec.retirerMinerai(1);
+                    } else if (nextCase.getBatiment() instanceof BatimentMaitre ||
+                                nextCase.getBatiment() instanceof Stockage) {
+                        Batiment bat = nextCase.getBatiment();
+                        if (!bat.estPlein()) {
+                            bat.ajouterMinerai(1);
+                            // Retirer le minerai de la route précédente
+                            if (currentCase.aBatiment() && currentCase.getBatiment() instanceof Route) {
+                                Route routePrec = (Route) currentCase.getBatiment();
+                                routePrec.retirerMinerai(1);
+                            }
+                            this.x = nextX;
+                            this.y = nextY;
+                            // Le minerai disparaît (fin du thread)
+                            Thread.currentThread().interrupt();
                         }
-                        this.x = nextX;
-                        this.y = nextY;
-                        // Le minerai disparaît (fin du thread)
-                        Thread.currentThread().interrupt();
+                        else {
+                            // Si le bâtiment de destination est plein, on attends
+                        }
                     } else {
                         // Si ce n'est ni une route ni un bâtiment maître, on arrête
                         break;
@@ -128,4 +157,40 @@ public class Minerai implements Runnable {
         // Permet d'arrêter proprement le thread
         running = false;
     }
+
+
+    public Direction trouverMeilleurDirection() {
+        Direction dir = null;
+
+        for (Direction d : Direction.values()) {
+            int nx = this.x, ny = this.y;
+        
+            // Calculate neighbor coordinates
+            switch (d) {
+                case NORD: ny--; break;
+                case SUD:  ny++; break;
+                case EST:  nx++; break;
+                case OUEST: nx--; break;
+            }
+
+            // Boundary Check
+            if (nx < 0 || nx >= terrain.getTaille() || ny < 0 || ny >= terrain.getTaille()) continue;
+
+            Case adj = terrain.getCase(nx, ny);
+            if (adj.aBatiment() && adj.getBatiment() instanceof Route && !adj.getBatiment().estPlein()) {
+                Route r = (Route) adj.getBatiment();
+                
+                // PRIORITE 1: C'est une route parfaitement alignée, on y va directement
+                if (r.getDirection() == d) {
+                    return d; 
+                }
+                // PRIORITE 2: C'est une route mais pas alignée, on la garde en option au cas où on ne trouve pas mieux
+                dir = d;
+            } else if (adj.aBatiment() && (adj.getBatiment() instanceof Stockage || adj.getBatiment() instanceof BatimentMaitre)) {
+                // PRIORITE PLUS HAUTE: C'est un bâtiment de stockage ou maître, on veut y aller directement
+                return d;
+            }
+        }
+        return dir;
+    } 
 }

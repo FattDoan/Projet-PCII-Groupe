@@ -6,113 +6,51 @@ import model.*;
 import view.*;
 
 /**
- * Cette classe gère les clics de souris sur la fenêtre de jeu. 
- * Elle doit déterminer si le clic a eu lieu sur la grille ou dans le menu, 
- * et appeler les méthodes appropriées de EventHandler en fonction du contexte du clic.
+ * Gère les clics souris (bouton gauche, clic court) sur AffichageTerrain.
+ * Utilise Camera.screenToGridX/Y pour tenir compte du pan ET du zoom.
  */
-// TODO : ajouter un survol de souris pour surligner la case sous le curseur.
 public class ReactionClic implements MouseListener {
-    // Références aux composants nécessaires pour gérer les clics
-    private final Affichage affichage;
-    private final EventHandler eventHandler;
-    private final Terrain terrain;
-
-    public ReactionClic(Affichage affichage, Terrain terrain, EventHandler eventHandler) {
-        this.affichage = affichage;
-        this.eventHandler = eventHandler;
-        this.terrain = terrain;
-        this.affichage.addMouseListener(this);
+ 
+    private final Affichage        affichage;
+    private final Terrain          terrain;
+    private final CameraController cameraController; // pour lire isDragging()
+ 
+    public ReactionClic(Affichage affichage, Terrain terrain,
+                        CameraController cameraController) {
+        this.affichage        = affichage;
+        this.terrain          = terrain;
+        this.cameraController = cameraController;
+        affichage.getAffichageTerrain().addMouseListener(this);
     }
-
-    // Les getters utiles 
-    private int getCaseSize() {
-        return Affichage.TAILLE_CASE; 
-    }
-
-    private int getTerrainWidth() {
-        return terrain.getTaille() * getCaseSize();
-    }
-
-    private int getTerrainHeight() {
-        return terrain.getTaille() * getCaseSize();
-    }
-
-    private int getMenuWidth() {
-        return affichage.getWidth() - getTerrainWidth();
-    }
-
-    // Conversion des coordonnées de la souris en coordonnées de la grille
-    private int getGridX(int pixelX) {
-        return pixelX / getCaseSize();
-    }
-
-    private int getGridY(int pixelY) {
-        return pixelY / getCaseSize();
-    }
-
-    // Enum pour différencier les contextes de clic (grille vs menu)
-    private enum ClickContext {
-        GRID,
-        MENU
-    }
-
-    // Méthode pour déterminer le contexte du clic en fonction des coordonnées de la souris
-    private ClickContext getClickContext(int x, int y) {
-        Validation.requireArgument(x >= 0 && y >= 0, "Coordonnées de clic négatives: x=" + x + ", y=" + y);
-        // Clic dans le menu à droite de la grille
-        if (x >= getTerrainWidth()) {
-            return ClickContext.MENU;
-        }
-        // Clic dans la grille
-        else {
-            return ClickContext.GRID;
-        }
-    }
-
-
-
-    // Méthode appelée lors d'un clic de souris. 
-    // Elle détermine le contexte du clic et appelle les méthodes appropriées de EventHandler.
-    @Override 
-    public void mouseClicked(MouseEvent e) {
-        int x = e.getX();
-        int y = e.getY();
-
-        ClickContext ctx = getClickContext(x, y);
-        switch(ctx) {
-            case GRID : 
-                int gridX = getGridX(x);
-                int gridY = getGridY(y);
-                Validation.requireArgument(
-                    gridX < terrain.getTaille() && gridY < terrain.getTaille(),
-                    "Clic hors de la grille: gridX=" + gridX + ", gridY=" + gridY
-                );
-                System.out.println("[ReactionClic] Clic dans la grille: x=" + x + ", y=" + y + " => gridX=" + gridX + ", gridY=" + gridY);
-                eventHandler.handleClicSurCase(terrain.getCase(gridX, gridY));
-                break;
-
-            case MENU :
-                System.out.println("[ReactionClic] Clic dans le menu: x=" + x + ", y=" + y);
-                eventHandler.handleClicDansMenu(x - getTerrainWidth(), y);
-                break;
-
-        }
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-    }
-
+ 
+    @Override public void mousePressed(MouseEvent e) {}
+ 
     @Override
     public void mouseReleased(MouseEvent e) {
+        if (e.getButton() != MouseEvent.BUTTON1) return;
+        // Ignore si c'était un drag et non un clic
+        if (cameraController.isDragging()) return;
+ 
+        Camera cam = affichage.getCamera();
+        if (cam == null) return;
+ 
+        int gx = cam.screenToGridX(e.getX());
+        int gy = cam.screenToGridY(e.getY());
+ 
+        if (gx < 0 || gx >= terrain.getTaille() ||
+            gy < 0 || gy >= terrain.getTaille()) {
+            affichage.hideMenu(); return;
+        }
+ 
+        Case c = terrain.getCase(gx, gy);
+        if (!c.estVide()) {
+            affichage.getAffichageTerrain().setSelectedCase(c);
+            affichage.showMenu(c);
+        }
     }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-    }
-
+ 
+    @Override public void mouseClicked (MouseEvent e) {}
+    @Override public void mouseEntered (MouseEvent e) {}
+    @Override public void mouseExited  (MouseEvent e) {}
 }
+ 

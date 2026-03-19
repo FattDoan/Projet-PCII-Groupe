@@ -1,7 +1,6 @@
 package view;
 
 import javax.swing.JFrame;
-import java.awt.BorderLayout;
 
 import model.Terrain;
 
