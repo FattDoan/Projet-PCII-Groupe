@@ -188,17 +188,17 @@ L'interface utilisateur permet d'afficher les informations relatives aux ressour
     — Priorité : 1
     — Temps estimé : 1h
 
-1. **Menu pour les unités**
+2. **Menu pour les unités**
     — Difficulté : Moyenne
     — Priorité : 2
     — Temps estimé : 1h30
 
-2. **Menu des bâtiments (affichage des quantités de minerai)**
+3. **Menu des bâtiments (affichage des quantités de minerai)**
     — Difficulté : Moyenne
     — Priorité : 3
     — Temps estimé : 30 min
 
-3. **Vue d'ensemble des données (minerais, unités, bâtiments) (optionnel)**
+4. **Vue d'ensemble des données (minerais, unités, bâtiments) (optionnel)**
     — Difficulté : Faible
     — Priorité : 5
     — Temps estimé : 30 min
@@ -272,12 +272,13 @@ TODO
 ### 4.2.1 : Fenêtre principale avec grille de jeu
 
 - Classe `Fenetre` : classe principale d'affichage, hérite de `JFrame`
+  
   - Constructeur `Fenetre(String titre, Terrain terrain)` : initialise la fenêtre, ajoute les composants graphiques nécessaires (comme l'affichage du terrain) et rend la fenêtre visible.
 
 - Classe `Affichage` : responsable de l'affichage du terrain de jeu, hérite de `JPanel`
+  
   - Attribut : `terrain` (référence au terrain à afficher)
   - Méthode `paintComponent(Graphics g)` : surcharge pour dessiner les éléments du terrain (minerais, bâtiments, etc.) en fonction de leur position et de leur type. Appelle les fonctions d'affichage spécifiques dans `AffichageMinerais` et `AffichageBâtiments`. Garde un espace pour afficher le menu à droite de la grille.
-
 
 ### 4.2.3 : Affichage des filons de minerai et des bâtiments
 
@@ -563,35 +564,12 @@ TODO
 
 ### 4.6.1 : Miner
 
-TODO
+La classe `Minerai` modélise le transport d'une unité de ressource sur la carte.
 
-### 4.6.2 : Construction de bâtiments
-
-TODO
-
-### 4.6.3 : Transport du minerai
-
-TODO
-
-### 4.6.4 : Défense (tourelle)
-
-TODO
-
-### 4.6.5 : Attribution d'ordres aux unités
-
-TODO
-
-## 4.7 : Menus et interface utilisateur
-
-### 4.7.1 : Gestion des clics de l'utilisateur
-
-#### Structures de données principales et constantes
-
-**Classe** `ReactionClic` (implémente `MouseListener`) : capte les clics de souris sur la fenêtre et délègue les actions au `EventHandler`.
-
-- Attributs : `affichage` (JPanel avec la grille et le menu), `terrain` (grille de jeu), `eventHandler` (gestionnaire des actions).
-
-- Enum `ClickContext` : distingue les clics sur la **#### Diagramme de classe simplifié
+- `Minerai` implémente `Runnable`.
+- La position courante est stockée via `x` et `y`.
+- Le déplacement s'exécute par pas temporels (`DELAI_TRANSPORT`).
+- Le grille** ou le **menu** .
 
 ```mermaid
 classDiagram
@@ -616,84 +594,182 @@ classDiagram
 
 Ce diagramme met en avant la relation d’héritage et les méthodes principales pour la gestion de l’extraction automatique.
 
-#### Côté Minerai
+### 4.6.2 : Construction de bâtiments
 
-La classe `Minerai` modélise le transport d'une unité de ressource sur la carte.
+TODO
 
-- `Minerai` implémente `Runnable`.
-- La position courante est stockée via `x` et `y`.
-- Le déplacement s'exécute par pas temporels (`DELAI_TRANSPORT`).
-- Le grille** ou le **menu** .
+### 4.6.3 : Transport du minerai
 
-**Classe** `EventHandler` : encapsule la logique du jeu déclenchée par les clics.
+TODO
 
-- Attribut : 
-  
-  * `terrain: Terrain` → pour lire/modifier l’état des cases.
-  
-  * `affichage: Affichage` → pour fournir un *retour visuel immédiat* (par ex. surligner la case sélectionnée, mettre à jour un bouton, etc.).
+### 4.6.4 : Défense (tourelle)
 
-#### Algorithme abstrait
+TODO
 
-1) `ReactionClic` reçoit un clic `(x, y)` via `mouseClicked`.
+### 4.6.5 : Attribution d'ordres aux unités
 
-2) `getClickContext(x, y)` détermine si le clic est sur la **grille** ou le **menu** et selon l’endroit cliqué , il délègue au `EventHandler`. 
+TODO
 
-3) `EventHandler`: 
+## 4.7 : Menus et interface utilisateur
+
+### 4.7.1 : Gestion des clics de l'utilisateur
+
+#### Structures de données principales et constantes
+
+La gestion des interactions utilisateur a été regroupée en plusieurs contrôleurs spécialisés, chacun ayant sa propre responsabilité :
+
+- **Classe `CameraController`**  
+  Gère les interactions liées au déplacement de la caméra :
+  - déplacement via drag souris (clic gauche maintenu)
+  - déplacement via clavier (flèches)
+  - distinction entre clic et drag grâce à un seuil (`DRAG_THRESHOLD`)
+- **Classe `ReactionClic` (implémente `MouseListener`)**  
+  Gère les clics utilisateur sur la grille :
+  - détecte les clics courts (bouton gauche)
+  - ignore les événements si un drag est en cours
+  - déclenche l’affichage du menu
+- **Classe `ReactionHover` (implémente `MouseMotionListener`)**  
+  Gère le survol des cases :
+  - met à jour dynamiquement la case survolée
+  - permet un retour visuel en temps réel
+- **Classe `Camera`**  
+  Permet la conversion des coordonnées écran vers la grille :
+  - `screenToGridX(int)`
+  - `screenToGridY(int)`  
+    Ces méthodes prennent en compte le décalage de la caméra (offset).
+
+#### Constantes importantes
+
+- `DRAG_THRESHOLD` : seuil minimal (en pixels) pour considérer un mouvement comme un drag
+- `PAN_KEY_SPEED` : vitesse de déplacement de la caméra au clavier
+
+### Algorithme abstrait
+
+#### 1. Gestion du clic (ReactionClic)
+
+1. *Lors d’un événement `mouseReleased` :*
    
-   * Lit ou modifie l’état du modèle (`Terrain` / `Case`).
+   - vérifier que le bouton gauche est utilisé
+   - vérifier qu’il ne s’agit pas d’un drag (`cameraController.isDragging()`)
+
+2. *Convertir les coordonnées écran `(x, y)` en coordonnées grille :*
    
-   * Met à jour la vue (`Affichage`) pour refléter visuellement le résultat du clic.
+   `(gx, gy) = screenToGrid(x, y)`
 
-#### Conditions limites à respecter
+3. *Vérifier les bornes :*
+   
+   - si hors de la grille → masquer le menu
 
-- **Grille carrée** : le nombre de cases en largeur = nombre de cases en hauteur.
+4. *Récupérer la case correspondante :*
+   
+   - si la case contient un bâtiment → afficher le menu
+   - sinon → ne rien faire
 
-- **Dimensions de la grille** : largeur et hauteur en pixels = `taille_grille * TAILLE_CASE`.
+#### 2. Gestion du drag (CameraController) :
 
-- **Clics dans la grille** : les coordonnées `(gridX, gridY)` doivent rester dans `[0, taille_grille[`.
+1. `mousePressed` :      
+   
+   - mémorise la position initiale de la souris
+   - mémorise l’offset initial de la caméra
 
-- **Menu à droite** : le menu commence à la frontière de la grille (`x >= largeur_grille_en_pixels`).
+2. `mouseDragged` :
+   
+   - calcule le déplacement `(dx, dy)`  
+   
+   - si dépasse `DRAG_THRESHOLD` → activation du mode drag
+   
+   - met à jour la caméra :
+     
+     `offset = offset_initial - déplacement_souris`
 
-- **Coordonnées de clic non négatives** : `x >= 0`, `y >= 0`.
+3. `mouseReleased` :
+   
+   - désactive le drag
+
+#### 3. Gestion du survol (ReactionHover)
+
+1. À chaque mouvement souris : conversion écran → grille
+2. Vérification des bornes : si hors grille → suppression du survol
+3. Mise à jour uniquement si la case change : optimisation pour éviter des redessins inutiles
+
+#### 4. Conditions limites à respecter
+
+- Différenciation clic / drag
+  Un déplacement léger ne doit pas être interprété comme un drag.
+
+- Conversion correcte des coordonnées
+  Les coordonnées doivent toujours prendre en compte l’offset de la caméra.
+
+- Respect des bornes de la grille
+  
+    0 ≤ gx < taille
+    0 ≤ gy < taille
+
+- Focus clavier : nécessaire pour capter les événements clavier `requestFocusInWindow()`
 
 #### Diagramme de classes simplifié
 
 ```mermaid
 classDiagram
+    %% Core
+    class Camera {
+        +screenToGridX(int)
+        +screenToGridY(nt)
+        +setOffset(int,int)
+    }
+
+    %% Controllers
+    class CameraController {
+        -camera: Camera
+        -dragging: boolean
+        +isDragging()
+    }
+
+    class ReactionClic {
+        -affichage: Affichage
+        -terrain: Terrain
+        -cameraController: CameraController
+    }
+
+    class ReactionHover {
+        -camera: Camera
+        -terrain: Terrain
+    }
+
     %% Model
     class Terrain {
     }
 
     %% View
-   class Affichage {
+    class Affichage {
     }
 
-    %% Controller
-    class ReactionClic {
-        -affichage: Affichage
-        -terrain: Terrain
-        -eventHandler: EventHandler
-        +mouseClicked(MouseEvent)
-    }
+    %% Camera dependency
+    CameraController --> Camera
+    ReactionClic --> Camera
+    ReactionHover --> Camera
+    Camera --> Affichage : met à jour le viewport
 
-    class EventHandler {
-        -terrain: Terrain
-        -affichage: Affichage
-        +handleClicSurCase(Case)
-        +handleClicDansMenu(int, int)
-    }
+    %% MVC Relationships
+    Affichage --> Terrain : affiche
+    ReactionClic --> Terrain : met à jour (actions)
 
-    %% Relations
-    ReactionClic <-- Affichage : écoute les clics
-    ReactionClic --> EventHandler : délègue le traitement des clics
-    ReactionClic --> Terrain : lit l'état des cases
-    EventHandler --> Terrain : lit/modifie l'état des cases
-    EventHandler --> Affichage : met à jour la vue pour un retour visuel
-    Affichage <-- Terrain : rend la grille
+    %% Controllers listen to view
+    CameraController <-- Affichage : écoute le drag
+    ReactionClic <-- Affichage : écoute clics
+    ReactionHover <-- Affichage : écoute mouvement
+
+    %% Controllers use model
+    ReactionClic --> Terrain : lit les cases
+    ReactionHover --> Terrain : lit les cases
+
+    %% Controllers update view
+    ReactionClic --> Affichage : met à jour (menu)
+    ReactionHover --> Affichage : met à jour (hover)
+   
 ```
 
-Ce diagramme représente l'essentiel de la logique du jeu et suit le patron **MVC** (Model-View-Controller). Le modèle (`Terrain`) contient les données du jeu, la vue (`Affichage`) gère l'affichage en fonction du modèle, et le contrôleur (`ReactionClic` + `EventHandler`) gère le modèle tout en mettant également à jour directement la vue pour fournir un retour visuel.
+Ce diagramme représente l'essentiel de la logique du jeu et suit le patron **MVC** (Model-View-Controller). Le modèle (`Terrain`) contient les données du jeu, la vue (`Affichage`) gère l'affichage en fonction du modèle, et les contrôleur (`ReactionClic` , `ReactionHover `, `CameraController` et `Camera`) gère le modèle tout en mettant également à jour directement la vue pour fournir un retour visuel.
 
 ### 4.7.2 : Menu pour les unités
 
@@ -701,7 +777,110 @@ TODO
 
 ### 4.7.3 : Menu des bâtiments (affichage des quantités de minerai)
 
-TODO
+### Structures de données principales et constantes
+
+- **Classe `MenuPanel`** : panneau principal affiché à droite de l’écran qui contient :
+  - `HeaderPanel`
+  - `StatsPanel`
+  - `ActionsPanel`
+- **Classe `StatsPanel`** : responsable de l’affichage des informations du bâtiment:
+  - une barre de capacité (`CapacityBar`)
+  - des labels pour les valeurs numériques
+- **Classe `CapacityBar`**
+  - composant graphique personnalisé
+  - affiche le ratio de remplissage du stockage
+
+### Algorithme abstrait
+
+#### 1. Affichage du menu
+
+1. Lors d’un clic sur une case contenant un bâtiment :
+   - appel à `showMenu(c)`
+2. Le menu :
+   - devient visible
+   - stocke la case sélectionnée
+   - déclenche un rafraîchissement (`refresh()`)
+
+#### 2. Construction des statistiques
+
+Si la case sélectionnée change :
+
+- suppression des composants existants
+- reconstruction complète de l’interface :
+  - création de la barre de capacité
+  - création des lignes d’information
+
+#### 3. Mise à jour dynamique (optimisation)
+
+**Si la case sélectionnée reste la même :**
+
+1. Ne pas reconstruire l’interface
+2. Mettre à jour uniquement :
+   - la barre (`CapacityBar.updateValues`)
+   - les labels
+
+ Cela permet d’éviter des recalculs inutiles, des re-layout coûteux et des effets visuels indésirables (en rafraîchissant constamment le menu)
+
+#### 4. Mise à jour de la barre de capacité
+
+1. *Calcul du ratio :*
+   
+   ratio = stockage / capacité
+
+2. *Choix de la couleur :*
+   
+   - vert : faible remplissage
+   - orange : moyen
+   - rouge : proche de la saturation
+
+3. *Redessin uniquement si les valeurs changent*
+
+### Conditions limites à respecter
+
+- **Capacité nulle** :éviter la division par zéro
+
+- **Respect de l’invariant** `stockage ≤ capacité`
+
+- **Performance** : ne pas recréer l’interface à chaque mise à jour (sauf en cas d'absolue nécessité)
+
+- **Cohérence avec les threads** : les valeurs peuvent changer de manière asynchrone (foreuse, transport)
+
+#### Diagramme de classes simplifié
+
+```mermaid
+classDiagram
+
+    %%Menu
+    class MenuPanel {  
+        -selectedCase: Case  
+        +refresh()  
+    }
+
+    class StatsPanel {  
+        -liveCapBar: CapacityBar  
+        -liveStockageLabel: JLabel  
+        +update(Case)  
+    }
+
+    class CapacityBar {  
+        -ratio: float  
+        +updateValues(int, int)  
+    }
+
+    class Case {  
+        +getBatiment()  
+    }
+
+    class Batiment {  
+        +getStockage()  
+        +getCapaciteMax()  
+    }
+
+MenuPanel --> StatsPanel  
+StatsPanel --> CapacityBar  
+StatsPanel --> Case  
+Case --> Batiment
+```
 
 ### 4.7.4 : Vue d'ensemble des données (minerais, unités, bâtiments) (optionnel)
 
