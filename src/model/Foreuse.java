@@ -9,7 +9,7 @@ import common.AsyncExecutor;
  * La capacité de stockage temporaire est fixée à 1 minerai.
  */
 public class Foreuse extends Batiment implements Runnable {
-    private static final int DELAI_EXTRACTION_MS = 1000; // 1 seconde
+    public static final int DELAI_EXTRACTION_MS = 2000; // 2 seconde
     private volatile boolean running = true; // Indique si le thread doit continuer à fonctionner
 
 
@@ -37,7 +37,11 @@ public class Foreuse extends Batiment implements Runnable {
                 // Extraction du minerai
                 if (!estPlein()) {
                     this.ajouterMinerai(1);
-                    AsyncExecutor.runAsync(new Minerai(getX(), getY(), getTerrain()));
+                    Minerai nouveauMinerai = new Minerai(getX(), getY(), getTerrain());
+    
+                    // Soumet le minerai extrait pour transport vers la route ou le stockage
+                    // immédiatement
+                    common.AsyncExecutor.schedule(nouveauMinerai, 0);
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();

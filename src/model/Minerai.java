@@ -19,7 +19,7 @@ public class Minerai implements Runnable {
     // Drapeau d'arrêt coopératif du thread.
     private volatile boolean running = true;
     // Cadence de déplacement d'un minerai.
-    private static final int DELAI_TRANSPORT_MS = 1000;
+    public static final int DELAI_TRANSPORT_MS = 1000;
 
     public int getX() {
         return x;
@@ -38,7 +38,7 @@ public class Minerai implements Runnable {
 
     @Override
     public void run() {
-        // Boucle de vie du minerai: tant qu'il n'est pas arrivé à destination
+/*         // Boucle de vie du minerai: tant qu'il n'est pas arrivé à destination
         // (stockage/HQ) et tant que le thread n'est pas interrompu.
         while (running && !Thread.currentThread().isInterrupted()) {
             try {
@@ -50,6 +50,21 @@ public class Minerai implements Runnable {
                 Thread.currentThread().interrupt();
                 break;
             }
+        } */
+
+        // Si le thread est déjà interrompu ou que le minerai est marqué pour arrêt, 
+        // on ne fait rien
+        if (!running || Thread.currentThread().isInterrupted()) {
+            return;
+        }
+
+        // On fait un seul pas logique
+        running = transporterUnPas();
+
+        // Si le minerai n'est pas encore arrivé à destination finale
+        // on se reprogramme pour continuer le transport au prochain tick.
+        if (running) {
+            common.AsyncExecutor.schedule(this, DELAI_TRANSPORT_MS);
         }
     }
 

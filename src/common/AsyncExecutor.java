@@ -11,7 +11,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 /**
  * Gestionnaire centralise des taches asynchrones du jeu.
  */
@@ -155,6 +156,14 @@ public final class AsyncExecutor {
             "}}";
     }
 
+    private static final ScheduledExecutorService SCHEDULED_EXECUTOR =
+        Executors.newScheduledThreadPool(SHORT_CORE_THREADS, namedFactory("pcii-scheduler-"));
+
+    public static void schedule(Runnable task, long delayMs) {
+        if (!SCHEDULED_EXECUTOR.isShutdown()) {
+            SCHEDULED_EXECUTOR.schedule(task, delayMs, TimeUnit.MILLISECONDS);
+        }
+    }
     /**
      * Log utilitaire prêt à l'emploi pour diagnostiquer la charge en live.
      */

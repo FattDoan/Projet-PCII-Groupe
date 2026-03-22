@@ -22,13 +22,13 @@ public class MenuPanel extends JPanel {
     private static final Color C_RED        = new Color(225,  75,  65);
     private static final Color C_BLUE       = new Color( 90, 160, 255);
  
-    private static final Font F_TITLE = new Font("Consolas", Font.BOLD,  18);
-    private static final Font F_DESC  = new Font("Consolas", Font.PLAIN, 14);
-    private static final Font F_SECT  = new Font("Consolas", Font.BOLD,  13);
-    private static final Font F_KEY   = new Font("Consolas", Font.PLAIN, 14);
-    private static final Font F_VAL   = new Font("Consolas", Font.BOLD,  16);
-    private static final Font F_BTN   = new Font("Consolas", Font.BOLD,  14);
-    private static final Font F_SMALL = new Font("Consolas", Font.PLAIN, 11);
+    private static final Font F_TITLE = new Font("Dialog", Font.BOLD,  18);
+    private static final Font F_DESC  = new Font("Dialog", Font.PLAIN, 14);
+    private static final Font F_SECT  = new Font("Dialog", Font.BOLD,  13);
+    private static final Font F_KEY   = new Font("Dialog", Font.PLAIN, 14);
+    private static final Font F_VAL   = new Font("Dialog", Font.BOLD,  16);
+    private static final Font F_BTN   = new Font("Dialog", Font.BOLD,  14);
+    private static final Font F_SMALL = new Font("Dialog", Font.PLAIN, 11);
  
 
     private static void hint(Graphics2D g2) {
@@ -303,11 +303,23 @@ public class MenuPanel extends JPanel {
                 liveStockageLabel = addRow("Stockage", String.valueOf(b.getStockage()), C_AMBER);
                 
                 switch (b.type()) {
-                    case FOREUSE         -> addRow("Cadence",   "1/sec",            C_TEXT_SEC);
-                    case ROUTE           -> { if (b instanceof Route r) addRow("Direction", labelDir(r.getDirection()), C_BLUE); }
-                    case USINE           -> addRow("État",      "ACTIF",            C_GREEN);
-                    case BATIMENT_MAITRE -> addRow("Rôle",      "HQ", C_AMBER);
-                    default -> {}
+                    case FOREUSE: 
+                            String cadence = Foreuse.DELAI_EXTRACTION_MS > 0 ? String.format("%.1f", 1000.0 / Foreuse.DELAI_EXTRACTION_MS) : "∞";
+                            addRow("Cadence",  cadence+"/sec", C_TEXT_SEC);
+                            break;
+                    case ROUTE: 
+                            String speed = Minerai.DELAI_TRANSPORT_MS > 0 ? String.format("%.1f", 1000.0 / Minerai.DELAI_TRANSPORT_MS) : "∞";
+                            if (b instanceof Route r) addRow("Direction", labelDir(r.getDirection()), C_BLUE); 
+                            addRow("Vitesse", speed+"/sec", C_TEXT_SEC);
+                            break;
+                    case USINE:
+                            addRow("État",      "ACTIF",            C_GREEN);
+                            break;
+                    case BATIMENT_MAITRE:
+                            addRow("Rôle",      "HQ", C_AMBER);
+                            break;
+                    default:
+                            break;
                 }
                 addSpacer(8);
             }
