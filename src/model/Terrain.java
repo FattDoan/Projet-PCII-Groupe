@@ -1,6 +1,7 @@
 package model;
 
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import common.Validation;
 
@@ -27,8 +28,7 @@ public class Terrain {
    /** Tableau 2D contenant toutes les cases de la grille */
    private final Case[][] grille;
 
-   /** Liste des unités présentes sur le terrain */
-   // TODO : private List<Unite> unites;
+   /** Extension future: unités présentes sur le terrain. */
 
 
    /**
@@ -52,7 +52,7 @@ public class Terrain {
       // Génération aléatoire des minerais sur la grille
       int nombreMinerais = (int)(taille * taille * RATIO_MINERAIS);
       // On génère la liste des positions de minerais aléatoirement.
-      ArrayList<PositionGrille> positionsMinerais = new ArrayList<PositionGrille>();
+      Set<PositionGrille> positionsMinerais = new HashSet<>();
       while (positionsMinerais.size() < nombreMinerais) {
          int x = (int)(Math.random() * taille);
          int y = (int)(Math.random() * taille);
@@ -100,19 +100,46 @@ public class Terrain {
      */
 
     public Case getCase(int x, int y) {
-        // Validation : les coordonnées doivent être dans les limites de la grille
-      Validation.requireArgument(x >= 0 && y >= 0, "Coordonnées négatives: x=" + x + ", y=" + y);
-      Validation.requireArgument(x < taille && y < taille, "Coordonnées hors limites: x=" + x + ", y=" + y + ", taille=" + taille);
+      validateCoordonnees(x, y);
         return grille[x][y];
     }
+
+   /**
+    * API explicite pour les scénarios de démonstration et de setup manuel.
+    * Remplace le type de case sans toucher au bâtiment présent.
+    */
+   public void definirTypeCase(int x, int y, TypeCase type) {
+      validateCoordonnees(x, y);
+      Validation.requireArgument(type != null, "type=null");
+
+      Case actuelle = grille[x][y];
+      Case nouvelle = new Case(x, y, type);
+      if (actuelle.getBatiment() != null) {
+         nouvelle.setBatiment(actuelle.getBatiment());
+      }
+      grille[x][y] = nouvelle;
+   }
 
 
    /***** SETTER *****/
 
-   /** Modifie la case située à la position (x, y) dans la grille 
-    * TODO : /!\ uniquement utilisée pour les tests, à supprimer ou rendre privée dans la version finale du projet /!\
-   */
+   /**
+    * @deprecated API de mutation brute conservée pour compatibilité.
+    * Préférer {@link #definirTypeCase(int, int, TypeCase)}.
+    */
+   @Deprecated
    public void setCase(int x, int y, Case c) {
+      Validation.requireArgument(c != null, "case=null");
+      validateCoordonnees(x, y);
+      Validation.requireArgument(
+         c.getX() == x && c.getY() == y,
+         "Case incoherente avec la position cible: case=(" + c.getX() + ", " + c.getY() + ") cible=(" + x + ", " + y + ")"
+      );
       this.grille[x][y] = c;
+   }
+
+   private void validateCoordonnees(int x, int y) {
+      Validation.requireArgument(x >= 0 && y >= 0, "Coordonnées négatives: x=" + x + ", y=" + y);
+      Validation.requireArgument(x < taille && y < taille, "Coordonnées hors limites: x=" + x + ", y=" + y + ", taille=" + taille);
    }
 }

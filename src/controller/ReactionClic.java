@@ -1,7 +1,6 @@
 package controller;
 
 import java.awt.event.*;
-import common.Validation;
 import model.*;
 import view.*;
 
@@ -28,7 +27,7 @@ public class ReactionClic implements MouseListener {
     @Override
     public void mouseReleased(MouseEvent e) {
         if (e.getButton() != MouseEvent.BUTTON1) return;
-        // Ignore si c'était un drag et non un clic
+        // Ignore l'événement s'il s'agissait d'un glisser et non d'un clic.
         if (cameraController.isDragging()) return;
  
         Camera cam = affichage.getCamera();

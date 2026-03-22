@@ -15,7 +15,9 @@ public class AffichageCases {
         }
         else if (c.aBatiment()) {
             AffichageBatiments.afficheBatiment(g, c);
-            // TODO: c.aMinerai() here doesnt work? re-think the model
+            // TODO: confirmer la règle d'affichage quand une case contient à la fois
+            // un bâtiment et un minerai (priorité visuelle / superposition).
+            // Le minerai en transit est affiché uniquement sur les routes chargées.
             if (c.getBatiment().type() == model.TypeBatiment.ROUTE && c.getBatiment().getStockage() > 0) { 
                 afficheMinerai(g, c);
             }
@@ -27,7 +29,7 @@ public class AffichageCases {
         int x = c.getX() * Affichage.TAILLE_CASE; // conversion des coordonnées de la case en pixels pour l'affichage
         int y = c.getY() * Affichage.TAILLE_CASE;
 
-        // i want dark green 
+        // Choix visuel: vert foncé pour évoquer l'herbe.
         g.setColor(DARK_GREEN); // Couleur d'une case vide, ici vert pour faire de l'herbe
         g.fillRect(x, y, Affichage.TAILLE_CASE, Affichage.TAILLE_CASE); // Dessine un carré dans la case correspondante
     }

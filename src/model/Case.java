@@ -99,6 +99,11 @@ public class Case {
       Validation.requireState(!this.aBatiment(), "La case (" + x + ", " + y + ") n'est pas vide");
       // Validation : le bâtiment ne peut pas être nul
       Validation.requireArgument(batiment != null, "batiment=null");
+      // Validation : les coordonnées du bâtiment doivent correspondre à la case ciblée.
+      Validation.requireArgument(
+         batiment.getX() == x && batiment.getY() == y,
+         "Coordonnees batiment incoherentes avec la case: batiment=(" + batiment.getX() + ", " + batiment.getY() + ") case=(" + x + ", " + y + ")"
+      );
       this.batiment = batiment;
    }
 

@@ -1,5 +1,6 @@
 package tests;
 
+import common.AsyncExecutor;
 import model.*;
 import view.*;
 import controller.*;
@@ -22,9 +23,9 @@ public class ReactionClicTest {
     }
 
     private static void setupForeuse(Terrain t, int x, int y) {
-        t.setCase(x, y, new Case(x, y, TypeCase.MINERAI));
+        t.definirTypeCase(x, y, TypeCase.MINERAI);
         Foreuse f = new Foreuse(x, y, t);
         t.getCase(x, y).setBatiment(f);
-        new Thread(f).start();
+        AsyncExecutor.runLongLived(f);
     }
 }

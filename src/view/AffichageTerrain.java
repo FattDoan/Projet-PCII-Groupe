@@ -3,12 +3,9 @@ package view;
 import model.Camera;
 import model.Case;
 import model.Terrain;
-import model.Minerai;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class AffichageTerrain extends JPanel {
 
@@ -17,8 +14,6 @@ public class AffichageTerrain extends JPanel {
 
     private Case hoveredCase = null;
     private Case selectedCase = null;
-
-    private final List<Minerai> minerais = new CopyOnWriteArrayList<>();
  
     private static final Color C_AMBER = new Color(255, 185, 30, 80);
 
@@ -28,7 +23,7 @@ public class AffichageTerrain extends JPanel {
         setFocusable(true);
     }
 
-    // ── Injection caméra (post-construction) ─────────────────────────────
+    // ── Injection caméra (après construction) ────────────────────────────
 
     /** Appelé par Affichage.setCamera(), lui-même appelé par GameController. */
     public void setCamera(Camera camera) {
@@ -37,7 +32,7 @@ public class AffichageTerrain extends JPanel {
 
     public Camera getCamera() { return camera; }
 
-    // ── Hover ─────────────────────────────────────────────────────────────
+    // ── Gestion du survol ─────────────────────────────────────────────────
 
     public void setHoveredCase(Case c) {
         if (c == hoveredCase) return;
@@ -51,13 +46,13 @@ public class AffichageTerrain extends JPanel {
         repaint();
     }
 
-    // ── Rendu ─────────────────────────────────────────────────────────────
+    // ── Rendu ──────────────────────────────────────────────────────────────
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        // Guard : camera pas encore injectée au premier repaint spurieux
+        // Garde: la caméra peut ne pas être injectée lors d'un premier repaint.
         if (camera == null) return;
 
         Graphics2D g2 = (Graphics2D) g;
@@ -65,7 +60,7 @@ public class AffichageTerrain extends JPanel {
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
         g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,     RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
-        // Sauvegarde pour restauration après — protège les overlays Swing (MenuPanel)
+        // Sauvegarde de la transformation pour restaurer correctement les overlays.
         AffineTransform originalTransform = g2.getTransform();
 
         int   offsetX  = camera.getOffsetX();
@@ -73,10 +68,10 @@ public class AffichageTerrain extends JPanel {
         float cellSize = camera.effectiveCellSize();
         int   base     = camera.getBaseCellSize();
 
-        // Applique translation
+        // Translation globale selon l'offset caméra.
         g2.translate(-offsetX, -offsetY);
 
-        // Culling — ne dessine que les cases visibles, cases partielles incluses
+        // Élagage du rendu: ne dessine que les cases visibles (partielles incluses).
         int firstCol = Math.max(0, (int)(offsetX / cellSize));
         int firstRow = Math.max(0, (int)(offsetY / cellSize));
         int lastCol  = Math.min(terrain.getTaille() - 1, (int)((offsetX + getWidth())  / cellSize));
@@ -88,7 +83,7 @@ public class AffichageTerrain extends JPanel {
             }
         }
 
-        // Make hovered case whiten up
+        // Surbrillance légère de la case survolée.
         if (hoveredCase != null && hoveredCase != selectedCase) {
             int hx = hoveredCase.getX() * base;
             int hy = hoveredCase.getY() * base;
@@ -101,7 +96,7 @@ public class AffichageTerrain extends JPanel {
             g2.drawRect(hx, hy, base - 1, base - 1);
         }
 
-        // Draw selected case border
+        // Encadrement renforcé de la case sélectionnée.
         if (selectedCase != null) {
             int sx = selectedCase.getX() * base;
             int sy = selectedCase.getY() * base;
@@ -115,7 +110,7 @@ public class AffichageTerrain extends JPanel {
             g2.drawRect(sx + 1, sy + 1, base - 2, base - 2);
             
         }
-        // Restaure la transformation
+        // Restauration pour ne pas impacter les autres couches Swing.
         g2.setTransform(originalTransform);
     }
 }

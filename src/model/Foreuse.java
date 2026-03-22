@@ -9,7 +9,7 @@ import common.AsyncExecutor;
  * La capacité de stockage temporaire est fixée à 1 minerai.
  */
 public class Foreuse extends Batiment implements Runnable {
-    private int DELAI_EXTRACTION = 1000; // Délai d'extraction en millisecondes (1 seconde)
+    private static final int DELAI_EXTRACTION_MS = 1000; // 1 seconde
     private volatile boolean running = true; // Indique si le thread doit continuer à fonctionner
 
 
@@ -21,11 +21,6 @@ public class Foreuse extends Batiment implements Runnable {
         super(1, x, y, terrain);
     }
 
-    // Le terrain est déjà transmis au constructeur via Batiment
-    public Terrain getTerrain() {
-        return super.getTerrain();
-    }
-
     @Override
     public TypeBatiment type() {
         return TypeBatiment.FOREUSE;
@@ -34,17 +29,15 @@ public class Foreuse extends Batiment implements Runnable {
     
     @Override
     public void run() {
-        while (running) {
+        while (running && !Thread.currentThread().isInterrupted()) {
             try {
                 // Simule le temps d'extraction du minerai
-                Thread.sleep(DELAI_EXTRACTION);
+                Thread.sleep(DELAI_EXTRACTION_MS);
                 
                 // Extraction du minerai
                 if (!estPlein()) {
                     this.ajouterMinerai(1);
-                    if (getTerrain() != null) {
-                        AsyncExecutor.runAsync(new Minerai(this.x, this.y, getTerrain())); // Crée et démarre une tache pour le minerai extrait
-                    }
+                    AsyncExecutor.runAsync(new Minerai(getX(), getY(), getTerrain()));
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();

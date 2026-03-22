@@ -6,7 +6,7 @@ import model.Terrain;
 
 /** La fenêtre principale de l'application */
 public class Fenetre extends JFrame {
-    private Affichage affichage;    // pour afficher la grille de jeu
+    private final Affichage affichage;    // pour afficher la grille de jeu
 
     /** Constructeur de la fenêtre principale. Génère un affichage de la grille et du menu à partir du terrain donné.
      * @param titre le titre de la fenêtre
@@ -18,10 +18,12 @@ public class Fenetre extends JFrame {
         
         affichage = new Affichage(terrain);
         this.add(affichage);
-        
-        // TODO: ajouter ici les autres éléments relatifs à la fenêtre (menu, threads, MouseListener, etc.)
+
+        // TODO: ajouter ici les autres éléments de fenêtre (barre d'outils,
+        // raccourcis clavier globaux, etc.) selon les besoins produit.
 
         this.pack();
+        this.setLocationRelativeTo(null);
         this.setVisible(true);
     }
 

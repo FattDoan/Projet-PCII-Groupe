@@ -3,12 +3,11 @@ package model;
 /** Un bâtiment de stockage de minerai */
 public class Stockage extends Batiment {
     /** Capacité de stockage du bâtiment de stockage */
-    // TODO: augmenter la capacité du stockage
-    // en ce moment c'est juste pour le demo
+    // TODO: ajuster cette capacité selon l'équilibrage final du gameplay.
     private static final int CAPACITE = 10;
 
     /**
-     * Crée un nouveau bâtiment de stockage avec la capacité par défaut de 50 minerais.
+    * Crée un nouveau bâtiment de stockage avec la capacité par défaut.
      * 
      * @param x la coordonnée x du bâtiment sur la grille
      * @param y la coordonnée y du bâtiment sur la grille

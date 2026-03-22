@@ -1,5 +1,6 @@
 package tests;
 
+import common.AsyncExecutor;
 import model.*;
 import view.*;
 import controller.*;
@@ -14,7 +15,7 @@ public class TestView {
 
         int mid = size / 2;
 
-        // --- Simple Foreuse + Route + Stockage chain ---
+       // --- Chaîne simple foreuse -> route -> stockage ---
         setupForeuse(terrain, mid - 3, mid);
 
         terrain.getCase(mid - 2, mid)
@@ -37,9 +38,9 @@ public class TestView {
     }
 
     private static void setupForeuse(Terrain t, int x, int y) {
-        t.setCase(x, y, new Case(x, y, TypeCase.MINERAI));
+              t.definirTypeCase(x, y, TypeCase.MINERAI);
         Foreuse f = new Foreuse(x, y, t);
         t.getCase(x, y).setBatiment(f);
-        new Thread(f).start();
+              AsyncExecutor.runLongLived(f);
     }
 }

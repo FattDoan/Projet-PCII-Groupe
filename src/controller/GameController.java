@@ -7,46 +7,53 @@ import view.AffichageTerrain;
  
 public class GameController {
  
+    // Caméra unique de la session de jeu.
     private final Camera           camera;
+    // Conserve une référence pour le cycle de vie des listeners (drag clavier/souris).
     private final CameraController cameraController;
  
     public GameController(Terrain terrain, Affichage affichage) {
  
-        // CRITICAL: pass LARGEUR/HAUTEUR (capped window size),
-        // NOT LARGEUR_GRILLE/HAUTEUR_GRILLE (full terrain size).
-        // Getting this wrong makes maxOffset = 0 → camera can't move.
+        // Important: on initialise la caméra avec la taille de vue visible,
+        // pas avec la taille totale de la map, sinon la caméra ne se déplace pas.
         camera = new Camera(
             terrain.getTaille(),
             Affichage.TAILLE_CASE,
-            Affichage.LARGEUR,   // window width
-            Affichage.HAUTEUR    // window height
+            affichage.getLargeurVue(),
+            affichage.getHauteurVue()
         );
  
-        centerOnHQ(terrain);
+        // Positionnement initial sur le bâtiment maître.
+        centerOnHQ(terrain, affichage);
+        // Injection de la caméra dans la couche vue.
         affichage.setCamera(camera);
  
         AffichageTerrain view = affichage.getAffichageTerrain();
  
+        // Orchestration des interactions utilisateur.
         cameraController = new CameraController(camera, affichage);
         new ReactionClic(affichage, terrain, cameraController);
         new ReactionHover(view, terrain, camera);
     }
  
     /**
-     * Centers the camera on the HQ tile (terrain.getTaille() / 2).
+        * Centre la caméra sur la case du QG (terrain.getTaille() / 2).
      *
-     * Formula:
-     *   HQ pixel center = hqGrid * cellSize + cellSize/2
-     *   offsetX = HQ pixel center - viewWidth/2
+        * Formule:
+        *   centrePixelQG = hqGrid * tailleCase + tailleCase/2
+        *   offsetX = centrePixelQG - largeurVue/2
      *
-     * setOffset clamps to [0, maxOffset] so this is always safe.
+        * setOffset borne automatiquement dans [0, maxOffset].
      */
-    private void centerOnHQ(Terrain terrain) {
+    private void centerOnHQ(Terrain terrain, Affichage affichage) {
         int cellSize   = Affichage.TAILLE_CASE;
         int hqGrid     = terrain.getTaille() / 2;
+        // Centre pixel de la case HQ.
         int hqCenterPx = hqGrid * cellSize + cellSize / 2;
-        int offsetX    = hqCenterPx - Affichage.LARGEUR  / 2;
-        int offsetY    = hqCenterPx - Affichage.HAUTEUR  / 2;
+        // Décalage pour que le centre HQ arrive au centre de la vue.
+        int offsetX    = hqCenterPx - affichage.getLargeurVue() / 2;
+        int offsetY    = hqCenterPx - affichage.getHauteurVue() / 2;
+        // La caméra clamp automatiquement dans les bornes valides.
         camera.setOffset(offsetX, offsetY);
     }
  

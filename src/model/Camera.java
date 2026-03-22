@@ -19,7 +19,7 @@ public class Camera {
         this.viewHeight         = viewHeight;
     }
  
-    // ── Pan ───────────────────────────────────────────────────────────────
+    // ── Déplacement caméra ────────────────────────────────────────────────
  
     public void move(int dx, int dy) {
         setOffset(offsetX + dx, offsetY + dy);
@@ -32,7 +32,7 @@ public class Camera {
         offsetY  = clamp(y, 0, maxY);
     }
  
-    // ── Screen → grid ─────────────────────────────────────────────────────
+    // ── Conversion écran -> grille ────────────────────────────────────────
  
     public int screenToGridX(int screenX) {
         return (screenX + offsetX) / baseCellSize;
@@ -42,16 +42,16 @@ public class Camera {
         return (screenY + offsetY) / baseCellSize;
     }
  
-    // ── Getters ───────────────────────────────────────────────────────────
+    // ── Accesseurs ─────────────────────────────────────────────────────────
  
     public int getOffsetX()      { return offsetX; }
     public int getOffsetY()      { return offsetY; }
     public int getBaseCellSize() { return baseCellSize; }
  
-    // effectiveCellSize kept so GameCanvas compiles without changes
+    // Conservé pour compatibilité avec le rendu existant.
     public float effectiveCellSize() { return baseCellSize; }
  
-    // ── Internal ──────────────────────────────────────────────────────────
+    // ── Utilitaires internes ───────────────────────────────────────────────
  
     private static int clamp(int v, int min, int max) {
         return Math.max(min, Math.min(max, v));

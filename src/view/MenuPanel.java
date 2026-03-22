@@ -36,11 +36,11 @@ public class MenuPanel extends JPanel {
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
         g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
     }
-    // ── State ─────────────────────────────────────────────────────────────
+    // ── Etat ──────────────────────────────────────────────────────────────
     private volatile Case selectedCase = null;
     private final Affichage affichage;
  
-    // ── Sub-panels ────────────────────────────────────────────────────────
+    // ── Sous-panneaux ─────────────────────────────────────────────────────
     private final HeaderPanel  header;
     private final StatsPanel   stats;
     private final ActionsPanel actions;
@@ -73,7 +73,7 @@ public class MenuPanel extends JPanel {
             }
         });
  
-        // Left accent border via MatteBorder — static, no animation needed
+        // Bordure d'accent à gauche, volontairement statique.
         setBorder(new MatteBorder(0, 3, 0, 0, C_BORDER_LIT));
  
         add(header, BorderLayout.NORTH);
@@ -81,14 +81,14 @@ public class MenuPanel extends JPanel {
         add(actions, BorderLayout.SOUTH);
 
 
-        // WARM-UP
+        // Pré-initialisation visuelle pour éviter un premier affichage saccadé.
         stats.update((Case)null); 
         header.update((Case)null);
     
-        // This tells the LayoutManager to do the math NOW, not on the first click
+        // Force le calcul de layout immédiatement.
         this.doLayout();
         
-        //force a paint to an off-screen buffer to warm up font rendering
+        // Pré-rendu hors écran pour chauffer le rendu des polices.
         BufferedImage warmUp = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         this.paint(warmUp.getGraphics());
         //----------------------------------------------------------------------------------
@@ -110,7 +110,7 @@ public class MenuPanel extends JPanel {
     }
  
     // ═════════════════════════════════════════════════════════════════════
-    // HeaderPanel
+    // Panneau d'en-tête
     // ═════════════════════════════════════════════════════════════════════
     private class HeaderPanel extends JPanel {
         private static final int ICON_SIZE = 52;
@@ -128,7 +128,7 @@ public class MenuPanel extends JPanel {
             setPreferredSize(new Dimension(0, H));
             setBackground(C_RAISED);
  
-            // Close button — top right
+            // Bouton de fermeture en haut à droite.
             JButton close = new JButton("×") {
                 { setFont(new Font("Dialog", Font.PLAIN, 20));
                   setMargin(new Insets(0, 0, 0, 0));
@@ -142,9 +142,9 @@ public class MenuPanel extends JPanel {
                       @Override public void mouseExited (java.awt.event.MouseEvent e) { setForeground(C_TEXT_SEC); repaint(); }
                   }); }
             };
-            close.setBounds(0, 0, 28, 28); // positioned in doLayout
+            close.setBounds(0, 0, 28, 28); // Position finale ajustée dans doLayout.
             add(close);
-            // store ref to reposition
+            // Stocke la référence pour le repositionnement dynamique.
             this.putClientProperty("closeBtn", close);
         }
 
@@ -155,7 +155,7 @@ public class MenuPanel extends JPanel {
         }
  
         void update(Case c) {
-            // Don't rebuild if it's the same case
+            // Évite un recalcul complet si la case est identique.
             if (c == lastCase && c != null) return; 
             lastCase = c;
 
@@ -203,7 +203,7 @@ public class MenuPanel extends JPanel {
                 }
                 case STOCKAGE -> { g.fillRect(8, s/2, s-16, s/2-8); g.fillRect(6, s/2-4, s-12, 8); }
                 case BATIMENT_MAITRE -> {
-                    // draw a star
+                    // Dessine une étoile pour le bâtiment maître.
                     int[] xp={s/2, s*3/4-4, s-8, s*3/4-4, s/2, s/4+4, 8, s/4+4};
                     int[] yp={8, s/2-4, s/2, s*3/4-4, s-8, s*3/4-4, s/2, s/2-4};
                     g.fillPolygon(xp, yp, 8);
@@ -233,15 +233,15 @@ public class MenuPanel extends JPanel {
             Graphics2D g2 = (Graphics2D) g; hint(g2);
             int w = getWidth(), h = getHeight();
  
-            // Accent top bar
+            // Barre d'accent en partie haute.
             g2.setColor(accent); g2.fillRect(0, 0, w, 3);
  
-            // Icon
+            // Icône du type sélectionné.
             int ix = 12, iy = (h - ICON_SIZE) / 2;
             if (icon != null) g2.drawImage(icon, ix, iy, null);
             else { g2.setColor(C_BORDER); g2.drawRoundRect(ix, iy, ICON_SIZE, ICON_SIZE, 8, 8); }
  
-            // Title + description
+            // Titre et description de l'élément.
             int tx = ix + ICON_SIZE + 12;
             g2.setFont(F_TITLE); g2.setColor(C_TEXT_PRI);
             g2.drawString(title, tx, 26);
@@ -254,10 +254,10 @@ public class MenuPanel extends JPanel {
     }
  
     // ═════════════════════════════════════════════════════════════════════
-    // StatsPanel
+    // Panneau statistiques
     // ═════════════════════════════════════════════════════════════════════
     private static class StatsPanel extends JPanel {
-        // State tracking for optimization
+        // Suivi d'état pour limiter les reconstructions de l'UI.
         private CapacityBar liveCapBar = null;
         private JLabel liveStockageLabel = null;
         private Case lastCase = null;
@@ -274,13 +274,13 @@ public class MenuPanel extends JPanel {
             Graphics2D g2 = (Graphics2D) g; hint(g2);
         }
          void update(Case c) {
-            // OPTIMIZATION: If looking at the same case, just update live stats
+            // Optimisation: même case => mise à jour légère des valeurs.
             if (c == lastCase && c != null) {
                 updateLiveStats(c);
                 return;
             }
 
-            // Case changed (i.e user click on different tile)! Rebuild the UI.
+            // La case a changé: on reconstruit le contenu du panneau.
             lastCase = c;
             removeAll();
             liveCapBar = null;
@@ -291,7 +291,7 @@ public class MenuPanel extends JPanel {
             if (c.getBatiment() != null) {
                 Batiment b = c.getBatiment();
                 
-                // Save reference to the CapacityBar
+                // Conserve une référence pour les mises à jour incrémentales.
                 liveCapBar = new CapacityBar(b.getStockage(), b.getCapaciteMax());
                 add(liveCapBar);
                 
@@ -299,7 +299,7 @@ public class MenuPanel extends JPanel {
                 addSection("BÂTIMENT");
                 addRow("Classe", labelType(b.type()), C_TEXT_PRI);
                 
-                // Save reference to the Stockage label
+                // Référence du label de stockage pour MAJ sans reconstruire.
                 liveStockageLabel = addRow("Stockage", String.valueOf(b.getStockage()), C_AMBER);
                 
                 switch (b.type()) {
@@ -344,7 +344,7 @@ public class MenuPanel extends JPanel {
             row.setPreferredSize(new Dimension(0, 36));
             row.setBorder(new EmptyBorder(0, 12, 0, 12));
             JLabel kl = new JLabel(key);   kl.setFont(F_KEY); kl.setForeground(C_TEXT_SEC);
-            JLabel vl = new JLabel(value); vl.setFont(F_VAL); vl.setForeground(vc); // <--- We return this!
+            JLabel vl = new JLabel(value); vl.setFont(F_VAL); vl.setForeground(vc); // Retourné pour mise à jour live.
             row.add(kl, BorderLayout.WEST); row.add(vl, BorderLayout.EAST);
             add(row);
             JSeparator sep = new JSeparator();
@@ -378,7 +378,7 @@ public class MenuPanel extends JPanel {
     }
  
     // ═════════════════════════════════════════════════════════════════════
-    // CapacityBar
+    // Barre de capacité
     // ═════════════════════════════════════════════════════════════════════
     private static class CapacityBar extends JPanel {
         private float ratio; 
@@ -389,16 +389,16 @@ public class MenuPanel extends JPanel {
             setPreferredSize(new Dimension(0, 28));
             setMaximumSize(new Dimension(Integer.MAX_VALUE, 28));
             setBackground(C_BASE);
-            updateValues(stock, cap); // Initialize values
+            updateValues(stock, cap); // Initialise l'état visuel.
         }
 
-        // NEW: Method to update values on the fly
+        // Met à jour la barre dynamiquement sans reconstruire le composant.
         public void updateValues(int stock, int cap) {
             float newRatio = cap > 0 ? Math.min(1f, (float)stock / cap) : 0f;
             String newLabel = stock + " / " + cap;
             Color newBar = newRatio > 0.85f ? C_RED : newRatio > 0.5f ? C_AMBER : C_GREEN;
 
-            // Only trigger a repaint if the visual data actually changed
+            // Limite les repaint aux vrais changements visuels.
             if (newRatio != ratio || !newLabel.equals(label)) {
                 this.ratio = newRatio;
                 this.label = newLabel;
@@ -421,10 +421,10 @@ public class MenuPanel extends JPanel {
     }
  
     // ═════════════════════════════════════════════════════════════════════
-    // ActionsPanel
+    // Panneau actions
     // ═════════════════════════════════════════════════════════════════════
     private static class ActionsPanel extends JPanel {
-        private Case lastCase = null; // Track current state
+        private Case lastCase = null; // Suit l'état courant pour éviter le travail inutile.
         ActionsPanel() {
             setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
             setBackground(C_BASE);
@@ -439,7 +439,7 @@ public class MenuPanel extends JPanel {
         }
 
         void update(Case c) {
-            // OPTIMIZATION: Do nothing if the case hasn't changed
+            // Optimisation: ne fait rien si la case n'a pas changé.
             if (c == lastCase) return;
             
             lastCase = c;

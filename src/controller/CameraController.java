@@ -6,8 +6,8 @@ import view.AffichageTerrain;
 import java.awt.event.*;
  
 /**
- * Pan via drag (BUTTON1) ou touches fléchées / WASD.
- * Drag distingué du clic via DRAG_THRESHOLD pixels.
+ * Déplacement de la caméra par glisser (bouton gauche) ou clavier.
+ * Le glisser est distingué d'un clic simple via un seuil de pixels.
  */
 public class CameraController implements MouseListener, MouseMotionListener, KeyListener {
  
@@ -17,7 +17,7 @@ public class CameraController implements MouseListener, MouseMotionListener, Key
     private final Camera camera;
     private final AffichageTerrain view;
  
-    // Drag state
+    // État interne du glisser-déposer caméra.
     private boolean dragging   = false;
     private boolean dragIntent = false;
     private int dragStartX, dragStartY;
@@ -33,10 +33,10 @@ public class CameraController implements MouseListener, MouseMotionListener, Key
         view.requestFocusInWindow();
     }
  
-    /** Read by ReactionClic to skip click handling after a drag. */
+    /** Utilisé par ReactionClic pour ignorer un clic après un glisser. */
     public boolean isDragging() { return dragging; }
  
-    // ── Mouse drag ────────────────────────────────────────────────────────
+    // ── Gestion du glisser souris ─────────────────────────────────────────
  
     @Override
     public void mousePressed(MouseEvent e) {
@@ -66,7 +66,7 @@ public class CameraController implements MouseListener, MouseMotionListener, Key
         dragging   = false;
     }
  
-    // ── Keyboard pan ──────────────────────────────────────────────────────
+    // ── Gestion clavier ────────────────────────────────────────────────────
  
     @Override
     public void keyPressed(KeyEvent e) {

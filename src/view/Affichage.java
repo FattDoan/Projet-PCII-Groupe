@@ -13,34 +13,49 @@ public class Affichage extends JPanel {
     public static final int    TAILLE_CASE        = 40;
     public static final double RATIO_LARGEUR_MENU = 0.30;
  
-    public static int LARGEUR_GRILLE, HAUTEUR_GRILLE, LARGEUR, HAUTEUR;
+    // Dimensions réelles du terrain en pixels (hors clipping fenêtre).
+    private final int largeurGrille;
+    private final int hauteurGrille;
+
+    // Dimensions visibles effectives de la fenêtre de jeu.
+    private final int largeurVue;
+    private final int hauteurVue;
  
     private final AffichageTerrain affichageTerrain;
     private final MenuPanel        menuPanel;
     private final int              menuW;
  
+    // Caméra injectée plus tard par le contrôleur de jeu.
     private Camera camera = null;
  
     public Affichage(Terrain terrain) {
         super(null);
  
-        LARGEUR_GRILLE = terrain.getTaille() * TAILLE_CASE;
-        HAUTEUR_GRILLE = terrain.getTaille() * TAILLE_CASE;
-        LARGEUR = Math.min(LARGEUR_GRILLE, MAX_VIEW_W);
-        HAUTEUR = Math.min(HAUTEUR_GRILLE, MAX_VIEW_H);
-        menuW   = (int)(LARGEUR * RATIO_LARGEUR_MENU);
+        // Conversion cases -> pixels.
+        largeurGrille = terrain.getTaille() * TAILLE_CASE;
+        hauteurGrille = terrain.getTaille() * TAILLE_CASE;
+
+        // On borne la taille de vue pour garder une UI lisible et fluide.
+        largeurVue = Math.min(largeurGrille, MAX_VIEW_W);
+        hauteurVue = Math.min(hauteurGrille, MAX_VIEW_H);
+
+        // Le panneau menu occupe un ratio fixe de la largeur de vue.
+        menuW   = (int)(largeurVue * RATIO_LARGEUR_MENU);
  
-        setPreferredSize(new Dimension(LARGEUR, HAUTEUR));
+        setPreferredSize(new Dimension(largeurVue, hauteurVue));
  
+        // Couche 1: terrain principal.
         affichageTerrain = new AffichageTerrain(terrain);
-        affichageTerrain.setBounds(0, 0, LARGEUR, HAUTEUR);
+        affichageTerrain.setBounds(0, 0, largeurVue, hauteurVue);
         add(affichageTerrain);
  
-        menuPanel = new MenuPanel(menuW, HAUTEUR, this);
-        menuPanel.setBounds(LARGEUR - menuW, 0, menuW, HAUTEUR);
+        // Couche 2: menu contextuel superposé.
+        menuPanel = new MenuPanel(menuW, hauteurVue, this);
+        menuPanel.setBounds(largeurVue - menuW, 0, menuW, hauteurVue);
         menuPanel.setVisible(false);
         add(menuPanel);
 
+        // Z-order explicite pour éviter les surprises de rendu.
         setComponentZOrder(menuPanel, 0);
         setComponentZOrder(affichageTerrain, 1);
     }
@@ -49,8 +64,13 @@ public class Affichage extends JPanel {
     public Camera           getCamera()           { return camera; }
     public AffichageTerrain getAffichageTerrain() { return affichageTerrain; }
     public MenuPanel        getMenuPanel()        { return menuPanel; }
+    public int getLargeurVue() { return largeurVue; }
+    public int getHauteurVue() { return hauteurVue; }
+    public int getLargeurGrille() { return largeurGrille; }
+    public int getHauteurGrille() { return hauteurGrille; }
  
     public void showMenu(Case c) {
+        // Le menu est alimenté à partir de la case sélectionnée.
         menuPanel.setSelectedCase(c);
         menuPanel.refresh();
         menuPanel.setVisible(true);
@@ -65,6 +85,8 @@ public class Affichage extends JPanel {
 
     @Override
     public boolean isOptimizedDrawingEnabled() {
-        return false; // Tells Swing: "My children overlap, please calculate Z-order correctly!"
+        // Les composants se chevauchent volontairement (terrain + menu overlay),
+        // on désactive donc l'optimisation Swing pour respecter le Z-order.
+        return false; // Indique à Swing de conserver le calcul de superposition des couches.
     }
 }
