@@ -15,12 +15,11 @@ javac -d target/test-classes -cp target/classes $(find src/tests -name "*.java")
 
 ### Execute
 
-Fichier src (remplacer `pkg` par le nom du package (model, view ou controller), `TOTO` par le nom de la classe)
 ```bash
-java -cp target/classes pkg.TOTO
+java -cp target/classes main.Main
 ```
 
-Fichier test (remplacer `TOTO` par le nom de la classe)
+Pour executer le fichier de test: (remplacer `TOTO` par le nom de la classe)
 
 ```bash
 java -cp target/classes:target/test-classes tests.TOTO
