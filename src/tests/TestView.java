@@ -1,63 +1,45 @@
 package tests;
 
-import model.BatimentMaitre;
-import model.Case;
-import model.Direction;
-import model.Foreuse;
-import model.Route;
-import model.Terrain;
-import model.TypeCase;
-import view.Fenetre;
-import view.TimerView;
+import model.*;
+import view.*;
+import controller.*;
 
-/** Classe de tests pour l'affichage */
 public class TestView {
 
     public static void main(String[] args) {
-        // on créé un terrain de test 
-        Terrain terrain = new Terrain(10); 
-
-        //et une fenêtre pour l'afficher
-        Fenetre fenetre = new Fenetre("Test d'affichage", terrain);
-
-        // on démarre le timer d'affichage pour mettre à jour l'affichage régulièrement, 
-        // même si pour l'instant ça ne fait rien car le terrain reste le même
+        int size = 20;
+        Terrain terrain = new Terrain(size);
+        Fenetre fenetre = new Fenetre("Test View", terrain);
         new TimerView(fenetre);
 
-        // on ajoute des éléments de test sur le terrain pour vérifier leur affichage
+        int mid = size / 2;
 
-        // batiment maître avec 0, 10 et 100 minerais
-        // TODO : à remplacer par des bâtiments basiques de stockage, le bâtiment maître ne doit pas être créé manuellement
-        // BatimentMaitre batimentMaitre1 = new BatimentMaitre();
-        // BatimentMaitre batimentMaitre2 = new BatimentMaitre();
-        // BatimentMaitre batimentMaitre3 = new BatimentMaitre();
-        // batimentMaitre2.ajouterMinerai(10);
-        // batimentMaitre3.ajouterMinerai(100);
-        // terrain.getCase(1, 1).setBatiment(batimentMaitre1);
-        // terrain.getCase(2, 1).setBatiment(batimentMaitre2);
-        // terrain.getCase(3, 1).setBatiment(batimentMaitre3);
+        // --- Simple Foreuse + Route + Stockage chain ---
+        setupForeuse(terrain, mid - 3, mid);
 
-        // une foreuse avec 0 et 1 minerai
-        Foreuse foreuse1 = new Foreuse(1, 3, terrain);
-        Foreuse foreuse2 = new Foreuse(2, 3, terrain);
-        foreuse2.ajouterMinerai(1);
-        terrain.getCase(1, 3).setBatiment(foreuse1);
-        terrain.getCase(2, 3).setBatiment(foreuse2);
+        terrain.getCase(mid - 2, mid)
+               .setBatiment(new Route(Direction.EST, mid - 2, mid, terrain));
 
-        // routes qui vont dans 4 directions différentes
-        Route routeHaut = new Route(Direction.NORD, 5, 4, terrain);
-        Route routeBas = new Route(Direction.SUD, 5, 6, terrain);
-        Route routeGauche = new Route(Direction.OUEST, 4, 5, terrain);
-        Route routeDroite = new Route(Direction.EST, 6, 5, terrain);
-        terrain.getCase(5, 4).setBatiment(routeHaut);
-        terrain.getCase(5, 6).setBatiment(routeBas);
-        terrain.getCase(4, 5).setBatiment(routeGauche);
-        terrain.getCase(6, 5).setBatiment(routeDroite);
+        terrain.getCase(mid - 1, mid)
+               .setBatiment(new Route(Direction.EST, mid - 1, mid, terrain));
 
-        // les minerais sont déjà placés aléatoirement dans le constructeur du terrain, 
-        // on n'a pas besoin d'en ajouter manuellement
-
-        // TODO : ajouter les tests pour les autres types de bâtiments une fois qu'ils seront implémentés
+        // --- Test si les routes faisent des virages correctement ---
+        terrain.getCase(mid, mid - 1)
+               .setBatiment(new Route(Direction.NORD, mid, mid - 1, terrain));
+        terrain.getCase(mid, mid + 1)
+               .setBatiment(new Route(Direction.SUD, mid, mid + 1, terrain));
+        terrain.getCase(mid - 1, mid - 1)
+               .setBatiment(new Route(Direction.OUEST, mid - 1, mid - 1, terrain));
+        terrain.getCase(mid + 1, mid - 1)
+               .setBatiment(new Route(Direction.EST, mid + 1, mid - 1, terrain));
+    
+         new GameController(terrain, fenetre.getAffichage());
     }
 
+    private static void setupForeuse(Terrain t, int x, int y) {
+        t.setCase(x, y, new Case(x, y, TypeCase.MINERAI));
+        Foreuse f = new Foreuse(x, y, t);
+        t.getCase(x, y).setBatiment(f);
+        new Thread(f).start();
+    }
 }
