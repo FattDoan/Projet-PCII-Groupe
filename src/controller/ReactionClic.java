@@ -42,10 +42,9 @@ public class ReactionClic implements MouseListener {
         }
  
         Case c = terrain.getCase(gx, gy);
-        if (!c.estVide()) {
-            affichage.getAffichageTerrain().setSelectedCase(c);
-            affichage.showMenu(c);
-        }
+
+        affichage.getAffichageTerrain().setSelectedCase(c);
+        affichage.showMenu(c);
     }
  
     @Override public void mouseClicked (MouseEvent e) {}

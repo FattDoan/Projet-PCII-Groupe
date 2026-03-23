@@ -6,8 +6,9 @@ import javax.swing.border.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
  
+/** Panneau du menu contenant toutes les données relatives à la case sélectionnée */
 public class MenuPanel extends JPanel {
- 
+
     // ── Palette ───────────────────────────────────────────────────────────
     private static final Color C_BASE       = new Color(18,  18,  20);
     private static final Color C_SURFACE    = new Color(26,  27,  30);
@@ -21,7 +22,8 @@ public class MenuPanel extends JPanel {
     private static final Color C_GREEN      = new Color( 85, 210, 130);
     private static final Color C_RED        = new Color(225,  75,  65);
     private static final Color C_BLUE       = new Color( 90, 160, 255);
- 
+
+    // ── Polices ───────────────────────────────────────────────────────────
     private static final Font F_TITLE = new Font("Dialog", Font.BOLD,  18);
     private static final Font F_DESC  = new Font("Dialog", Font.PLAIN, 14);
     private static final Font F_SECT  = new Font("Dialog", Font.BOLD,  13);
@@ -29,53 +31,70 @@ public class MenuPanel extends JPanel {
     private static final Font F_VAL   = new Font("Dialog", Font.BOLD,  16);
     private static final Font F_BTN   = new Font("Dialog", Font.BOLD,  14);
     private static final Font F_SMALL = new Font("Dialog", Font.PLAIN, 11);
- 
 
+
+    /** Définit les types de rendu pour une meilleure qualité d'affichage (antialiasing, interpolation...) */
     private static void hint(Graphics2D g2) {
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
         g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
     }
+
     // ── Etat ──────────────────────────────────────────────────────────────
+    /** La case actuellement sélectionnée */
     private volatile Case selectedCase = null;
+    /** L'instance d'affichage utilisée pour le rendu */
     private final Affichage affichage;
- 
+
     // ── Sous-panneaux ─────────────────────────────────────────────────────
+    /** Contient l'en-tête du menu/les infos de base sur la case sélectionnée (logo, nom) */
     private final HeaderPanel  header;
+    /** Contient les statistiques de la case sélectionnée */
     private final StatsPanel   stats;
+    /** Contient les actions disponibles pour la case sélectionnée */
     private final ActionsPanel actions;
 
     public MenuPanel(int width, int height, Affichage affichage) {
-        this.affichage = affichage;
+        // On fixe la taille du panneau et les propriétés de base.
         setPreferredSize(new Dimension(width, height));
         setBackground(C_BASE);
         setLayout(new BorderLayout(0, 0));
 
+        // On initialise les variables
+        this.affichage = affichage;
+
         header  = new HeaderPanel();
         stats   = new StatsPanel();
         actions = new ActionsPanel();
- 
+
+
+        // Le panneau de stats est placé dans un JScrollPane pour gérer les cas de contenu trop grand.
         JScrollPane scroll = new JScrollPane(stats,
             JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
             JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scroll.setBorder(null);
         scroll.getViewport().setBackground(C_SURFACE);
+
+        // Personnalisation de la scrollbar pour l'intégration visuelle.
         JScrollBar vsb = scroll.getVerticalScrollBar();
         vsb.setPreferredSize(new Dimension(4, 0));
+
         vsb.setUI(new javax.swing.plaf.basic.BasicScrollBarUI() {
             @Override protected void configureScrollBarColors() {
                 thumbColor = C_BORDER_LIT; trackColor = C_BASE;
             }
+            // Pas de boutons de défilement, on les remplace par des composants vides.
             @Override protected JButton createDecreaseButton(int o) { return zeroBtn(); }
             @Override protected JButton createIncreaseButton(int o) { return zeroBtn(); }
             private JButton zeroBtn() {
                 JButton b = new JButton(); b.setPreferredSize(new Dimension(0, 0)); return b;
             }
         });
- 
+
+
         // Bordure d'accent à gauche, volontairement statique.
         setBorder(new MatteBorder(0, 3, 0, 0, C_BORDER_LIT));
- 
+
         add(header, BorderLayout.NORTH);
         add(scroll, BorderLayout.CENTER);
         add(actions, BorderLayout.SOUTH);
@@ -95,54 +114,82 @@ public class MenuPanel extends JPanel {
     }
 
 
+
+    /***** GETTER *****/
+
     public void setSelectedCase(Case c) { 
         this.selectedCase = c; 
     }
+
+    /***** SETTER *****/
+
     public Case getSelectedCase() {
         return this.selectedCase;
     }
 
+    /** Met à jour les informations affichées (uniquement si une case est sélectionnée) */
     public void refresh() {
         if (selectedCase == null) return;
         header.update(selectedCase);
         stats.update(selectedCase);
         actions.update(selectedCase);
     }
- 
+
+
+
+
     // ═════════════════════════════════════════════════════════════════════
     // Panneau d'en-tête
     // ═════════════════════════════════════════════════════════════════════
     private class HeaderPanel extends JPanel {
+
+        /**** CONSTANTES VISUELLES ****/
+
+        // taille du logo correpondant au type de la case
         private static final int ICON_SIZE = 52;
+        // hauteur fixe du panneau d'en-tête
         private static final int H        = 80;
- 
+
+
+        /**** VARIABLES ****/
+
         private String        title   = "";
         private String[]      desc    = {};
         private Color         accent  = C_TEXT_DIM;
         private BufferedImage icon    = null;
 
+        // Cache pour éviter de reconstruire les icônes à chaque fois. Les clés sont soit des TypeBatiment, soit la chaîne "MINERAI".
         private static final java.util.Map<Object, BufferedImage> ICON_CACHE = new java.util.HashMap<>();
+        // La dernière case affichée pour éviter les recalculs inutiles.
         private Case lastCase = null;
-        HeaderPanel() {
+
+        // Constructeur: initialise le layout, le bouton de fermeture et les éléments de base.
+        /*package-private*/ HeaderPanel() {
             setLayout(null);
             setPreferredSize(new Dimension(0, H));
             setBackground(C_RAISED);
  
-            // Bouton de fermeture en haut à droite.
+            // Bouton pour fermer le panneau en haut à droite.
             JButton close = new JButton("×") {
-                { setFont(new Font("Dialog", Font.PLAIN, 20));
-                  setMargin(new Insets(0, 0, 0, 0));
-                  setForeground(C_TEXT_SEC); setBackground(C_RAISED);
-                  setFocusPainted(false); setBorderPainted(false);
-                  setContentAreaFilled(false);
-                  setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                  addActionListener(e -> affichage.hideMenu());
-                  addMouseListener(new java.awt.event.MouseAdapter() {
-                      @Override public void mouseEntered(java.awt.event.MouseEvent e) { setForeground(C_TEXT_PRI); repaint(); }
-                      @Override public void mouseExited (java.awt.event.MouseEvent e) { setForeground(C_TEXT_SEC); repaint(); }
+                {   // Style visuel du bouton de fermeture.
+                    setFont(new Font("Dialog", Font.PLAIN, 20));
+                    setMargin(new Insets(0, 0, 0, 0));
+                    setForeground(C_TEXT_SEC); setBackground(C_RAISED);
+                    setFocusPainted(false); setBorderPainted(false);
+                    setContentAreaFilled(false);
+                    // TODO : demander à chatgpt vu que apparemment c'est lui qui a fait ce code
+                    setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    // Action de fermeture: cache le menu et réinitialise la sélection.
+                    addActionListener(e -> affichage.hideMenu());
+                    // Modifie la couleur de l'arrière-plan lorsqu'on passe la souris sur le bouton.
+                    addMouseListener(new java.awt.event.MouseAdapter() {
+                        @Override public void mouseEntered(java.awt.event.MouseEvent e) { setForeground(C_TEXT_PRI); repaint(); }
+                        @Override public void mouseExited (java.awt.event.MouseEvent e) { setForeground(C_TEXT_SEC); repaint(); }
                   }); }
             };
             close.setBounds(0, 0, 28, 28); // Position finale ajustée dans doLayout.
+
+            // ajout du bouton de fermeture au panneau d'en-tête
             add(close);
             // Stocke la référence pour le repositionnement dynamique.
             this.putClientProperty("closeBtn", close);
@@ -153,13 +200,17 @@ public class MenuPanel extends JPanel {
             JButton b = (JButton) getClientProperty("closeBtn");
             if (b != null) b.setBounds(getWidth() - 40, 6, 36, 36);
         }
- 
+
+        // met à jour le contenu du panneau d'en-tête en fonction de la case sélectionnée
         void update(Case c) {
             // Évite un recalcul complet si la case est identique.
             if (c == lastCase && c != null) return; 
             lastCase = c;
 
+            // Détermine le nom, la couleur et la description en fonction du type/batiment dans la case. Utilise le cache pour les icônes.
+            // Si aucune case n'est sélectionnée, affiche un état vide.
             if (c == null) { title = ""; desc = new String[]{}; accent = C_TEXT_DIM; icon = null; }
+            // Si la case contient un bâtiment, on affiche les infos du bâtiment.
             else if (c.getBatiment() != null) {
                 TypeBatiment type = c.getBatiment().type();
                 switch (type) {
@@ -169,24 +220,42 @@ public class MenuPanel extends JPanel {
                     case BATIMENT_MAITRE -> { title = "HQ";       desc = new String[]{"Sa destruction = défaite. \nIl peut stocker aussi les minerais."}; accent = C_AMBER; }
                     case ROUTE           -> { title = "ROUTE";    desc = new String[]{"Achemine les minerais."}; accent = C_TEXT_SEC; }
                 }
+                // Récupère l'icone dans le cache si elle y est déjà présente, sinon la construit et la stocke dans le cache pour les prochaines fois.
                 icon = ICON_CACHE.computeIfAbsent(type, t -> buildIcon((TypeBatiment)t, accent)); 
-            } else if (c.getType() == TypeCase.MINERAI) {
+            }
+            // Si la case contient un minerai, on affiche les infos du minerai.
+            else if (c.getType() == TypeCase.MINERAI) {
                 title = "MINERAI"; desc = new String[]{"Gisement extractible."}; accent = C_AMBER;
                 icon = ICON_CACHE.computeIfAbsent("MINERAI", k -> buildMineraiIcon());
             }
+            // Si la case est vide 
+            else {
+                title = "CASE VIDE"; desc = new String[]{"Aucun contenu."}; accent = C_TEXT_DIM; icon = null;
+                icon = ICON_CACHE.computeIfAbsent("CASE VIDE", k -> buildCaseVideIcon());
+            }
+
+            // met à jour l'affichage avec les nouvelles informations.
             repaint();
         }
- 
+
+        /** Construit une icône simple pour un type de bâtiment donné (icones simples, peut-être modifier plus tard) */
         private static BufferedImage buildIcon(TypeBatiment type, Color accent) {
+            // la taille de l'icône
             int s = ICON_SIZE;
+            // On créé une image transparente sur laquelle on va dessiner l'icône du bâtiment. On utilise un Graphics2D pour bénéficier des options de rendu avancées.
             BufferedImage img = new BufferedImage(s, s, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = img.createGraphics();
+            // on définit les hints pour un rendu de meilleure qualité
             hint(g);
+
+            // Fond de l'icône (couleur partiellement transparente)
             g.setColor(new Color(accent.getRed(), accent.getGreen(), accent.getBlue(), 30));
             g.fillRoundRect(0, 0, s, s, 10, 10);
             g.setColor(new Color(accent.getRed(), accent.getGreen(), accent.getBlue(), 110));
             g.setStroke(new BasicStroke(1.5f));
             g.drawRoundRect(1, 1, s-2, s-2, 10, 10);
+
+            // Dessine une forme simple représentant le type de bâtiment
             g.setColor(accent);
             switch (type) {
                 case USINE -> {
@@ -214,9 +283,12 @@ public class MenuPanel extends JPanel {
                     g.fillPolygon(xp, yp, 7);
                 }
             }
-            g.dispose(); return img;
+            // Libère les ressources graphiques et retourne l'image de l'icône construite.
+            g.dispose(); 
+            return img;
         }
- 
+
+        /** Construit une icône simple pour le minerai (un losange orange) (a modifier plus tard). */
         private static BufferedImage buildMineraiIcon() {
             int s = ICON_SIZE;
             BufferedImage img = new BufferedImage(s, s, BufferedImage.TYPE_INT_ARGB);
@@ -227,7 +299,19 @@ public class MenuPanel extends JPanel {
             g.fillPolygon(xp, yp, 4);
             g.dispose(); return img;
         }
- 
+
+        /** Construit une icône simple pour une case vide. */
+        private static BufferedImage buildCaseVideIcon() {
+            int s = ICON_SIZE;
+            BufferedImage img = new BufferedImage(s, s, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = img.createGraphics(); hint(g);
+            g.fillRoundRect(0, 0, s, s, 10, 10);
+            g.setColor(C_TEXT_DIM);
+            g.setStroke(new BasicStroke(2.0f));
+            g.drawRoundRect(1, 1, s-2, s-2, 10, 10);
+            g.dispose(); return img;
+        }
+
         @Override protected void paintComponent(Graphics g) {
             super.paintComponent(g);
             Graphics2D g2 = (Graphics2D) g; hint(g2);
@@ -256,12 +340,14 @@ public class MenuPanel extends JPanel {
     // ═════════════════════════════════════════════════════════════════════
     // Panneau statistiques
     // ═════════════════════════════════════════════════════════════════════
+    /** Panneau affichant les statistiques d'une case sélectionnée. */
     private static class StatsPanel extends JPanel {
         // Suivi d'état pour limiter les reconstructions de l'UI.
         private CapacityBar liveCapBar = null;
         private JLabel liveStockageLabel = null;
         private Case lastCase = null;
 
+        /** Constructeur du panneau de statistiques. */
         StatsPanel() {
             setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
             setBackground(C_SURFACE);
@@ -273,7 +359,9 @@ public class MenuPanel extends JPanel {
             super.paintComponent(g);
             Graphics2D g2 = (Graphics2D) g; hint(g2);
         }
-         void update(Case c) {
+
+        /** Met à jour les statistiques du panneau. */
+        void update(Case c) {
             // Optimisation: même case => mise à jour légère des valeurs.
             if (c == lastCase && c != null) {
                 updateLiveStats(c);
@@ -286,22 +374,25 @@ public class MenuPanel extends JPanel {
             liveCapBar = null;
             liveStockageLabel = null;
 
+            // Si aucune case n'est sélectionnée, on affiche un message d'invite.
             if (c == null) { addMsg("Cliquez sur une case."); revalidate(); repaint(); return; }
 
+            // S'il y a un bâtiment, on affiche ses statistiques principales.
             if (c.getBatiment() != null) {
                 Batiment b = c.getBatiment();
-                
+
                 // Conserve une référence pour les mises à jour incrémentales.
                 liveCapBar = new CapacityBar(b.getStockage(), b.getCapaciteMax());
                 add(liveCapBar);
-                
+
                 addSpacer(6);
                 addSection("BÂTIMENT");
                 addRow("Classe", labelType(b.type()), C_TEXT_PRI);
-                
+
                 // Référence du label de stockage pour MAJ sans reconstruire.
                 liveStockageLabel = addRow("Stockage", String.valueOf(b.getStockage()), C_AMBER);
-                
+
+                // Statistiques spécifiques selon le type de bâtiment.
                 switch (b.type()) {
                     case FOREUSE: 
                             String cadence = Foreuse.DELAI_EXTRACTION_MS > 0 ? String.format("%.1f", 1000.0 / Foreuse.DELAI_EXTRACTION_MS) : "∞";
@@ -323,14 +414,17 @@ public class MenuPanel extends JPanel {
                 }
                 addSpacer(8);
             }
+            // Si la case contient du minerai, on affiche les infos du minerai.
             if (c.getType() == TypeCase.MINERAI) {
                 addSection("RESSOURCE");
                 addRow("Minerai", "Disponible", C_AMBER);
             }
+            // On force la mise à jour de l'affichage après avoir reconstruit le contenu.
             revalidate(); 
             repaint();
         }
 
+        /** Met à jour les statistiques du bâtiment de la case sélectionée */
         private void updateLiveStats(Case c) {
             if (c.getBatiment() == null) return;
             Batiment b = c.getBatiment();
@@ -339,6 +433,7 @@ public class MenuPanel extends JPanel {
             if (liveStockageLabel != null) liveStockageLabel.setText(String.valueOf(b.getStockage()));
         }
 
+        /** Ajoute une section au panneau */
         private void addSection(String text) {
             JPanel row = new JPanel(new BorderLayout());
             row.setBackground(C_RAISED);
@@ -349,6 +444,7 @@ public class MenuPanel extends JPanel {
             row.add(lbl, BorderLayout.WEST); add(row);
         }
  
+        /** Ajoute une ligne de statistiques au panneau */
         private JLabel addRow(String key, String value, Color vc) { 
             JPanel row = new JPanel(new BorderLayout(8, 0));
             row.setBackground(C_SURFACE);
@@ -365,25 +461,29 @@ public class MenuPanel extends JPanel {
             return vl;
         }
 
+        /** Ajoute un espace vide au panneau */
         private void addSpacer(int h) {
             JPanel sp = new JPanel(); sp.setBackground(C_BASE);
             sp.setMaximumSize(new Dimension(Integer.MAX_VALUE, h));
             sp.setPreferredSize(new Dimension(0, h)); add(sp);
         }
- 
+
+        /** Ajoute un message au panneau */
         private void addMsg(String msg) {
             JLabel lbl = new JLabel(msg, SwingConstants.CENTER);
             lbl.setFont(F_SMALL); lbl.setForeground(C_TEXT_DIM);
             lbl.setAlignmentX(Component.CENTER_ALIGNMENT);
             lbl.setBorder(new EmptyBorder(24, 0, 0, 0)); add(lbl);
         }
- 
+
+        /** Retourne le libellé correspondant au type de bâtiment */
         private static String labelType(TypeBatiment t) {
             return switch (t) {
                 case USINE -> "Usine"; case FOREUSE -> "Foreuse";
                 case STOCKAGE -> "Stockage"; case BATIMENT_MAITRE -> "Bâtiment maître"; case ROUTE -> "Route";
             };
         }
+        /** Retourne le libellé correspondant à la direction */
         private static String labelDir(Direction d) {
             return switch (d) { case NORD -> "Nord ↑"; case SUD -> "Sud ↓"; case EST -> "Est →"; case OUEST -> "Ouest ←"; };
         }

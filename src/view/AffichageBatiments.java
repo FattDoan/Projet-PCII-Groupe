@@ -127,7 +127,6 @@ public class AffichageBatiments {
         }
     }
 
-    
     /** Affiche un minerai qui se déplace sur la case c */
     private static void afficheMinerai(Graphics g, Case c) {
         int N = Affichage.TAILLE_CASE / 3;

@@ -35,6 +35,6 @@ public class ReactionHover implements MouseMotionListener {
         if (c == lastHovered) return;
         lastHovered = c;
         // On ne met en surbrillance que les cases non vides.
-        view.setHoveredCase(c.estVide() ? null : c);
+        view.setHoveredCase(c);
     }
 }
