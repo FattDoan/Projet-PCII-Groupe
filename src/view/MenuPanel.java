@@ -1,12 +1,10 @@
 package view;
  
-import common.AsyncExecutor;
 import model.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.lang.reflect.Type;
  
 /** Panneau du menu contenant toutes les données relatives à la case sélectionnée */
 public class MenuPanel extends JPanel {

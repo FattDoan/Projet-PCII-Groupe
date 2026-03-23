@@ -340,6 +340,32 @@ TODO
 
 ## 4.3 : Gestion des bâtiments (usine, stockage, mine, routes)
 
+### 4.3.0 : Destruction des bâtiments
+
+Lorsque l'utilisateur clique sur une case contenant un bâtiment (sauf le bâtiment maître), un bouton "Détruire" apparaît dans le menu d'actions. En cliquant dessus, le bâtiment est retiré de la case correspondante, et l'affichage est mis à jour pour refléter la suppression du bâtiment.
+
+Chaque bâtiment contient une méthode `detruire()` qui gère la logique de destruction (ex: libérer les ressources, mettre à jour l'état de la case, etc.). Le `MenuPanel` appelle la méthode `detruireBatiment()` de la `Case`, qui appelle la méthode `detruire()` sur le bâtiment et met la variable `batiment` à `null`.
+
+```mermaid
+classDiagram
+    class MenuPanel {
+        -selectedCase: Case
+    }
+
+    class Case {
+        -batiment: Batiment
+        +detruireBatiment()
+    }
+
+    class Batiment {
+        +detruire()
+    }
+
+    MenuPanel --> Case : sélectionne
+    Case --> Batiment : détruit le bâtiment
+    MenuPanel --> Case : donne l'ordre de détruire le bâtiment
+```
+
 ### 4.3.1 : Usine
 
 TODO
@@ -569,7 +595,7 @@ La classe `Minerai` modélise le transport d'une unité de ressource sur la cart
 - `Minerai` implémente `Runnable`.
 - La position courante est stockée via `x` et `y`.
 - Le déplacement s'exécute par pas temporels (`DELAI_TRANSPORT`).
-- Le grille** ou le **menu** .
+- La **grille** ou le **menu** .
 
 ```mermaid
 classDiagram
@@ -596,7 +622,49 @@ Ce diagramme met en avant la relation d’héritage et les méthodes principales
 
 ### 4.6.2 : Construction de bâtiments
 
-TODO
+TEMPORAIRE : à modifier une fois que les unités seront implémentées (actuellement, la construction est gérée directement via le menu).
+
+Lorsque l'utilisateur sélectionne une case ne contenant aucun bâtiment, il peut cliquer sur un bouton pour construire un bâtiment (ex: route, foreuse, etc.).
+
+La classe `ActionsPanel` dans `MenuPanel` affiche les boutons pour la construction de bâtiments. Lorsqu'un bouton est cliqué, il vérifie que la case sélectionnée `selectedCase` est vide. Si l'utilisateur veut construire une route, un `JOptionPane` s'ouvre et lui demande la direction de la route. Une fois les conditions remplies, une instance du bâtiment correspondant (ex: `Route`, `Foreuse`, `Stockage`) est créée et ajoutée à la case sélectionnée. L'affichage du terrain est ensuite mis à jour pour refléter le nouveau bâtiment.
+
+```mermaid
+classDiagram
+    class MenuPanel {
+        -actionsPanel: ActionsPanel
+        -selectedCase: Case
+    }
+
+    class Affichage {
+        +repaint()
+    }
+
+    class ActionsPanel {
+        +construireBatiment(Case c, TypeBatiment type)
+        +demanderDirectionRoute(Case c)
+    }
+
+    class Case {
+        -type: TypeCase
+        +aBatiment()
+        +construireStockage(Terrain terrain)
+        +construireForeuse(Terrain terrain)
+        +construireRoute(Terrain terrain, Direction direction)
+    }
+
+    class Route {
+        -direction: Direction
+    }
+
+    class Foreuse {
+    }
+
+    MenuPanel --> ActionsPanel : contient
+    ActionsPanel --> Case : construit un batiment dans
+    Case --> Route : peut contenir une route
+    Case --> Foreuse : peut contenir une foreuse
+    ActionsPanel --> Affichage : met à jour l'affichage après construction
+```
 
 ### 4.6.3 : Transport du minerai
 
