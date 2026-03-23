@@ -61,6 +61,7 @@ public final class DemoScenarioBuilder {
         terrain.definirTypeCase(x, y, TypeCase.MINERAI);
         Foreuse foreuse = new Foreuse(x, y, terrain);
         terrain.getCase(x, y).setBatiment(foreuse);
-        AsyncExecutor.runLongLived(foreuse);
+        //AsyncExecutor.runLongLived(foreuse);
+        AsyncExecutor.runAsync(foreuse);
     }
 }

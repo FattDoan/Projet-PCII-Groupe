@@ -26,6 +26,6 @@ public class ReactionClicTest {
         t.definirTypeCase(x, y, TypeCase.MINERAI);
         Foreuse f = new Foreuse(x, y, t);
         t.getCase(x, y).setBatiment(f);
-        AsyncExecutor.runLongLived(f);
+        AsyncExecutor.runAsync(f); 
     }
 }

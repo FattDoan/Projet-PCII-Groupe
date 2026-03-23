@@ -41,7 +41,8 @@ public class Foreuse extends Batiment implements Runnable {
     
                     // Soumet le minerai extrait pour transport vers la route ou le stockage
                     // immédiatement
-                    common.AsyncExecutor.schedule(nouveauMinerai, 0);
+                    //common.AsyncExecutor.schedule(nouveauMinerai, 0);
+                    AsyncExecutor.runAsync(nouveauMinerai);
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();

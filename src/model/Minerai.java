@@ -38,7 +38,7 @@ public class Minerai implements Runnable {
 
     @Override
     public void run() {
-/*         // Boucle de vie du minerai: tant qu'il n'est pas arrivé à destination
+         // Boucle de vie du minerai: tant qu'il n'est pas arrivé à destination
         // (stockage/HQ) et tant que le thread n'est pas interrompu.
         while (running && !Thread.currentThread().isInterrupted()) {
             try {
@@ -50,9 +50,9 @@ public class Minerai implements Runnable {
                 Thread.currentThread().interrupt();
                 break;
             }
-        } */
+        } 
 
-        // Si le thread est déjà interrompu ou que le minerai est marqué pour arrêt, 
+/*         // Si le thread est déjà interrompu ou que le minerai est marqué pour arrêt, 
         // on ne fait rien
         if (!running || Thread.currentThread().isInterrupted()) {
             return;
@@ -65,7 +65,7 @@ public class Minerai implements Runnable {
         // on se reprogramme pour continuer le transport au prochain tick.
         if (running) {
             common.AsyncExecutor.schedule(this, DELAI_TRANSPORT_MS);
-        }
+        } */
     }
 
     private boolean transporterUnPas() {
