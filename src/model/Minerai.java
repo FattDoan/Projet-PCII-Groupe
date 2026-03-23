@@ -101,14 +101,15 @@ public class Minerai implements Runnable {
 
         // 4) Validation géométrique.
         if (!isInsideBounds(nextX, nextY)) {
-            // Sortie de carte: le minerai disparaît.
-            return false;
+            // Direction non praticable pour l'instant: on retentera au prochain tick.
+            return true;
         }
 
         // 5) Validation métier: la case suivante doit contenir un bâtiment.
         Case nextCase = terrain.getCase(nextX, nextY);
         if (!nextCase.aBatiment()) {
-            return false;
+            // Si la route n'est pas encore construite, on attend au lieu d'abandonner.
+            return true;
         }
 
         // 6) Transaction logique en deux temps:

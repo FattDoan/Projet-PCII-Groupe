@@ -50,7 +50,7 @@ public class Affichage extends JPanel {
         add(affichageTerrain);
  
         // Couche 2: menu contextuel superposé.
-        menuPanel = new MenuPanel(menuW, hauteurVue, this);
+        menuPanel = new MenuPanel(menuW, hauteurVue, this, terrain);
         menuPanel.setBounds(largeurVue - menuW, 0, menuW, hauteurVue);
         menuPanel.setVisible(false);
         add(menuPanel);

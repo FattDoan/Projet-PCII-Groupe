@@ -1,5 +1,6 @@
 package view;
  
+import common.AsyncExecutor;
 import model.*;
 import javax.swing.*;
 import javax.swing.border.*;
@@ -45,6 +46,8 @@ public class MenuPanel extends JPanel {
     private volatile Case selectedCase = null;
     /** L'instance d'affichage utilisée pour le rendu */
     private final Affichage affichage;
+    /** Terrain du jeu pour créer des bâtiments sur la case sélectionnée */
+    private final Terrain terrain;
 
     // ── Sous-panneaux ─────────────────────────────────────────────────────
     /** Contient l'en-tête du menu/les infos de base sur la case sélectionnée (logo, nom) */
@@ -54,7 +57,7 @@ public class MenuPanel extends JPanel {
     /** Contient les actions disponibles pour la case sélectionnée */
     private final ActionsPanel actions;
 
-    public MenuPanel(int width, int height, Affichage affichage) {
+    public MenuPanel(int width, int height, Affichage affichage, Terrain terrain) {
         // On fixe la taille du panneau et les propriétés de base.
         setPreferredSize(new Dimension(width, height));
         setBackground(C_BASE);
@@ -62,6 +65,7 @@ public class MenuPanel extends JPanel {
 
         // On initialise les variables
         this.affichage = affichage;
+        this.terrain = terrain;
 
         header  = new HeaderPanel();
         stats   = new StatsPanel();
@@ -162,6 +166,8 @@ public class MenuPanel extends JPanel {
         private static final java.util.Map<Object, BufferedImage> ICON_CACHE = new java.util.HashMap<>();
         // La dernière case affichée pour éviter les recalculs inutiles.
         private Case lastCase = null;
+        // Dernier bâtiment observé pour détecter les changements sur une même case.
+        private Batiment lastBatiment = null;
 
         // Constructeur: initialise le layout, le bouton de fermeture et les éléments de base.
         /*package-private*/ HeaderPanel() {
@@ -204,8 +210,10 @@ public class MenuPanel extends JPanel {
         // met à jour le contenu du panneau d'en-tête en fonction de la case sélectionnée
         void update(Case c) {
             // Évite un recalcul complet si la case est identique.
-            if (c == lastCase && c != null) return; 
+            Batiment currentBatiment = (c != null) ? c.getBatiment() : null;
+            if (c == lastCase && currentBatiment == lastBatiment) return;
             lastCase = c;
+            lastBatiment = currentBatiment;
 
             // Détermine le nom, la couleur et la description en fonction du type/batiment dans la case. Utilise le cache pour les icônes.
             // Si aucune case n'est sélectionnée, affiche un état vide.
@@ -346,6 +354,7 @@ public class MenuPanel extends JPanel {
         private CapacityBar liveCapBar = null;
         private JLabel liveStockageLabel = null;
         private Case lastCase = null;
+        private Batiment lastBatiment = null;
 
         /** Constructeur du panneau de statistiques. */
         StatsPanel() {
@@ -363,13 +372,15 @@ public class MenuPanel extends JPanel {
         /** Met à jour les statistiques du panneau. */
         void update(Case c) {
             // Optimisation: même case => mise à jour légère des valeurs.
-            if (c == lastCase && c != null) {
+            Batiment currentBatiment = (c != null) ? c.getBatiment() : null;
+            if (c != null && c == lastCase && currentBatiment == lastBatiment) {
                 updateLiveStats(c);
                 return;
             }
 
             // La case a changé: on reconstruit le contenu du panneau.
             lastCase = c;
+            lastBatiment = currentBatiment;
             removeAll();
             liveCapBar = null;
             liveStockageLabel = null;
@@ -426,6 +437,7 @@ public class MenuPanel extends JPanel {
 
         /** Met à jour les statistiques du bâtiment de la case sélectionée */
         private void updateLiveStats(Case c) {
+            if (c == null) return;
             if (c.getBatiment() == null) return;
             Batiment b = c.getBatiment();
             
@@ -535,8 +547,9 @@ public class MenuPanel extends JPanel {
     // ═════════════════════════════════════════════════════════════════════
     // Panneau actions
     // ═════════════════════════════════════════════════════════════════════
-    private static class ActionsPanel extends JPanel {
+    private class ActionsPanel extends JPanel {
         private Case lastCase = null; // Suit l'état courant pour éviter le travail inutile.
+        private Batiment lastBatiment = null;
         ActionsPanel() {
             setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
             setBackground(C_BASE);
@@ -552,11 +565,30 @@ public class MenuPanel extends JPanel {
 
         void update(Case c) {
             // Optimisation: ne fait rien si la case n'a pas changé.
-            if (c == lastCase) return;
+            Batiment currentBatiment = (c != null) ? c.getBatiment() : null;
+            if (c == lastCase && currentBatiment == lastBatiment) return;
             
             lastCase = c;
+            lastBatiment = currentBatiment;
             removeAll();
-            if (c == null || c.getBatiment() == null) { revalidate(); repaint(); return; }
+            if (c == null) { revalidate(); repaint(); return; }
+
+            if (c.getBatiment() == null) {
+                JLabel hdr = new JLabel("ACTIONS"); hdr.setFont(F_SECT); hdr.setForeground(C_TEXT_DIM);
+                hdr.setBorder(new EmptyBorder(0, 0, 8, 0)); add(hdr);
+
+                if (c.getType() == TypeCase.MINERAI) {
+                    addBtn("CONSTRUIRE FOREUSE", C_AMBER, () -> construireForeuse(c));
+                    addBtn("CONSTRUIRE STOCKAGE", C_GREEN, () -> construireStockage(c));
+                } else {
+                    addBtn("CONSTRUIRE STOCKAGE", C_GREEN, () -> construireStockage(c));
+                }
+                addBtn("CONSTRUIRE ROUTE", C_BLUE, () -> construireRoute(c));
+                revalidate();
+                repaint();
+                return;
+            }
+
             JLabel hdr = new JLabel("ACTIONS"); hdr.setFont(F_SECT); hdr.setForeground(C_TEXT_DIM);
             hdr.setBorder(new EmptyBorder(0, 0, 8, 0)); add(hdr);
             switch (c.getBatiment().type()) {
@@ -568,6 +600,47 @@ public class MenuPanel extends JPanel {
             }
             revalidate(); 
             repaint();
+        }
+
+        private void construireStockage(Case c) {
+            if (c == null || c.getBatiment() != null || c.getType() != TypeCase.VIDE) return;
+            c.setBatiment(new Stockage(c.getX(), c.getY(), terrain));
+            affichage.getAffichageTerrain().repaint();
+            MenuPanel.this.refresh();
+        }
+
+        private void construireForeuse(Case c) {
+            if (c == null || c.getBatiment() != null || c.getType() != TypeCase.MINERAI) return;
+            Foreuse foreuse = new Foreuse(c.getX(), c.getY(), terrain);
+            c.setBatiment(foreuse);
+            AsyncExecutor.runAsync(foreuse);
+            affichage.getAffichageTerrain().repaint();
+            MenuPanel.this.refresh();
+        }
+
+        private void construireRoute(Case c) {
+            if (c == null || c.getBatiment() != null) return;
+
+            Direction direction = demanderDirectionRoute();
+            if (direction == null) return;
+
+            Route route = new Route(direction, c.getX(), c.getY(), terrain);
+            c.setBatiment(route);
+            affichage.getAffichageTerrain().repaint();
+            MenuPanel.this.refresh();
+        }
+
+        private Direction demanderDirectionRoute() {
+            Direction[] options = {Direction.NORD, Direction.EST, Direction.SUD, Direction.OUEST};
+            return (Direction) JOptionPane.showInputDialog(
+                MenuPanel.this,
+                "Choisissez la direction de la route :",
+                "Construction route",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                options,
+                Direction.NORD
+            );
         }
  
         void addBtn(String label, Color accent, Runnable action) {
