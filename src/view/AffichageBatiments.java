@@ -96,6 +96,7 @@ public class AffichageBatiments {
         }
         Route route = (Route) c.getBatiment(); // On suppose que la case contient une route, il faudrait vérifier avant de caster pour éviter les erreurs
 
+        // on détermine la direction de la case pour afficher la flèche dans la bonne direction
         int[] xPoints;
         int[] yPoints;
         switch (route.getDirection()) {
@@ -119,5 +120,22 @@ public class AffichageBatiments {
                 throw new IllegalArgumentException("Direction de route inconnue : " + route.getDirection());
         }
         g.fillPolygon(xPoints, yPoints, 3); // Dessine une flèche dans la case correspondante
+
+        // Si un minerai est en transit sur la route, on l'affiche (exemple : un carré bleu pour représenter le minerai)
+        if (c.getBatiment().type() == model.TypeBatiment.ROUTE && c.getBatiment().getStockage() > 0) { 
+            afficheMinerai(g, c);
+        }
     }
+
+    
+    /** Affiche un minerai qui se déplace sur la case c */
+    private static void afficheMinerai(Graphics g, Case c) {
+        int N = Affichage.TAILLE_CASE / 3;
+        int x = c.getX() * Affichage.TAILLE_CASE; // conversion des coord
+        int y = c.getY() * Affichage.TAILLE_CASE;
+
+        g.setColor(java.awt.Color.BLUE); // Couleur du minerai
+        g.fillRect(x + N, y + N, Affichage.TAILLE_CASE/3, Affichage.TAILLE_CASE/3); // Dessine un carré dans la case correspondante
+    }
+
 }
