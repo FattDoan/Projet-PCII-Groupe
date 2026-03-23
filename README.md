@@ -1,4 +1,8 @@
 # Projet-PCII-Groupe
+
+Diagramme de Gantt:
+https://docs.google.com/spreadsheets/d/1t5F3BJhigyTUmA8UtGCP11jiXa81Ue2nVTwKPMdGs0E/edit?usp=sharing
+
 ## Compile
 
 Fichiers `src`
