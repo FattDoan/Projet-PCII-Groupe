@@ -26,4 +26,11 @@ public class BatimentMaitre extends Batiment {
     public TypeBatiment type() {
         return TypeBatiment.BATIMENT_MAITRE;
     }
+
+    @Override
+    public void detruire() {
+        // impossible de détruire le bâtiment maître
+        // on déclenche une erreur 
+        throw new UnsupportedOperationException("Le bâtiment maître ne peut pas être détruit. Perte de la partie.");
+    }
 }

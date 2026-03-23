@@ -29,6 +29,7 @@ public class Minerai implements Runnable {
         return y;
     }
 
+    /** Constructeur d'un minerai avec une position et un terrain donnés. */
     public Minerai(int x, int y, Terrain terrain) {
         Validation.requireArgument(x >= 0 && y >= 0, "Position minerai invalide: x=" + x + ", y=" + y);
         this.x = x;
@@ -52,7 +53,7 @@ public class Minerai implements Runnable {
             }
         } 
 
-/*         // Si le thread est déjà interrompu ou que le minerai est marqué pour arrêt, 
+/*      // Si le thread est déjà interrompu ou que le minerai est marqué pour arrêt, 
         // on ne fait rien
         if (!running || Thread.currentThread().isInterrupted()) {
             return;
@@ -68,12 +69,14 @@ public class Minerai implements Runnable {
         } */
     }
 
+    /** Transporte le minerai d'une case à la suivante. Renvoie true si le minerai peut continuer à exister, false si on doit le détruire. */
     private boolean transporterUnPas() {
         // 1) Lire la case courante et le bâtiment support.
         Case currentCase = terrain.getCase(x, y);
         Batiment currentBatiment = currentCase.getBatiment();
         if (currentBatiment == null) {
             // État invalide: un minerai ne doit pas exister hors bâtiment.
+            // Ou on a supprimé le bâtiment sous un minerai: dans les deux cas, on considère que le minerai disparaît.
             return false;
         }
 

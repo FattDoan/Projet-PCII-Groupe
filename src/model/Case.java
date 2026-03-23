@@ -1,6 +1,11 @@
 package model;
 
+import java.awt.event.TextEvent;
+import java.lang.reflect.Type;
+
+import common.AsyncExecutor;
 import common.Validation;
+import view.MenuPanel;
 
 /**
  * Représente une case de la grille de jeu.
@@ -105,6 +110,35 @@ public class Case {
          "Coordonnees batiment incoherentes avec la case: batiment=(" + batiment.getX() + ", " + batiment.getY() + ") case=(" + x + ", " + y + ")"
       );
       this.batiment = batiment;
+   }
+
+
+   /***** GESTION DES BATIMENTS *****/
+
+   /** Détruit le bâtiment présent sur la case */
+   public void detruireBatiment() {
+      if (this.batiment != null) this.batiment.detruire();
+      this.batiment = null;
+   }
+
+   /** Construction de batiments */
+
+   public void construireStockage(Terrain terrain) {
+      if (this.getBatiment() != null) return;
+      this.setBatiment(new Stockage(this.getX(), this.getY(), terrain));
+   }
+
+   public void construireForeuse(Terrain terrain) {
+      if (this.getBatiment() != null || this.getType() != TypeCase.MINERAI) return;
+      Foreuse foreuse = new Foreuse(this.getX(), this.getY(), terrain);
+      this.setBatiment(foreuse);
+      AsyncExecutor.runAsync(foreuse); // Lance la foreuse dans un thread séparé pour qu'elle puisse extraire le minerai en continu
+   }
+
+   public void construireRoute(Terrain terrain, Direction direction) {
+      if (this.getBatiment() != null) return;
+      Route route = new Route(direction, this.getX(), this.getY(), terrain);
+      this.setBatiment(route);
    }
 
 }

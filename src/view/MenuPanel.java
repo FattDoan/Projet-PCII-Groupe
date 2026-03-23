@@ -6,6 +6,7 @@ import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.lang.reflect.Type;
  
 /** Panneau du menu contenant toutes les données relatives à la case sélectionnée */
 public class MenuPanel extends JPanel {
@@ -349,7 +350,7 @@ public class MenuPanel extends JPanel {
     // Panneau statistiques
     // ═════════════════════════════════════════════════════════════════════
     /** Panneau affichant les statistiques d'une case sélectionnée. */
-    private static class StatsPanel extends JPanel {
+    private class StatsPanel extends JPanel {
         // Suivi d'état pour limiter les reconstructions de l'UI.
         private CapacityBar liveCapBar = null;
         private JLabel liveStockageLabel = null;
@@ -500,29 +501,42 @@ public class MenuPanel extends JPanel {
             return switch (d) { case NORD -> "Nord ↑"; case SUD -> "Sud ↓"; case EST -> "Est →"; case OUEST -> "Ouest ←"; };
         }
     }
- 
+
+
+
+
     // ═════════════════════════════════════════════════════════════════════
     // Barre de capacité
     // ═════════════════════════════════════════════════════════════════════
-    private static class CapacityBar extends JPanel {
+    /** Barre qui montre la capacité actuelle d'un bâtiment de stockage */
+    private class CapacityBar extends JPanel {
         private float ratio; 
         private String label; 
         private Color bar;
 
+        /** Constructeur */
         CapacityBar(int stock, int cap) {
+            // Détermine la taille de la barre
             setPreferredSize(new Dimension(0, 28));
             setMaximumSize(new Dimension(Integer.MAX_VALUE, 28));
+            // Couleur de fond
             setBackground(C_BASE);
-            updateValues(stock, cap); // Initialise l'état visuel.
+
+            // Initialise l'état visuel.
+            updateValues(stock, cap);
         }
 
-        // Met à jour la barre dynamiquement sans reconstruire le composant.
+        /** Met à jour la barre dynamiquement sans reconstruire le composant. */
         public void updateValues(int stock, int cap) {
+            // Pourcentage (stock actuel / capacité max)
             float newRatio = cap > 0 ? Math.min(1f, (float)stock / cap) : 0f;
+            // Message affiché au centre de la barre (ex: "3 / 10")
             String newLabel = stock + " / " + cap;
+            // Couleur de la barre change en fonction du pourcentage: (devient + rouge moins il reste de place)
+            //      rouge (>85%), ambre (50-85%), verte (<50%)
             Color newBar = newRatio > 0.85f ? C_RED : newRatio > 0.5f ? C_AMBER : C_GREEN;
 
-            // Limite les repaint aux vrais changements visuels.
+            // Met à jour l'affichage uniquement si le ratio ou le label ont changé (pour éviter les repaint inutiles).
             if (newRatio != ratio || !newLabel.equals(label)) {
                 this.ratio = newRatio;
                 this.label = newLabel;
@@ -534,22 +548,37 @@ public class MenuPanel extends JPanel {
         @Override protected void paintComponent(Graphics g) {
             super.paintComponent(g);
             Graphics2D g2 = (Graphics2D) g; hint(g2);
+            // longueur et largeur de la barre, et longueur de la partie remplie de la barre en fonction du ratio
             int w = getWidth(), h = getHeight(), f = (int)(w * ratio);
+
+            // arrière plan de la barre transparent
             g2.setColor(new Color(bar.getRed(), bar.getGreen(), bar.getBlue(), 40)); g2.fillRect(0, 0, w, h);
+            // partie remplie de la barre avec une couleur plus opaque
             g2.setColor(new Color(bar.getRed(), bar.getGreen(), bar.getBlue(), 100)); g2.fillRect(0, 0, f, h);
             g2.setColor(bar); g2.fillRect(0, h-3, f, 3);
+
+            // texte centré sur la barre
             g2.setFont(F_SMALL); g2.setColor(C_TEXT_SEC);
             FontMetrics fm = g2.getFontMetrics();
             g2.drawString(label, (w - fm.stringWidth(label))/2, (h + fm.getAscent() - fm.getDescent())/2);
         }
     }
+
+
+
+
+
  
     // ═════════════════════════════════════════════════════════════════════
     // Panneau actions
     // ═════════════════════════════════════════════════════════════════════
+    /** Panneau affichant les actions disponibles pour une case sélectionnée */
     private class ActionsPanel extends JPanel {
         private Case lastCase = null; // Suit l'état courant pour éviter le travail inutile.
         private Batiment lastBatiment = null;
+
+
+        /** Constructeur */
         ActionsPanel() {
             setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
             setBackground(C_BASE);
@@ -557,79 +586,100 @@ public class MenuPanel extends JPanel {
                 new MatteBorder(1, 0, 0, 0, C_BORDER_LIT),
                 new EmptyBorder(10, 12, 12, 12)));
         }
+
         @Override
         public void paintComponent(Graphics g) {
             super.paintComponent(g);
             Graphics2D g2 = (Graphics2D) g; hint(g2);
         }
 
+        /** Met à jour les actions affichées en fonction de la case sélectionnée */
         void update(Case c) {
             // Optimisation: ne fait rien si la case n'a pas changé.
             Batiment currentBatiment = (c != null) ? c.getBatiment() : null;
             if (c == lastCase && currentBatiment == lastBatiment) return;
             
+            // Si la case a changé, on reconstruit entièrement le panneau d'actions
             lastCase = c;
             lastBatiment = currentBatiment;
             removeAll();
+
+            // Si aucune case n'est sélectionnée, on n'affiche rien.
             if (c == null) { revalidate(); repaint(); return; }
 
-            if (c.getBatiment() == null) {
-                JLabel hdr = new JLabel("ACTIONS"); hdr.setFont(F_SECT); hdr.setForeground(C_TEXT_DIM);
-                hdr.setBorder(new EmptyBorder(0, 0, 8, 0)); add(hdr);
+            // Le label contenant les actions
+            JLabel hdr = new JLabel("ACTIONS"); 
+            hdr.setFont(F_SECT); // Police d'écriture
+            hdr.setForeground(C_TEXT_DIM); // Couleur du texte
+            hdr.setBorder(new EmptyBorder(0, 0, 8, 0)); // Marge en dessous du label
+            add(hdr); // On ajoute le label au panneau
 
+            // Si la case est vide, on peut y construire un bâtiment (sauf une foreuse qui nécessite un minerai)
+            // Si la case contient un minerai, on peut y construire n'importe quel bâtiment.
+            if (c.estVide() || (c.aMinerai() && !c.aBatiment())) {
                 if (c.getType() == TypeCase.MINERAI) {
-                    addBtn("CONSTRUIRE FOREUSE", C_AMBER, () -> construireForeuse(c));
-                    addBtn("CONSTRUIRE STOCKAGE", C_GREEN, () -> construireStockage(c));
-                } else {
-                    addBtn("CONSTRUIRE STOCKAGE", C_GREEN, () -> construireStockage(c));
+                    addBtn("CONSTRUIRE FOREUSE", C_AMBER, () -> construireBatiment(c, TypeBatiment.FOREUSE));
                 }
-                addBtn("CONSTRUIRE ROUTE", C_BLUE, () -> construireRoute(c));
-                revalidate();
-                repaint();
-                return;
+                addBtn("CONSTRUIRE STOCKAGE", C_GREEN, () -> construireBatiment(c, TypeBatiment.STOCKAGE));
+                addBtn("CONSTRUIRE ROUTE", C_BLUE, () -> construireBatiment(c, TypeBatiment.ROUTE));
+                // addBtn("CONSTRUIRE", C_GREEN, ()->{
+                //     // TODO : ouvrir un menu de construction avec les différents types de bâtiments disponibles, vérifier la validité de la construction (ex: foreuse uniquement sur minerai) et afficher les coûts de construction.
+                // });
             }
 
-            JLabel hdr = new JLabel("ACTIONS"); hdr.setFont(F_SECT); hdr.setForeground(C_TEXT_DIM);
-            hdr.setBorder(new EmptyBorder(0, 0, 8, 0)); add(hdr);
-            switch (c.getBatiment().type()) {
-                case USINE           -> { addBtn("AMÉLIORER",      C_BLUE,  ()->{}); addBtn("PAUSE", C_BORDER_LIT, ()->{}); }
-                case FOREUSE         -> addBtn("RÉGLER VITESSE",   C_AMBER, ()->{});
-                case ROUTE           -> addBtn("INVERSER",         C_BLUE,  ()->{});
-                case BATIMENT_MAITRE -> addBtn("INVENTAIRE",       C_GREEN, ()->{});
-                default -> {}
+            // Si la case contient un bâtiment, les actions disponibles dépendent du type de bâtiment.
+            // TODO : définir les actions réelles pour chaque type de bâtiment, actuellement ce sont des placeholders.
+            if (c.aBatiment()) {
+                switch (c.getBatiment().type()) {
+                    case USINE           -> {
+                        addBtn("AMÉLIORER",       C_BLUE, ()->{}); // pas prévu
+                        addBtn("PAUSE",     C_BORDER_LIT, ()->{});
+                    }
+                    case FOREUSE         -> {
+                        addBtn("RÉGLER VITESSE", C_AMBER, ()->{}); // pourquoi?
+                        addBtn("PAUSE",     C_BORDER_LIT, ()->{}); // potentiellement mettre en pause pendant que les routes sont modifiées, mais déjà fait automatiquement lorsque la capacité est pleine, donc pas sûr que ce soit nécessaire.
+                    }
+                    case ROUTE           -> {
+                        addBtn("INVERSER",        C_BLUE, ()->{}); // modifier la direction au lieu de seulement inverser?
+                    }
+                    case BATIMENT_MAITRE -> {
+                        addBtn("INVENTAIRE",     C_GREEN, ()->{}); // sert à rien vu que c'est déjà affiché
+                    }
+                    case STOCKAGE -> { }
+                }
+                // Démolition disponible pour tous les bâtiments sauf le bâtiment maître (pour éviter les situations de blocage/défaite auto).
+                if (c.getBatiment().type() != TypeBatiment.BATIMENT_MAITRE) {
+                    addBtn("DÉMOLIR", C_RED, ()->{
+                        // TODO : implémenter la démolition d'un bâtiment, vérifier les conditions de démolition.
+                        // Pour chaque bâtiment pouvant contenir du minerai (stockage, bâtiment maître), le minerai qu'il contient est perdu à la démolition
+                        c.detruireBatiment();
+                    });
+                }
             }
             revalidate(); 
             repaint();
         }
 
-        private void construireStockage(Case c) {
-            if (c == null || c.getBatiment() != null || c.getType() != TypeCase.VIDE) return;
-            c.setBatiment(new Stockage(c.getX(), c.getY(), terrain));
+
+
+        /******** Méthodes pour la construction de nouveaux bâtiments ********/
+        // TODO : ces méthodes sont actuellement appelées depuis des boutons dans le panneau d'actions, mais il faudrait 
+        // peut-être les déplacer dans une classe de gestion de la logique de jeu pour séparer le modèle de l'affichage.
+
+        /** Construit un bâtiment de type [type] sur une case donnée, puis rafraîchit l'affichage */
+        private void construireBatiment(Case c, TypeBatiment type) {
+            switch (type) {
+                case USINE -> {}
+                case FOREUSE -> c.construireForeuse(terrain);
+                case STOCKAGE -> c.construireStockage(terrain);
+                case BATIMENT_MAITRE -> { throw new IllegalArgumentException("Le bâtiment maître ne peut pas être construit manuellement."); }
+                case ROUTE -> c.construireRoute(terrain, demanderDirectionRoute());
+            }
             affichage.getAffichageTerrain().repaint();
             MenuPanel.this.refresh();
         }
 
-        private void construireForeuse(Case c) {
-            if (c == null || c.getBatiment() != null || c.getType() != TypeCase.MINERAI) return;
-            Foreuse foreuse = new Foreuse(c.getX(), c.getY(), terrain);
-            c.setBatiment(foreuse);
-            AsyncExecutor.runAsync(foreuse);
-            affichage.getAffichageTerrain().repaint();
-            MenuPanel.this.refresh();
-        }
-
-        private void construireRoute(Case c) {
-            if (c == null || c.getBatiment() != null) return;
-
-            Direction direction = demanderDirectionRoute();
-            if (direction == null) return;
-
-            Route route = new Route(direction, c.getX(), c.getY(), terrain);
-            c.setBatiment(route);
-            affichage.getAffichageTerrain().repaint();
-            MenuPanel.this.refresh();
-        }
-
+        /** Demande à l'utilisateur la direction de la route qu'il souhaite construire */
         private Direction demanderDirectionRoute() {
             Direction[] options = {Direction.NORD, Direction.EST, Direction.SUD, Direction.OUEST};
             return (Direction) JOptionPane.showInputDialog(
@@ -642,6 +692,9 @@ public class MenuPanel extends JPanel {
                 Direction.NORD
             );
         }
+
+
+
  
         void addBtn(String label, Color accent, Runnable action) {
             JButton btn = new JButton(label) {

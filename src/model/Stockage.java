@@ -21,4 +21,9 @@ public class Stockage extends Batiment {
     public TypeBatiment type() {
         return TypeBatiment.STOCKAGE;
     }
+
+    @Override
+    public void detruire() {
+        viderStockage(); // Vide le stockage avant de détruire le bâtiment (pour l'instant sert pas à grand chose mais peut éviter des bugs)
+    }
 }

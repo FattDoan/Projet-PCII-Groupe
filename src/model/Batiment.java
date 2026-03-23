@@ -17,10 +17,6 @@ public abstract class Batiment{
     /** Capacité maximale de stockage du bâtiment */
     private final int capacite;
     private final Terrain terrain;
-    /** Getter pour le terrain */
-    public Terrain getTerrain() {
-        return terrain;
-    }
 
     /**
      * Crée un nouveau bâtiment avec une capacité de stockage définie.
@@ -64,6 +60,11 @@ public abstract class Batiment{
         return y;
     }
 
+    /** Getter pour le terrain */
+    public Terrain getTerrain() {
+        return terrain;
+    }
+
 
     /**
      * Vérifie si le bâtiment est vide (aucun minerai stocké).
@@ -85,6 +86,16 @@ public abstract class Batiment{
 
 
 
+
+    /***** SETTERS *****/
+
+    /** Effectue les actions nécessaires pour détruire le bâtiment */
+    public abstract void detruire();
+
+    /** Vide entièrement le stockage du bâtiment */
+    protected synchronized void viderStockage() {
+        this.stockage = 0;
+    }
 
     /**
      * Ajoute un minerai au stockage.

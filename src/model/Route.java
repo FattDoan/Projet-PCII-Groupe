@@ -37,4 +37,10 @@ public class Route extends Batiment {
     public TypeBatiment type() {
         return TypeBatiment.ROUTE;
     }
+
+    @Override
+    public void detruire() {
+        viderStockage(); // Vide le stockage avant de détruire la route (pour l'instant sert pas à grand chose mais peut éviter des bugs)
+        // les minerais sur la route sont détruits atomatiquement quand ils se rendent compte qu'ils ne sont sur rien (voir classe Minerai)
+    }
 }

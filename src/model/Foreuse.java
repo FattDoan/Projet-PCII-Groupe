@@ -26,19 +26,19 @@ public class Foreuse extends Batiment implements Runnable {
         return TypeBatiment.FOREUSE;
     }
 
-    
+
     @Override
     public void run() {
         while (running && !Thread.currentThread().isInterrupted()) {
             try {
                 // Simule le temps d'extraction du minerai
                 Thread.sleep(DELAI_EXTRACTION_MS);
-                
+
                 // Extraction du minerai
                 if (!estPlein()) {
                     this.ajouterMinerai(1);
                     Minerai nouveauMinerai = new Minerai(getX(), getY(), getTerrain());
-    
+
                     // Soumet le minerai extrait pour transport vers la route ou le stockage
                     // immédiatement
                     //common.AsyncExecutor.schedule(nouveauMinerai, 0);
@@ -49,7 +49,6 @@ public class Foreuse extends Batiment implements Runnable {
                 break;
             }
         }
-
     }
 
     /**
@@ -58,4 +57,11 @@ public class Foreuse extends Batiment implements Runnable {
     public void arreter() {
         running = false;
     }
+
+    @Override
+    public void detruire() {
+        this.viderStockage(); // Vide le stockage avant de détruire la foreuse (pour l'instant sert pas à grand chose mais peut éviter des bugs)
+        arreter(); // Arrête le thread de la foreuse
+    }
+
 }
