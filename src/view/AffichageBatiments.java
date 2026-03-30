@@ -26,7 +26,48 @@ public class AffichageBatiments {
                 afficheRoute(g, c);
                 break;
         }
+        // Si le bâtiment est en construction, on affiche une indication visuelle
+        if (!c.getBatiment().estFini()) {
+            afficheEnTravaux(g, c);
+        }
+        // Si le bâtiment a prit des dégâts, on affiche une indication visuelle
+        if (!c.getBatiment().atFullHP()) {
+            afficheDegats(g, c);
+        }
     }
+
+
+
+    /****** MODIFICATEURS ******/
+
+
+    /** Affichage par dessus un bâtiment pour indiquer qu'il n'est pas encore fini */
+    private static void afficheEnTravaux(Graphics g, Case c) {
+        // On affiches des lignes parallèles en diagonales pour indiquer que le bâtiment n'est pas encore fini
+        int x = c.getX() * Affichage.TAILLE_CASE; // conversion des coordonnées de la case en pixels pour l'affichage
+        int y = c.getY() * Affichage.TAILLE_CASE;
+        g.setColor(java.awt.Color.BLACK); // Couleur des lignes (exemple : noir)
+        for (int i = 0; i < Affichage.TAILLE_CASE; i += 10) {
+            g.drawLine(x + i, y, x, y + i); // Ligne diagonale de haut en bas
+            g.drawLine(x + Affichage.TAILLE_CASE, y + i, x + i, y + Affichage.TAILLE_CASE); // Ligne diagonale de bas en haut
+        }
+    }
+
+    /** Affichage par dessus un bâtiment pour indiquer qu'il a prit des dégâts */
+    private static void afficheDegats(Graphics g, Case c) {
+        // On affiche un carré rouge semi-transparent par dessus le bâtiment pour indiquer qu'il a prit des dégâts
+        int x = c.getX() * Affichage.TAILLE_CASE; // conversion des coordonnées de la case en pixels pour l'affichage
+        int y = c.getY() * Affichage.TAILLE_CASE;
+        double hpRatio = (double) c.getBatiment().getHP() / c.getBatiment().getHPMax(); // Calcul du ratio de points de vie restants
+        int alpha = (int) (30 + (1 - hpRatio) * 225); // Plus le bâtiment a de dégâts, plus le carré rouge est opaque
+        g.setColor(new java.awt.Color(255, 0, 0, alpha)); // Couleur rouge semi-transparente
+        g.fillRect(x, y, Affichage.TAILLE_CASE, Affichage.TAILLE_CASE); // Dessine un carré par dessus le bâtiment
+    }
+
+
+
+    /****** BASE BATIMENTS ******/
+
 
     /** Beaucoup de code est copié-collé, mais c'est un affichage temporaire et ça permet de modifier le visuel de chaque batiment individuellement, donc on se permet ici de faire comme ça */
 

@@ -78,6 +78,24 @@ public abstract class Batiment{
         return terrain;
     }
 
+    /** Le nombre de PV actuel du bâtiment */
+    public int getHP() {
+        return hp;
+    }
+    /** Le nombre de PV maximum du bâtiment */
+    public int getHPMax() {
+        return hpMax;
+    }
+    /** Renvoie vrai si le bâtiment est à son maximum de PV */
+    public boolean atFullHP() {
+        return hp == hpMax;
+    }
+
+    /** Renvoie le coût de construction du bâtiment */
+    public int getCout() {
+        return cout;
+    }
+
 
     /**
      * Vérifie si le bâtiment est vide (aucun minerai stocké).
