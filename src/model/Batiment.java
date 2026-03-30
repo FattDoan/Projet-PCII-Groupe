@@ -13,7 +13,6 @@ public abstract class Batiment{
     private final int y;
     /** Quantité actuelle de minerai stocké */
     private int stockage;
- 
     /** Capacité maximale de stockage du bâtiment */
     private final int capacite;
     private final Terrain terrain;
@@ -23,7 +22,7 @@ public abstract class Batiment{
      * Note : La capacité doit être positive.
      * 
      * @param capacite la capacité maximale de stockage, doit être >= 0
-        * @throws IllegalArgumentException si capacite < 0 (en validation stricte)
+     * @throws IllegalArgumentException si capacite < 0 (en validation stricte)
      */
     protected Batiment(int capacite, int x, int y, Terrain terrain) {
         // Validation : la capacité doit être positive
@@ -102,9 +101,8 @@ public abstract class Batiment{
      * Précondition : le stokage actuel plus la quantité ajoutée 
      * ne doit pas dépasser la capacité maximale du bâtiment.
      * 
-    * @throws IllegalStateException si le bâtiment est déjà plein (en validation stricte)
+     * @throws IllegalStateException si le bâtiment est déjà plein (en validation stricte)
      */
-
     public synchronized void ajouterMinerai(int quantite) {
         Validation.requireArgument(quantite >= 0, "quantite=" + quantite);
         Validation.requireState(
@@ -118,7 +116,7 @@ public abstract class Batiment{
      * Retire un minerai du stockage.
      * Précondition : le stockage actuel doit être suffisant pour retirer la quantité demandée.
      * 
-    * @throws IllegalStateException si le bâtiment est déjà vide (en validation stricte)
+     * @throws IllegalStateException si le bâtiment est déjà vide (en validation stricte)
      */
     public synchronized void retirerMinerai(int quantite) {
         Validation.requireArgument(quantite >= 0, "quantite=" + quantite);
