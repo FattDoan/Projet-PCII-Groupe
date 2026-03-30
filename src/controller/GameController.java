@@ -1,6 +1,6 @@
 package controller;
  
-import model.Camera;
+import view.Camera;
 import model.Terrain;
 import view.Affichage;
 import view.AffichageTerrain;

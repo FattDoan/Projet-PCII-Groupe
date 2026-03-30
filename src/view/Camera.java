@@ -1,4 +1,5 @@
-package model;
+package view;
+
 
 public class Camera {
  

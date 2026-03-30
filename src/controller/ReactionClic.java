@@ -3,6 +3,7 @@ package controller;
 import java.awt.event.*;
 import model.*;
 import view.*;
+import view.Camera;
 
 /**
  * Gère les clics souris (bouton gauche, clic court) sur AffichageTerrain.
@@ -13,7 +14,7 @@ public class ReactionClic implements MouseListener {
     private final Affichage        affichage;
     private final Terrain          terrain;
     private final CameraController cameraController; // pour lire isDragging()
- 
+
     public ReactionClic(Affichage affichage, Terrain terrain,
                         CameraController cameraController) {
         this.affichage        = affichage;

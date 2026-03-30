@@ -1,6 +1,6 @@
 package controller;
  
-import model.Camera;
+import view.Camera;
 import view.Affichage;
 import view.AffichageTerrain;
 import java.awt.event.*;
