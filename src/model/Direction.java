@@ -16,4 +16,17 @@ public enum Direction {
     
     /** Direction vers la gauche */
     OUEST
+    ;
+
+    /** Renvoie une chaine de caractère correspondant à la direction (ex: "Nord ↑") */
+    @Override
+    public String toString() {
+        return switch (this) { 
+            case NORD -> "Nord ↑"; 
+            case SUD -> "Sud ↓"; 
+            case EST -> "Est →"; 
+            case OUEST -> "Ouest ←"; 
+        };
+
+    }
 }

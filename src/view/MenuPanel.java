@@ -496,7 +496,7 @@ public class MenuPanel extends JPanel {
         }
         /** Retourne le libellé correspondant à la direction */
         private static String labelDir(Direction d) {
-            return switch (d) { case NORD -> "Nord ↑"; case SUD -> "Sud ↓"; case EST -> "Est →"; case OUEST -> "Ouest ←"; };
+            return d.toString();
         }
     }
 
@@ -575,7 +575,6 @@ public class MenuPanel extends JPanel {
         private Case lastCase = null; // Suit l'état courant pour éviter le travail inutile.
         private Batiment lastBatiment = null;
 
-
         /** Constructeur */
         ActionsPanel() {
             setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -638,7 +637,9 @@ public class MenuPanel extends JPanel {
                         addBtn("PAUSE",     C_BORDER_LIT, ()->{}); // potentiellement mettre en pause pendant que les routes sont modifiées, mais déjà fait automatiquement lorsque la capacité est pleine, donc pas sûr que ce soit nécessaire.
                     }
                     case ROUTE           -> {
-                        addBtn("INVERSER",        C_BLUE, ()->{}); // modifier la direction au lieu de seulement inverser?
+                        addBtn("CHANGER DIRECTION",        C_BLUE, ()->{
+                            ((Route)(c.getBatiment())).changeDirection(demanderDirectionRoute());
+                        }); // modifier la direction de la route
                     }
                     case BATIMENT_MAITRE -> {
                         addBtn("INVENTAIRE",     C_GREEN, ()->{}); // sert à rien vu que c'est déjà affiché
@@ -648,8 +649,6 @@ public class MenuPanel extends JPanel {
                 // Démolition disponible pour tous les bâtiments sauf le bâtiment maître (pour éviter les situations de blocage/défaite auto).
                 if (c.getBatiment().type() != TypeBatiment.BATIMENT_MAITRE) {
                     addBtn("DÉMOLIR", C_RED, ()->{
-                        // TODO : implémenter la démolition d'un bâtiment, vérifier les conditions de démolition.
-                        // Pour chaque bâtiment pouvant contenir du minerai (stockage, bâtiment maître), le minerai qu'il contient est perdu à la démolition
                         c.detruireBatiment();
                     });
                 }
@@ -671,7 +670,11 @@ public class MenuPanel extends JPanel {
                 case FOREUSE -> c.construireForeuse(terrain);
                 case STOCKAGE -> c.construireStockage(terrain);
                 case BATIMENT_MAITRE -> { throw new IllegalArgumentException("Le bâtiment maître ne peut pas être construit manuellement."); }
-                case ROUTE -> c.construireRoute(terrain, demanderDirectionRoute());
+                case ROUTE -> {
+                    Direction newD = demanderDirectionRoute();
+                    // si on ferme la fenêtre sans renseigner de direction, ne fait rien
+                    if (newD != null) c.construireRoute(terrain, newD);
+                }
             }
             affichage.getAffichageTerrain().repaint();
             MenuPanel.this.refresh();

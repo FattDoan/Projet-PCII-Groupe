@@ -11,7 +11,7 @@ public class Route extends Batiment {
     public static final int COUT_CONSTRUCTION = 1;
 
     /** Direction dans laquelle la route achemine les minerais */
-    private final Direction direction;
+    private Direction direction;
 
     /**
      * Crée une nouvelle route avec la direction spécifiée.
@@ -44,5 +44,14 @@ public class Route extends Batiment {
     public void detruire() {
         viderStockage(); // Vide le stockage avant de détruire la route (pour l'instant sert pas à grand chose mais peut éviter des bugs)
         // les minerais sur la route sont détruits atomatiquement quand ils se rendent compte qu'ils ne sont sur rien (voir classe Minerai)
+    }
+
+    /** 
+     * Change la direction de la route à la valeur spécifiée. 
+     * @param d la nouvelle direction. Si la direction est nulle, ne fait rien.
+    */
+    public void changeDirection(Direction d) {
+        if (d == null || d == direction) return;
+        else direction = d;
     }
 }
