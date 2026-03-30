@@ -136,7 +136,7 @@ public class Minerai implements Runnable {
         y = nextY;
 
         // 8) Fin de vie du minerai quand il atteint une destination finale.
-        return !(cible instanceof Stockage || cible instanceof BatimentMaitre);
+        return !(cible instanceof BatimentMaitre);
     }
 
     public void arreter() {
