@@ -5,7 +5,8 @@ import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
- 
+import model.unite.Unite; 
+
 /** Panneau du menu contenant toutes les données relatives à la case sélectionnée */
 public class MenuPanel extends JPanel {
 
@@ -43,6 +44,9 @@ public class MenuPanel extends JPanel {
     // ── Etat ──────────────────────────────────────────────────────────────
     /** La case actuellement sélectionnée */
     private volatile Case selectedCase = null;
+    /** L'unite actuellement sélectionnée (si la case sélectionnée en contient une) */
+    private volatile Unite selectedUnite = null;
+
     /** L'instance d'affichage utilisée pour le rendu */
     private final Affichage affichage;
     /** Terrain du jeu pour créer des bâtiments sur la case sélectionnée */
@@ -124,6 +128,10 @@ public class MenuPanel extends JPanel {
         this.selectedCase = c; 
     }
 
+    public void setSelectedUnite(Unite u) {
+        this.selectedUnite = u;
+    }
+
     /***** SETTER *****/
 
     public Case getSelectedCase() {
@@ -138,7 +146,7 @@ public class MenuPanel extends JPanel {
         actions.update(selectedCase);
     }
 
-
+    /** Met a jour les informations affichées en fonction de l'unité sélectionnée */
 
 
     // ═════════════════════════════════════════════════════════════════════

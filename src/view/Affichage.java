@@ -3,6 +3,7 @@ package view;
 import view.Camera;
 import model.Case;
 import model.Terrain;
+import model.unite.Unite;
 import javax.swing.*;
 import java.awt.*;
  
@@ -75,7 +76,13 @@ public class Affichage extends JPanel {
         menuPanel.refresh();
         menuPanel.setVisible(true);
     }
- 
+    public void showMenu(Unite u) {
+        // Le menu est alimenté à partir de l'unité sélectionnée.
+        menuPanel.setSelectedUnite(u);
+        menuPanel.refresh();
+        menuPanel.setVisible(true);
+    }
+
     public void hideMenu() {
         menuPanel.setVisible(false);
     }

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Deque;
 import java.util.ArrayDeque;
 
-public class Unite {
+public class Unite implements Selectable {
     public static final int CASE_SIZE = Affichage.TAILLE_CASE; // pixels par case
 
     // Coordonees continues (pixels)
@@ -89,5 +89,28 @@ public class Unite {
         hp -= degats;
         //TODO quand on ajoute ennemi
         //if (hp <= 0) mourir();
+    }
+
+    @Override
+    public String getDisplayName() {
+        switch (typeUnite) {
+            case OUVRIER -> { return "OUVRIER"; }
+            case ENNEMI  -> { return "ENNEMI";  }
+        }
+        return "UNITE";
+    }
+    @Override
+    public String getDescription() {
+        switch (typeUnite) {
+            case OUVRIER -> { 
+                return "Unités de base, capables de construire des bâtiments et de récolter du minerai."; 
+            }
+            case ENNEMI -> { 
+                return "Unités de combat, capables d'attaquer les bâtiments et les unités ennemies."; 
+            }
+            default -> {
+                return "";
+            }
+        }
     }
 }

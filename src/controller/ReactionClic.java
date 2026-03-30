@@ -4,7 +4,7 @@ import java.awt.event.*;
 import model.*;
 import view.*;
 import view.Camera;
-
+import model.unite.Unite;
 /**
  * Gère les clics souris (bouton gauche, clic court) sur AffichageTerrain.
  * Utilise Camera.screenToGridX/Y pour tenir compte du pan ET du zoom.
@@ -41,11 +41,22 @@ public class ReactionClic implements MouseListener {
             gy < 0 || gy >= terrain.getTaille()) {
             affichage.hideMenu(); return;
         }
- 
-        Case c = terrain.getCase(gx, gy);
 
-        affichage.getAffichageTerrain().setSelectedCase(c);
-        affichage.showMenu(c);
+        //TODO: double clic si on veut cliquer sur une case au lieu de clic sur unite
+
+        // On privilégie le clic sur une unité
+        Unite u = terrain.getUnite(gx, gy);
+        if (u != null) {
+            affichage.getAffichageTerrain().setSelectedCase(null);
+            affichage.showMenu(u);
+            return;
+        }
+        else {
+            Case c = terrain.getCase(gx, gy);
+
+            affichage.getAffichageTerrain().setSelectedCase(c);
+            affichage.showMenu(c);
+        }
     }
  
     @Override public void mouseClicked (MouseEvent e) {}

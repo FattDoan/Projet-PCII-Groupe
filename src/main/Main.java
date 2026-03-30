@@ -6,6 +6,7 @@ import javax.swing.SwingUtilities;
 import model.Terrain;
 import view.Fenetre;
 import view.TimerView;
+import model.unite.*;
 
 public class Main {
     // Taille utilisée quand aucun argument/propriété n'est fourni.
@@ -25,6 +26,9 @@ public class Main {
         // 1) argument CLI, 2) propriété JVM, 3) valeur par défaut.
         int terrainSize = resolveTerrainSize(args);
         Terrain terrain = new Terrain(terrainSize);
+        // ajoute une unite en ce moment pour tester 
+        terrain.addUnite(new Ouvrier(terrainSize/2 + 5, terrainSize/2 + 5, terrain));
+
 
         // Le shutdown hook garantit l'arrêt des threads asynchrones même
         // si la fenêtre est fermée brutalement.

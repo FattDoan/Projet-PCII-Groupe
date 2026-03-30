@@ -1,7 +1,11 @@
 package model;
 
+import model.unite.Unite;
+
 import java.util.HashSet;
 import java.util.Set;
+import java.util.List;
+import java.util.ArrayList;
 
 import common.Validation;
 
@@ -30,9 +34,9 @@ public class Terrain {
 
    /** Extension future: unités présentes sur le terrain. */
    // DOTO: ajouter une liste d'unités (mineurs, camions) présentes sur le terrain pour pouvoir les gérer plus facilement.
-
    /** batiment maître */
    private BatimentMaitre batimentMaitre;
+   private List<Unite> unites = new ArrayList<>();
 
    /**
     * Crée une nouvelle grille carrée de la taille spécifiée.
@@ -150,4 +154,26 @@ public class Terrain {
       Validation.requireArgument(x >= 0 && y >= 0, "Coordonnées négatives: x=" + x + ", y=" + y);
       Validation.requireArgument(x < taille && y < taille, "Coordonnées hors limites: x=" + x + ", y=" + y + ", taille=" + taille);
    }
+
+   // TODO: temp func pour tester 
+   public void addUnite(Unite u) {
+      Validation.requireArgument(u != null, "unite=null");
+      unites.add(u);
+   }
+
+   public List<Unite> getUnites() {
+      return unites;
+   }
+
+   // Get unit at pixel coordinates (px, py). Returns null if no unit is present at these coordinates.
+   public Unite getUniteAtPixel(float px, float py) {
+        for (Unite u : unites) {
+            // On considère qu'une unité occupe une zone de taille_case/2 x taille_case/2 centrée sur ses coordonnées pixels.
+            float halfSize = Unite.CASE_SIZE / 4.0f; // moitié de la moitié de la taille d'une case 
+            if (Math.abs(u.getPX() - px) <= halfSize && Math.abs(u.getPY() - py) <= halfSize) {
+                return u;
+            }
+        }
+        return null;
+    }
 }

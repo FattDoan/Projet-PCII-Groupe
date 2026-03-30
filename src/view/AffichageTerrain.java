@@ -6,6 +6,8 @@ import model.Terrain;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.util.List;
+import model.unite.Unite;
 
 public class AffichageTerrain extends JPanel {
 
@@ -77,11 +79,20 @@ public class AffichageTerrain extends JPanel {
         int lastCol  = Math.min(terrain.getTaille() - 1, (int)((offsetX + getWidth())  / cellSize));
         int lastRow  = Math.min(terrain.getTaille() - 1, (int)((offsetY + getHeight()) / cellSize));
 
+        // Affichage des cases
         for (int i = firstCol; i <= lastCol; i++) {
             for (int j = firstRow; j <= lastRow; j++) {
                 AffichageCases.afficheCase(g2, terrain.getCase(i, j));    
             }
         }
+
+        //Affichage des unites
+        List <Unite> unites = terrain.getUnites();
+        for (Unite u : unites) {
+            System.out.println("Affichage de l'unité: " + u.getType() + " à la position (" + u.getGX() + ", " + u.getGY() + ")");
+            AffichageUnites.afficheUnite(g2, u);
+        }
+
 
         // Surbrillance légère de la case survolée.
         if (hoveredCase != null && hoveredCase != selectedCase) {

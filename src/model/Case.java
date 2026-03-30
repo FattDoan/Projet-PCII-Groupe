@@ -7,7 +7,7 @@ import common.Validation;
  * Représente une case de la grille de jeu.
  * Chaque case possède des coordonnées (x, y) et un type (vide, minerai).
  */
-public class Case {
+public class Case implements Selectable {
    /** Coordonnée horizontale de la case dans la grille */
    private final int x;
 
@@ -138,4 +138,37 @@ public class Case {
       this.setBatiment(route);
    }
 
+    @Override
+    public String getDisplayName() {
+        if (aBatiment()) {
+            switch (getBatiment().type()) {
+                case USINE           -> { return "USINE";    }
+                case FOREUSE         -> { return "FOREUSE";  }
+                case STOCKAGE        -> { return "STOCKAGE"; }
+                case BATIMENT_MAITRE -> { return "HQ";       }
+                case ROUTE           -> { return "ROUTE";    }
+            }
+        } 
+        if (aMinerai()) {
+            return "MINERAI";
+        }
+        return "CASE VIDE";
+    }
+
+    @Override
+    public String getDescription() {
+        if (aBatiment()) {
+            switch (getBatiment().type()) {
+                case USINE           -> { return "Fabrique des unités."; }
+                case FOREUSE         -> { return "Extrait le minerai."; }
+                case STOCKAGE        -> { return "Stocke les minerais."; }
+                case BATIMENT_MAITRE -> { return "Sa destruction = défaite. \nIl peut stocker aussi les minerais."; }
+                case ROUTE           -> { return "Achemine les minerais."; }
+            }
+        }
+        else if (aMinerai()) {
+            return "Gisement extractible.";
+        }
+        return "";
+    }
 }

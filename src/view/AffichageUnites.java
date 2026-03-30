@@ -37,4 +37,6 @@ public class AffichageUnites {
         int size = Affichage.TAILLE_CASE / 2; // Taille de l'unité, ici la moitié de la taille d'une case
         g.fillRect(x - size / 2, y - size / 2, size, size); // Dessine un carré centré sur les coordonnées de l'unité 
    }
+
+
 }
