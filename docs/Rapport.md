@@ -494,16 +494,18 @@ Le transport est lancé de manière asynchrone par la foreuse via l'exécuteur c
 
 1. Le minerai démarre sur la position de la foreuse.
 2. À chaque cycle, le minerai lit la case courante.
-3. Si la case courante est une route, il calcule la prochaine case selon la direction de la route.
-4. Sinon, il applique une stratégie par défaut (avancée vers l'est).
-5. Si la prochaine case est hors limites, le transport s'arrête.
-6. Si la prochaine case contient une route non pleine, le minerai est transféré sur cette route.
-7. Si la prochaine case contient le bâtiment maître, le minerai est stocké et le transport se termine.
-8. Dans tous les autres cas (case non exploitable), le transport s'arrête.
+3. Le minerai vérifie d'abord que le bâtiment courant est terminé (`estFini()`). Si ce n'est pas le cas, il attend le cycle suivant.
+4. Si la case courante est une route, il calcule la prochaine case selon la direction de la route.
+5. Sinon, il recherche la meilleure direction disponible (route/destination finale valide).
+6. Si la prochaine case est hors limites, le minerai attend et retente au cycle suivant.
+7. La case cible doit contenir un bâtiment terminé (`estFini()`) et avec de la capacité disponible.
+8. Si les conditions source/cible sont valides, le minerai est transféré (ajout en cible puis retrait en source, avec rollback en cas d'échec).
+9. Si la cible est le bâtiment maître, le transport se termine pour ce minerai.
 
 #### Conditions limites à respecter
 
 - Une route ne peut contenir qu'un seul minerai à la fois.
+- Un minerai ne peut se déplacer que depuis/vers des bâtiments dont la construction est terminée (`estFini()`).
 - Le retrait du minerai depuis la case précédente doit rester cohérent avec l'ajout sur la case suivante.
 - Le déplacement ne doit jamais sortir des bornes de la grille.
 - L'arrêt doit être sûr même en contexte concurrent (flag `running` + interruption).
@@ -658,7 +660,13 @@ TEMPORAIRE : à modifier une fois que les unités seront implémentées (actuell
 
 Lorsque l'utilisateur sélectionne une case ne contenant aucun bâtiment, il peut cliquer sur un bouton pour construire un bâtiment (ex: route, foreuse, etc.).
 
-La classe `ActionsPanel` dans `MenuPanel` affiche les boutons pour la construction de bâtiments. Lorsqu'un bouton est cliqué, il vérifie que la case sélectionnée `selectedCase` est vide. Si l'utilisateur veut construire une route, un `JOptionPane` s'ouvre et lui demande la direction de la route. Une fois les conditions remplies, une instance du bâtiment correspondant (ex: `Route`, `Foreuse`, `Stockage`) est créée et ajoutée à la case sélectionnée. L'affichage du terrain est ensuite mis à jour pour refléter le nouveau bâtiment.
+La classe `ActionsPanel` dans `MenuPanel` affiche les boutons pour la construction de bâtiments. Lorsqu'un bouton est cliqué, elle vérifie d'abord que la case sélectionnée `selectedCase` est constructible (pas de bâtiment déjà présent, type de case compatible).
+
+Si l'utilisateur veut construire une route, un `JOptionPane` s'ouvre pour demander la direction. Ensuite, une instance du bâtiment correspondant (`Route`, `Foreuse`, `Stockage`) est créée et ajoutée à la case cible.
+
+Règle métier importante : un bâtiment n'est utilisable pour les autres actions (transport de minerai, interactions, etc.) que lorsqu'il est marqué comme terminé (`estFini() == true`). Tant qu'il n'est pas terminé, les actions qui dépendent de ce bâtiment sont bloquées et réévaluées au cycle suivant.
+
+En mode démonstration, les bâtiments posés par le scénario sont explicitement marqués terminés pour que la simulation démarre immédiatement.
 
 ```mermaid
 classDiagram
