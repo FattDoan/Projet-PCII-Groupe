@@ -1,11 +1,7 @@
 package model;
 
-import java.awt.event.TextEvent;
-import java.lang.reflect.Type;
-
 import common.AsyncExecutor;
 import common.Validation;
-import view.MenuPanel;
 
 /**
  * Représente une case de la grille de jeu.
