@@ -8,6 +8,8 @@ import common.Validation;
  * Chaque route possède une direction pour déplacer les minerais.
  */
 public class Route extends Batiment {
+    public static final int COUT_CONSTRUCTION = 1;
+
     /** Direction dans laquelle la route achemine les minerais */
     private final Direction direction;
 
@@ -20,7 +22,7 @@ public class Route extends Batiment {
      * @throws IllegalArgumentException si direction est null (en validation stricte)
      */
     public Route(Direction direction, int x, int y, Terrain terrain) {
-        super(1, x, y, terrain);
+        super(1, x, y, terrain, COUT_CONSTRUCTION);
         // Validation : la direction ne peut pas être nulle
         Validation.requireArgument(direction != null, "direction=null");
         this.direction = direction;

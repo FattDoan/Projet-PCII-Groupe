@@ -29,7 +29,10 @@ public class Terrain {
    private final Case[][] grille;
 
    /** Extension future: unités présentes sur le terrain. */
+   // DOTO: ajouter une liste d'unités (mineurs, camions) présentes sur le terrain pour pouvoir les gérer plus facilement.
 
+   /** batiment maître */
+   private BatimentMaitre batimentMaitre;
 
    /**
     * Crée une nouvelle grille carrée de la taille spécifiée.
@@ -78,6 +81,7 @@ public class Terrain {
 
       // On place le bâtiment maître au centre de la grille
       this.grille[centre][centre].setBatiment(new BatimentMaitre(centre, centre, this));
+      this.batimentMaitre = (BatimentMaitre) this.grille[centre][centre].getBatiment();
 
    }
 
@@ -91,6 +95,10 @@ public class Terrain {
     */
    public int getTaille() {
       return taille;
+   }
+
+   public BatimentMaitre getBatimentMaitre() {
+      return batimentMaitre;
    }
 
     /**

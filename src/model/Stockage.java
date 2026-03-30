@@ -3,8 +3,8 @@ package model;
 /** Un bâtiment de stockage de minerai */
 public class Stockage extends Batiment {
     /** Capacité de stockage du bâtiment de stockage */
-    // TODO: ajuster cette capacité selon l'équilibrage final du gameplay.
     private static final int CAPACITE = 10;
+    public static final int COUT_CONSTRUCTION = 10;
 
     /**
     * Crée un nouveau bâtiment de stockage avec la capacité par défaut.
@@ -14,7 +14,7 @@ public class Stockage extends Batiment {
      * @param terrain le terrain auquel appartient ce bâtiment
      */
     public Stockage(int x, int y, Terrain terrain) {
-        super(CAPACITE, x, y, terrain);
+        super(CAPACITE, x, y, terrain, COUT_CONSTRUCTION);
     }
 
     @Override

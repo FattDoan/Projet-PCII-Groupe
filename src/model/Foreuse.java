@@ -10,6 +10,7 @@ import common.AsyncExecutor;
  */
 public class Foreuse extends Batiment implements Runnable {
     public static final int DELAI_EXTRACTION_MS = 2000; // 2 seconde
+    public static final int COUT_CONSTRUCTION = 10;
     private volatile boolean running = true; // Indique si le thread doit continuer à fonctionner
 
 
@@ -18,7 +19,7 @@ public class Foreuse extends Batiment implements Runnable {
      * La capacité de stockage est fixée à 1 (un minerai extrait en attente).
      */
     public Foreuse(int x, int y, Terrain terrain) {
-        super(1, x, y, terrain);
+        super(1, x, y, terrain, COUT_CONSTRUCTION);
     }
 
     @Override

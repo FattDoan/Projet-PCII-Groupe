@@ -17,6 +17,9 @@ public abstract class Batiment{
     private final int capacite;
     private final Terrain terrain;
 
+    /** coût de construction */
+    private final int cout;
+
     /**
      * Crée un nouveau bâtiment avec une capacité de stockage définie.
      * Note : La capacité doit être positive.
@@ -24,7 +27,7 @@ public abstract class Batiment{
      * @param capacite la capacité maximale de stockage, doit être >= 0
      * @throws IllegalArgumentException si capacite < 0 (en validation stricte)
      */
-    protected Batiment(int capacite, int x, int y, Terrain terrain) {
+    protected Batiment(int capacite, int x, int y, Terrain terrain, int cout) {
         // Validation : la capacité doit être positive
         Validation.requireArgument(capacite >= 0, "capacite=" + capacite);
         Validation.requireArgument(x >= 0 && y >= 0, "Position batiment invalide: x=" + x + ", y=" + y);
@@ -33,6 +36,7 @@ public abstract class Batiment{
         this.terrain = Objects.requireNonNull(terrain, "terrain=null");
         this.x = x;
         this.y = y;
+        this.cout = cout;
     }
 
     /** Renvoie le type de bâtiment (USINE, FOREUSE, STOCKAGE, BATIMENT_MAITRE, ROUTE) */

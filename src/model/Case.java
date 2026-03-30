@@ -19,6 +19,7 @@ public class Case {
 
    /** Bâtiment présent sur la case */
    private Batiment batiment;
+
    /**
     * Crée une nouvelle case vide aux coordonnées spécifiées.
     * Par défaut, la case est de type VIDE.
@@ -118,20 +119,30 @@ public class Case {
 
    /** Construction de batiments */
 
+   private boolean payerConstruction(Terrain terrain, int cout) {
+      if (terrain == null || cout < 0) return false;
+      BatimentMaitre batimentMaitre = terrain.getBatimentMaitre();
+      if (batimentMaitre == null) return false;
+      return batimentMaitre.essayerRetirerMinerai(cout);
+   }
+
    public void construireStockage(Terrain terrain) {
       if (this.getBatiment() != null) return;
+      if (!payerConstruction(terrain, Stockage.COUT_CONSTRUCTION)) return;
       this.setBatiment(new Stockage(this.getX(), this.getY(), terrain));
    }
 
    public void construireForeuse(Terrain terrain) {
       if (this.getBatiment() != null || this.getType() != TypeCase.MINERAI) return;
+      if (!payerConstruction(terrain, Foreuse.COUT_CONSTRUCTION)) return;
       Foreuse foreuse = new Foreuse(this.getX(), this.getY(), terrain);
       this.setBatiment(foreuse);
       AsyncExecutor.runAsync(foreuse); // Lance la foreuse dans un thread séparé pour qu'elle puisse extraire le minerai en continu
    }
 
    public void construireRoute(Terrain terrain, Direction direction) {
-      if (this.getBatiment() != null) return;
+      if (this.getBatiment() != null || direction == null) return;
+      if (!payerConstruction(terrain, Route.COUT_CONSTRUCTION)) return;
       Route route = new Route(direction, this.getX(), this.getY(), terrain);
       this.setBatiment(route);
    }
