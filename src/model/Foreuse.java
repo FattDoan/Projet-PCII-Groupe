@@ -19,7 +19,7 @@ public class Foreuse extends Batiment implements Runnable {
      * La capacité de stockage est fixée à 1 (un minerai extrait en attente).
      */
     public Foreuse(int x, int y, Terrain terrain) {
-        super(1, x, y, terrain, COUT_CONSTRUCTION);
+        super(1, x, y, terrain, COUT_CONSTRUCTION, 10, 1, false); // La foreuse a une capacité de 1, un coût de construction défini, et des HP max de 100.
     }
 
     @Override
@@ -36,7 +36,7 @@ public class Foreuse extends Batiment implements Runnable {
                 Thread.sleep(DELAI_EXTRACTION_MS);
 
                 // Extraction du minerai
-                if (!estPlein()) {
+                if (!estPlein() && this.estFini()) {
                     this.ajouterMinerai(1);
                     Minerai nouveauMinerai = new Minerai(getX(), getY(), getTerrain());
 

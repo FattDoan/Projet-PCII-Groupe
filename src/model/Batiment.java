@@ -20,6 +20,13 @@ public abstract class Batiment{
     /** coût de construction */
     private final int cout;
 
+    /** bool finir de construitr */
+    private boolean fini = false;
+
+    /** hp */
+    private final int hpMax;
+    private int hp;
+
     /**
      * Crée un nouveau bâtiment avec une capacité de stockage définie.
      * Note : La capacité doit être positive.
@@ -27,7 +34,7 @@ public abstract class Batiment{
      * @param capacite la capacité maximale de stockage, doit être >= 0
      * @throws IllegalArgumentException si capacite < 0 (en validation stricte)
      */
-    protected Batiment(int capacite, int x, int y, Terrain terrain, int cout) {
+    protected Batiment(int capacite, int x, int y, Terrain terrain, int cout,int hpMax, int hp, boolean fini) {
         // Validation : la capacité doit être positive
         Validation.requireArgument(capacite >= 0, "capacite=" + capacite);
         Validation.requireArgument(x >= 0 && y >= 0, "Position batiment invalide: x=" + x + ", y=" + y);
@@ -37,6 +44,9 @@ public abstract class Batiment{
         this.x = x;
         this.y = y;
         this.cout = cout;
+        this.hpMax = hpMax;
+        this.fini = fini;
+        this.hp = 1;
     }
 
     /** Renvoie le type de bâtiment (USINE, FOREUSE, STOCKAGE, BATIMENT_MAITRE, ROUTE) */
@@ -85,6 +95,16 @@ public abstract class Batiment{
      */
     public synchronized boolean estPlein() {
         return stockage >= capacite;
+    }
+
+    /** Renvoie vrai si la construction du batiment est terminee. */
+    public synchronized boolean estFini() {
+        return fini;
+    }
+
+    /** Marque la construction du batiment comme terminee. */
+    public synchronized void terminerConstruction() {
+        this.fini = true;
     }
 
 

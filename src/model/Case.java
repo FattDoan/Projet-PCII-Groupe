@@ -13,7 +13,7 @@ public class Case {
 
    /** Coordonnée verticale de la case dans la grille */
    private final int y;
-
+   
    /** Type de la case (VIDE, MINERAI) */
    private final TypeCase type;
 
@@ -28,7 +28,7 @@ public class Case {
     * @param x la coordonnée horizontale (colonne), doit être >= 0
     * @param y la coordonnée verticale (ligne), doit être >= 0
     * @param type le type de case, ne doit pas être null
-    * @throws IllegalArgumentException si x < 0, y < 0 ou type est null (en validation stricte)
+   * @throws IllegalArgumentException si x < 0, y < 0 ou type est null (en validation stricte)
     */
    public Case(int x, int y, TypeCase type) {
       // Validation : les coordonnées ne peuvent pas être négatives
@@ -68,6 +68,7 @@ public class Case {
       return y;
    }
 
+
    /** Renvoie vrai si la case est vide, faux sinon */
    public boolean estVide() {
       return this.type == TypeCase.VIDE && this.batiment == null;
@@ -92,8 +93,8 @@ public class Case {
     * Note : Un bâtiment ne peut être placé que sur une case vide.
     * 
     * @param batiment le bâtiment à placer, ne doit pas être null
-    * @throws IllegalStateException si la case n'est pas vide (en validation stricte)
-    * @throws IllegalArgumentException si le bâtiment est null (en validation stricte)
+   * @throws IllegalStateException si la case n'est pas vide (en validation stricte)
+   * @throws IllegalArgumentException si le bâtiment est null (en validation stricte)
     */
    public void setBatiment(Batiment batiment) {
       // Validation : la case ne doit pas déjà contenir de bâtiment
@@ -119,30 +120,20 @@ public class Case {
 
    /** Construction de batiments */
 
-   private boolean payerConstruction(Terrain terrain, int cout) {
-      if (terrain == null || cout < 0) return false;
-      BatimentMaitre batimentMaitre = terrain.getBatimentMaitre();
-      if (batimentMaitre == null) return false;
-      return batimentMaitre.essayerRetirerMinerai(cout);
-   }
-
    public void construireStockage(Terrain terrain) {
       if (this.getBatiment() != null) return;
-      if (!payerConstruction(terrain, Stockage.COUT_CONSTRUCTION)) return;
       this.setBatiment(new Stockage(this.getX(), this.getY(), terrain));
    }
 
    public void construireForeuse(Terrain terrain) {
       if (this.getBatiment() != null || this.getType() != TypeCase.MINERAI) return;
-      if (!payerConstruction(terrain, Foreuse.COUT_CONSTRUCTION)) return;
       Foreuse foreuse = new Foreuse(this.getX(), this.getY(), terrain);
       this.setBatiment(foreuse);
       AsyncExecutor.runAsync(foreuse); // Lance la foreuse dans un thread séparé pour qu'elle puisse extraire le minerai en continu
    }
 
    public void construireRoute(Terrain terrain, Direction direction) {
-      if (this.getBatiment() != null || direction == null) return;
-      if (!payerConstruction(terrain, Route.COUT_CONSTRUCTION)) return;
+      if (this.getBatiment() != null) return;
       Route route = new Route(direction, this.getX(), this.getY(), terrain);
       this.setBatiment(route);
    }

@@ -22,7 +22,7 @@ public class Route extends Batiment {
      * @throws IllegalArgumentException si direction est null (en validation stricte)
      */
     public Route(Direction direction, int x, int y, Terrain terrain) {
-        super(1, x, y, terrain, COUT_CONSTRUCTION);
+        super(1, x, y, terrain, COUT_CONSTRUCTION, 5, 1, false); // La route a une capacité de 1, un coût de construction défini, et des HP max de 100.
         // Validation : la direction ne peut pas être nulle
         Validation.requireArgument(direction != null, "direction=null");
         this.direction = direction;

@@ -79,6 +79,10 @@ public class Minerai implements Runnable {
             // Ou on a supprimé le bâtiment sous un minerai: dans les deux cas, on considère que le minerai disparaît.
             return false;
         }
+        if (!currentBatiment.estFini()) {
+            // On attend la fin de construction du bâtiment courant avant tout transport.
+            return true;
+        }
 
         // 2) Déterminer la direction:
         // - Sur route: direction imposée par la route.
@@ -120,6 +124,10 @@ public class Minerai implements Runnable {
         // - retirer de la source,
         // - rollback si la source ne peut plus retirer.
         Batiment cible = nextCase.getBatiment();
+        if (cible == null || !cible.estFini()) {
+            // La cible doit exister et être terminée pour accepter un minerai.
+            return true;
+        }
         if (!cible.essayerAjouterMinerai(1)) {
             // Cible pleine: on reste sur place.
             return true;
@@ -168,6 +176,9 @@ public class Minerai implements Runnable {
                 continue;
             }
             Case adj = terrain.getCase(nx, ny);
+            if (!adj.aBatiment() || !adj.getBatiment().estFini()) {
+                continue;
+            }
             if (adj.aBatiment() && adj.getBatiment() instanceof Route && !adj.getBatiment().estPlein()) {
                 Route r = (Route) adj.getBatiment();
                 
