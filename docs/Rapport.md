@@ -229,15 +229,47 @@ Environ **50 heures** sont consacrées au développement des fonctionnalités du
 
 L'ensemble des tâches est présenté sous la forme d'un diagramme de Gantt, dont les ressources correspondent aux trois membres du groupe projet. Ce diagramme permet de visualiser la planification temporelle et le suivi de l'avancement du projet.
 
-## 4. Fonctionnalité détaillée
+## 4. Conception générale
 
-## 4.1 : Gestion des coordonnées (grille discrète vs mouvement continu)
+Le programme est basé sur une architecture MVC (Modèle Vue Contrôleur).
 
-### 4.1.1 : Gestion des collisions entre ennemis/unités et bâtiments
+```mermaid
+flowchart BT
+
+    subgraph Modele
+        direction LR
+        Terrain -->|contient| Case
+        Case -->|peut contenir| Batiment
+        Unité
+    end
+    subgraph Vue
+        direction LR
+        AffMod[Affichage du modèle]
+        AffMenu[Affichage du menu]
+        Fenêtre
+        Caméra
+    end
+    subgraph Controleur
+        RC[Réagir à la souris]
+        Camera[Contrôle de la caméra]
+    end
+
+    Vue -->|affiche| Modele
+    Controleur -->|modifie| Modele
+    Controleur -.->|déplace| Vue
+```
+
+
+
+## 5. Conception détaillée
+
+## 5.1 : Gestion des coordonnées (grille discrète vs mouvement continu)
+
+### 5.1.1 : Gestion des collisions entre ennemis/unités et bâtiments
 
 TODO
 
-### 4.1.2 : Coordonnées sur la grille (bâtiments et minerais)
+### 5.1.2 : Coordonnées sur la grille (bâtiments et minerais)
 
 La classe `Case` représente une case de la grille de jeu. Elle contient des coordonnées discrètes (x, y) qui correspondent à sa position sur la grille. Les bâtiments et les minerais sont placés sur ces cases, et leurs coordonnées sont donc alignées avec la grille.
 
@@ -263,13 +295,13 @@ classDiagram
     }
 ```
 
-### 4.1.3 : Coordonnées des unités et ennemis (mouvement continu)
+### 5.1.3 : Coordonnées des unités et ennemis (mouvement continu)
 
 TODO
 
-## 4.2 : Affichage des objets (unités, minerai, bâtiments)
+## 5.2 : Affichage des objets (unités, minerai, bâtiments)
 
-### 4.2.1 : Fenêtre principale avec grille de jeu
+### 5.2.1 : Fenêtre principale avec grille de jeu
 
 - Classe `Fenetre` : classe principale d'affichage, hérite de `JFrame`
   
@@ -280,7 +312,7 @@ TODO
   - Attribut : `terrain` (référence au terrain à afficher)
   - Méthode `paintComponent(Graphics g)` : surcharge pour dessiner les éléments du terrain (minerais, bâtiments, etc.) en fonction de leur position et de leur type. Appelle les fonctions d'affichage spécifiques dans `AffichageMinerais` et `AffichageBâtiments`. Garde un espace pour afficher le menu à droite de la grille.
 
-### 4.2.3 : Affichage des filons de minerai et des bâtiments
+### 5.2.3 : Affichage des filons de minerai et des bâtiments
 
 La classe `AffichageCases` contient des méthodes statiques pour afficher les différents types de cases (vide, minerai, bâtiment) à une position donnée sur la fenêtre. Chaque méthode prend en paramètre un objet Graphics et une Case pour dessiner l'élément correspondant à la position de la case sur la grille. Les coordonnées de la case sont converties en pixels pour l'affichage, et différentes couleurs sont utilisées pour différencier les types de cases.
 
@@ -330,17 +362,17 @@ classDiagram
     AffichageCases --> AffichageBatiments : utilisé pour afficher les bâtiments
 ```
 
-### 4.2.2 : Affichage des unités
+### 5.2.2 : Affichage des unités
 
 TODO
 
-### 4.2.4 : Animation du minerai sur les routes (effet visuel)
+### 5.2.4 : Animation du minerai sur les routes (effet visuel)
 
 TODO
 
-## 4.3 : Gestion des bâtiments (usine, stockage, mine, routes)
+## 5.3 : Gestion des bâtiments (usine, stockage, mine, routes)
 
-### 4.3.0 : Destruction des bâtiments
+### 5.3.0 : Destruction des bâtiments
 
 Lorsque l'utilisateur clique sur une case contenant un bâtiment (sauf le bâtiment maître), un bouton "Détruire" apparaît dans le menu d'actions. En cliquant dessus, le bâtiment est retiré de la case correspondante, et l'affichage est mis à jour pour refléter la suppression du bâtiment.
 
@@ -366,15 +398,15 @@ classDiagram
     MenuPanel --> Case : donne l'ordre de détruire le bâtiment
 ```
 
-### 4.3.1 : Usine
+### 5.3.1 : Usine
 
 TODO
 
-### 4.3.2 : Stockage des minerais
+### 5.3.2 : Stockage des minerais
 
 TODO
 
-### 4.3.3 : Mine (extraction automatique de minerai via des threads)
+### 5.3.3 : Mine (extraction automatique de minerai via des threads)
 
 #### Structures de données principales et constantes
 
@@ -449,7 +481,7 @@ La classe `Minerai` modélise le transport d'une unité de ressource sur la cart
 
 Le transport est lancé de manière asynchrone par la foreuse via l'exécuteur centralisé, puis le minerai avance case par case jusqu'à atteindre une route valide, le bâtiment maître, ou une condition d'arrêt.
 
-### 4.3.4 : Déplacement des minerais via routes
+### 5.3.4 : Déplacement des minerais via routes
 
 #### Structures de données principales
 
@@ -526,25 +558,25 @@ classDiagram
     Minerai --> BatimentMaitre : depose le minerai
 ```
 
-## 4.4 : Création, déplacements et actions des ennemis
+## 5.4 : Création, déplacements et actions des ennemis
 
-### 4.4.1 : Génération automatique des ennemis par vagues
-
-TODO
-
-### 4.4.2 : Déplacement des ennemis vers le bâtiment maître
+### 5.4.1 : Génération automatique des ennemis par vagues
 
 TODO
 
-### 4.4.3 : Actions des ennemis (destruction des bâtiments et unités à portée)
+### 5.4.2 : Déplacement des ennemis vers le bâtiment maître
 
 TODO
 
-### 4.4.4 : Mort des ennemis au contact des unités de défense
+### 5.4.3 : Actions des ennemis (destruction des bâtiments et unités à portée)
 
 TODO
 
-## 4.5 : Génération du terrain en début de partie
+### 5.4.4 : Mort des ennemis au contact des unités de défense
+
+TODO
+
+## 5.5 : Génération du terrain en début de partie
 
 ### Structures de données principales et constantes
 
@@ -582,13 +614,13 @@ classDiagram
     Case --> BatimentMaitre : peut contenir
 ```
 
-### 4.5.3 Création de l'unité de base initiale
+### 5.5.3 Création de l'unité de base initiale
 
 TODO
 
-## 4.6 : Actions et déplacements des unités
+## 5.6 : Actions et déplacements des unités
 
-### 4.6.1 : Miner
+### 5.6.1 : Miner
 
 La classe `Minerai` modélise le transport d'une unité de ressource sur la carte.
 
@@ -620,7 +652,7 @@ classDiagram
 
 Ce diagramme met en avant la relation d’héritage et les méthodes principales pour la gestion de l’extraction automatique.
 
-### 4.6.2 : Construction de bâtiments
+### 5.6.2 : Construction de bâtiments
 
 TEMPORAIRE : à modifier une fois que les unités seront implémentées (actuellement, la construction est gérée directement via le menu).
 
@@ -666,21 +698,21 @@ classDiagram
     ActionsPanel --> Affichage : met à jour l'affichage après construction
 ```
 
-### 4.6.3 : Transport du minerai
+### 5.6.3 : Transport du minerai
 
 TODO
 
-### 4.6.4 : Défense (tourelle)
+### 5.6.4 : Défense (tourelle)
 
 TODO
 
-### 4.6.5 : Attribution d'ordres aux unités
+### 5.6.5 : Attribution d'ordres aux unités
 
 TODO
 
-## 4.7 : Menus et interface utilisateur
+## 5.7 : Menus et interface utilisateur
 
-### 4.7.1 : Gestion des clics de l'utilisateur
+### 5.7.1 : Gestion des clics de l'utilisateur
 
 #### Structures de données principales et constantes
 
@@ -839,11 +871,11 @@ classDiagram
 
 Ce diagramme représente l'essentiel de la logique du jeu et suit le patron **MVC** (Model-View-Controller). Le modèle (`Terrain`) contient les données du jeu, la vue (`Affichage`) gère l'affichage en fonction du modèle, et les contrôleur (`ReactionClic` , `ReactionHover `, `CameraController` et `Camera`) gère le modèle tout en mettant également à jour directement la vue pour fournir un retour visuel.
 
-### 4.7.2 : Menu pour les unités
+### 5.7.2 : Menu pour les unités
 
 TODO
 
-### 4.7.3 : Menu des bâtiments (affichage des quantités de minerai)
+### 5.7.3 : Menu des bâtiments (affichage des quantités de minerai)
 
 ### Structures de données principales et constantes
 
@@ -950,8 +982,54 @@ StatsPanel --> Case
 Case --> Batiment
 ```
 
-### 4.7.4 : Vue d'ensemble des données (minerais, unités, bâtiments) (optionnel)
+### 5.7.4 : Vue d'ensemble des données (minerais, unités, bâtiments) (optionnel)
 
 TODO
 
-## 5\. Conclusion
+## 6\. Résultats
+
+TODO (1 page, ou plus s’il y a beaucoup de copies d’écran)
+
+## 7. Documentation utilisateur
+
+TODO 
+
+(1 page ou plus si bcp d'instructions
+
+C’est le mode d’emploi de votre code :
+
+- Que faut-il faire pour que ça marche ?
+- Quels sont les logiciels à installer ?
+- Sur quel bouton faut-il appuyer pour qu’il se passe quelque chose ?
+- etc.
+
+)
+
+## 8. Documentation développeur 
+
+TODO (1 à 2 pages)
+
+(Imaginez que quelqu’un reprenne votre code pour faire une version améliorée du projet…
+
+    Quelles sont les classes qu’il ou elle doit regarder en premier ? Où est la classe qui contient la méthode main ?
+
+    Quelles sont les principales constantes qu’il ou elle peut modifier pour changer le fonctionnement du code ?
+
+    Quelles sont les fonctionnalités que vous n’avez pas encore pu implémenter et qui mériteraient d’être développées en premier ? Comment auriez-vous fait ?
+)
+
+
+## 9. Conclusion et perspectives (1/2 page)
+
+TODO
+
+    Qu’avez-vous réalisé ?
+
+    Quelles étaient les difficultés et, surtout, comment les avez-vous résolues ?
+
+    Qu’avez-vous appris ?
+
+    Que voyez-vous comme évolution future de ce travail ?
+
+
+
