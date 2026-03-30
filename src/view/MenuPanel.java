@@ -191,7 +191,7 @@ public class MenuPanel extends JPanel {
                         @Override public void mouseEntered(java.awt.event.MouseEvent e) { setForeground(C_TEXT_PRI); repaint(); }
                         @Override public void mouseExited (java.awt.event.MouseEvent e) { setForeground(C_TEXT_SEC); repaint(); }
                   }); }
-            };
+            };            
             close.setBounds(0, 0, 28, 28); // Position finale ajustée dans doLayout.
 
             // ajout du bouton de fermeture au panneau d'en-tête

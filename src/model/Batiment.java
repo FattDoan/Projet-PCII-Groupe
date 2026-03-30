@@ -13,7 +13,7 @@ public abstract class Batiment{
     private final int y;
     /** Quantité actuelle de minerai stocké */
     private int stockage;
-    
+ 
     /** Capacité maximale de stockage du bâtiment */
     private final int capacite;
     private final Terrain terrain;

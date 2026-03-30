@@ -10,7 +10,7 @@ public class ForeuseThreadTest {
         t.start();
 
         // La foreuse extrait toutes les 1000 ms.
-        Thread.sleep(1300);
+        Thread.sleep(1000);
 
         int stockage = foreuse.getStockage();
         if (stockage != 1) {
