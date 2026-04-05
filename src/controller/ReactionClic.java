@@ -122,6 +122,8 @@ public class ReactionClic implements MouseListener, UnitActionCallback {
     @Override
     public void onDefendre(Unite u) {}
 
+    @Override public void onConstruire(Unite u) {}
+
     @Override public void mouseClicked (MouseEvent e) {}
     @Override public void mouseEntered (MouseEvent e) {}
     @Override public void mouseExited  (MouseEvent e) {}

@@ -46,7 +46,12 @@ public abstract class Batiment{
         this.cout = cout;
         this.hpMax = hpMax;
         this.fini = fini;
-        this.hp = 1;
+        
+        // TODO: si met hp = 1, tous les batiments deviennent ROUGES?
+        // je vous laisee a regler cela
+        // je remets hp = hpMax pour le fix temporairement
+        //this.hp = 1;
+        this.hp = hpMax;
     }
 
     /** Renvoie le type de bâtiment (USINE, FOREUSE, STOCKAGE, BATIMENT_MAITRE, ROUTE) */
