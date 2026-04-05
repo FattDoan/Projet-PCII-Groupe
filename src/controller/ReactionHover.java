@@ -1,20 +1,24 @@
 package controller;
  
 import view.Camera;
-import model.Case;
 import model.Terrain;
+import model.Selectable;
 import view.AffichageTerrain;
+import view.Affichage;
 import java.awt.event.*;
  
 public class ReactionHover implements MouseMotionListener {
  
+    private final Affichage affichage;
     private final AffichageTerrain view;
     private final Terrain terrain;
     private final Camera camera;
-    private Case lastHovered = null;
+    private Selectable lastHovered = null;
  
-    public ReactionHover(AffichageTerrain view, Terrain terrain, Camera camera) {
-        this.view = view; this.terrain = terrain; this.camera = camera;
+    public ReactionHover(Affichage affichage, Terrain terrain, Camera camera) {
+        this.affichage = affichage;
+        this.view = affichage.getAffichageTerrain();
+        this.terrain = terrain; this.camera = camera;
         view.addMouseMotionListener(this);
     }
  
@@ -27,14 +31,23 @@ public class ReactionHover implements MouseMotionListener {
         if (gx < 0 || gx>=terrain.getTaille() ||
             gy < 0 || gy>=terrain.getTaille()) {
             // Hors carte: on retire l'état de survol précédent.
-            if (lastHovered!=null) { view.setHoveredCase(null); lastHovered=null; }
+            if (lastHovered!=null) { view.setHoveredElement(null); lastHovered=null; }
             return;
         }
-        Case c = terrain.getCase(gx, gy);
+      
+        float worldPX = px + camera.getOffsetX();
+        float worldPY = py + camera.getOffsetY();
+        if (view.isAwaitingDestination()) {
+            view.setDestinationPreview(gx, gy, worldPX, worldPY);
+        }
+        else view.clearDestinationPreview();
+
+        Selectable s = affichage.getElementAtPixel(px + camera.getOffsetX(), py + camera.getOffsetY());
         // Évite les repaint inutiles si la case n'a pas changé.
-        if (c == lastHovered) return;
-        lastHovered = c;
+        if (s == lastHovered) return;
+        lastHovered = s;
         // On ne met en surbrillance que les cases non vides.
-        view.setHoveredCase(c);
+        view.setHoveredElement(s);
     }
+
 }

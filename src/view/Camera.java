@@ -5,7 +5,9 @@ public class Camera {
  
     private int offsetX = 0;
     private int offsetY = 0;
- 
+
+    private float zoom = 1.0f; // TODO: a implémenter
+
     private final int terrainPixelWidth;
     private final int terrainPixelHeight;
     private final int baseCellSize;
@@ -47,10 +49,10 @@ public class Camera {
  
     public int getOffsetX()      { return offsetX; }
     public int getOffsetY()      { return offsetY; }
+    // WARNING: Deprecated in the future, should always call effectiveCellSize() instead.
     public int getBaseCellSize() { return baseCellSize; }
  
-    // Conservé pour compatibilité avec le rendu existant.
-    public float effectiveCellSize() { return baseCellSize; }
+    public int effectiveCellSize() { return (int)(baseCellSize * zoom); }
  
     // ── Utilitaires internes ───────────────────────────────────────────────
  

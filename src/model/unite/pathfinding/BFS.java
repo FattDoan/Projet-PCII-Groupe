@@ -7,6 +7,7 @@ import java.util.LinkedList;
 
 import model.Terrain;
 import model.Case;
+import model.Route;
 
 public class BFS {
     
@@ -41,10 +42,10 @@ public static List<int[]> trouver(Terrain terrain,
         if (nx<0||ny<0||nx>=n||ny>=n) continue;
         if (visited[nx][ny]) continue;
 
-        // Passable = empty OR target cell
+        // Passable = empty OR target cell OR Route
         Case c = terrain.getCase(nx, ny);
         boolean passable =
-          c.estVide() || (nx==tx && ny==ty);
+          c.estVide() || (c.aBatiment() && c.getBatiment() instanceof Route) || (nx==tx && ny==ty);
         if (!passable) continue;
 
         visited[nx][ny] = true;

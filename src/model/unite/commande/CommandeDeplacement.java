@@ -10,9 +10,11 @@ import model.unite.Unite;
 
 public class CommandeDeplacement extends Commande {
     private final int tx, ty; // destination en coordonnées de grille
+    private final float finalPx, finalPy; // destination en coordonnées pixels
 
-    public CommandeDeplacement(int tx, int ty) {
+    public CommandeDeplacement(int tx, int ty, float finalPx, float finalPy) {
         this.tx = tx; this.ty = ty;
+        this.finalPx = finalPx; this.finalPy = finalPy;
     }
 
     @Override
@@ -25,14 +27,17 @@ public class CommandeDeplacement extends Commande {
                 List<int[]> result = BFS.trouver(unite.getTerrain(),
                         unite.getGX(), unite.getGY(), tx, ty);
                 SwingUtilities.invokeLater(() -> {
-                    unite.setChemin(result);
+                    unite.setChemin(result.isEmpty() ? null : result);
                     unite.setCheminEnAttente(false);
                 });
             });
             return false; // waiting
         }
         if (unite.isCheminEnAttente()) return false; // still computing
-        if (unite.cheminTermine()) return true;       // arrived
+        if (unite.cheminTermine()) {
+            unite.setChemin(null); // clear path for next command
+            return true;       // arrived
+        }
 
         // 2. Check if next waypoint is still passable (dynamic obstacle)
         int[] wp = unite.getChemin().get(unite.getProchainWP());
@@ -44,8 +49,10 @@ public class CommandeDeplacement extends Commande {
         }
 
         // 3. Move toward next waypoint in pixel space
-        float targetPX = wp[0] * Unite.CASE_SIZE + Unite.CASE_SIZE / 2f;
-        float targetPY = wp[1] * Unite.CASE_SIZE + Unite.CASE_SIZE / 2f;
+        // if it's the last waypoint, target the exact final pixel coordinates instead of the center of the case
+        boolean isLastWaypoint = (unite.getProchainWP() == unite.getChemin().size() - 1);
+        float targetPX = isLastWaypoint ? finalPx : wp[0] * Unite.CASE_SIZE + Unite.CASE_SIZE / 2f;
+        float targetPY = isLastWaypoint ? finalPy : wp[1] * Unite.CASE_SIZE + Unite.CASE_SIZE / 2f;
         float dx = targetPX - unite.getPX();
         float dy = targetPY - unite.getPY();
         float dist = (float) Math.hypot(dx, dy);

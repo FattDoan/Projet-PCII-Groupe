@@ -3,6 +3,7 @@ package view;
 import view.Camera;
 import model.Case;
 import model.Terrain;
+import model.Selectable;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -14,17 +15,46 @@ public class AffichageTerrain extends JPanel {
     private final Terrain terrain;
     private Camera camera = null;   // null jusqu'à l'injection par GameController
 
-    private Case hoveredCase = null;
-    private Case selectedCase = null;
- 
+    private Selectable selectedElement = null; // peut être une Case ou une Unite
+    private Selectable hoveredElement = null;  // peut être une Case ou une Unite
+
+    // Destination-picking mode (after "Deplacer" is clicked in unit menu)
+    private boolean awaitingDestination = false;
+    private int[] destinationPreview = null; // grid coords [gx, gy] of hovered cell while picking
+    private float previewWorldPX, previewWorldPY; // world coords of mouse cursor during destination picking (for warning bubble positioning)
+
+    // Avertissement affiché temporairement en cas d'action interdite (ex: déplacement hors portée).
+    private final WarningBubble warning = new WarningBubble();
+
     private static final Color C_AMBER = new Color(255, 185, 30, 80);
+    private static final Color C_DEST_TINT    = new Color(100, 180, 255,  40);
+    private static final Color C_DEST_BORDER  = new Color(100, 180, 255, 190);
+    private static final Color C_PATH_DOT     = new Color(180, 140, 255, 180);
+    private static final Color C_PATH_TARGET  = new Color(180, 140, 255, 220);
 
     public AffichageTerrain(Terrain terrain) {
         super();
         this.terrain = terrain;
         setFocusable(true);
-    }
 
+        // For warning bubble: if its out of bounds, reposition it
+        addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            @Override public void mouseMoved(java.awt.event.MouseEvent e) {
+                boolean wasHov = warning.isVisible() && warning.getCloseRect().contains(e.getPoint());
+                warning.setXHovered(wasHov);
+                if (warning.isVisible()) repaint();
+            }
+        });
+        addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override public void mouseReleased(java.awt.event.MouseEvent e) {
+                if (warning.isVisible() && warning.getCloseRect().contains(e.getPoint())) {
+                    warning.dismiss();
+                    repaint();
+                }
+            }
+        });
+    }
+    public Terrain getTerrain() { return terrain; }
     // ── Injection caméra (après construction) ────────────────────────────
 
     /** Appelé par Affichage.setCamera(), lui-même appelé par GameController. */
@@ -36,15 +66,29 @@ public class AffichageTerrain extends JPanel {
 
     // ── Gestion du survol ─────────────────────────────────────────────────
 
-    public void setHoveredCase(Case c) {
-        if (c == hoveredCase) return;
-        hoveredCase = c;
+    public void setHoveredElement(Selectable s) {
+        if (s == hoveredElement) return;
+        hoveredElement = s;
         repaint();
     }
 
-    public void setSelectedCase(Case c) {
-        if (c == selectedCase) return;
-        selectedCase = c;
+    public void setSelectedElement(Selectable s) {
+        if (s == selectedElement) return;
+        selectedElement = s;
+        repaint();
+    }
+
+    // ── Destination mode ─────────────────────────────────────────────────
+    public void setAwaitingDestination(boolean b) {
+        awaitingDestination = b;
+        setCursor(b ? Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR)
+                    : Cursor.getDefaultCursor());
+        clearDestinationPreview();
+        repaint();
+    }
+
+    public void showWarning(String msg, int cursorX, int cursorY) {
+        warning.show(msg, cursorX, cursorY, getWidth(), getHeight());
         repaint();
     }
 
@@ -69,6 +113,9 @@ public class AffichageTerrain extends JPanel {
         int   offsetY  = camera.getOffsetY();
         float cellSize = camera.effectiveCellSize();
         int   base     = camera.getBaseCellSize();
+        // Anything thats need CASE_TAILLE must be inquired through 
+        // camera.getBaseCellSize() and camera.getEffectiveCellSize() to accomodate zooming
+
 
         // Translation globale selon l'offset caméra.
         g2.translate(-offsetX, -offsetY);
@@ -89,39 +136,124 @@ public class AffichageTerrain extends JPanel {
         //Affichage des unites
         List <Unite> unites = terrain.getUnites();
         for (Unite u : unites) {
-            System.out.println("Affichage de l'unité: " + u.getType() + " à la position (" + u.getGX() + ", " + u.getGY() + ")");
-            AffichageUnites.afficheUnite(g2, u);
+            AffichageUnites.afficheUnite(g2, u, base/2);
+            // Unite de taille base/2
         }
 
+        drawIndicatorForUnitPath(g2, base);
 
         // Surbrillance légère de la case survolée.
-        if (hoveredCase != null && hoveredCase != selectedCase) {
-            int hx = hoveredCase.getX() * base;
-            int hy = hoveredCase.getY() * base;
+        drawHoverIndicator(g2, base);
+
+        // Encadrement renforcé de la case sélectionnée.
+        drawSelectionIndicator(g2, base);
+
+        drawPathIndicator(g2, base);
+
+        // Restauration pour ne pas impacter les autres couches Swing.
+        g2.setTransform(originalTransform);
+    
+        // Warning bubble must be displayed in screen space, not world(model) space
+        warning.paint(g2);
+    }
+
+    // TODO: Unit hovered should be circle, not square like Case
+    private void drawHoverIndicator(Graphics2D g2, int base) {
+        if (hoveredElement != null && hoveredElement != selectedElement) {
+            int hx = (int)hoveredElement.getPX();
+            int hy = (int)hoveredElement.getPY();
+
+            int size = base;
+            if (hoveredElement instanceof Unite) {
+                size = base/2; // Unite de taille base/2
+                hx -= size/2;
+                hy -= size/2;
+            }
 
             g2.setColor(new Color(255, 255, 255, 45)); 
-            g2.fillRect(hx, hy, base, base);
+            g2.fillRect(hx, hy, size, size);
 
             g2.setColor(new Color(255, 255, 255, 80));
             g2.setStroke(new BasicStroke(1.0f));
-            g2.drawRect(hx, hy, base - 1, base - 1);
+            g2.drawRect(hx, hy, size - 1, size - 1);
         }
+    }
 
-        // Encadrement renforcé de la case sélectionnée.
-        if (selectedCase != null) {
-            int sx = selectedCase.getX() * base;
-            int sy = selectedCase.getY() * base;
+    private void drawSelectionIndicator(Graphics2D g2, int base) {
+        if (selectedElement != null) {
+            int sx = (int)selectedElement.getPX();
+            int sy = (int)selectedElement.getPY();
+ 
+            int size = base;
+            if (selectedElement instanceof Unite) {
+                size = size/2; 
+                sx -= size/2;
+                sy -= size/2;
+            }
 
             g2.setColor(new Color(C_AMBER.getRed(), C_AMBER.getGreen(), C_AMBER.getBlue(), 60));
             g2.setStroke(new BasicStroke(4.0f)); 
-            g2.drawRect(sx, sy, base, base);
+            g2.drawRect(sx, sy, size, size);
 
             g2.setColor(C_AMBER);
             g2.setStroke(new BasicStroke(2.0f));
-            g2.drawRect(sx + 1, sy + 1, base - 2, base - 2);
-            
+            g2.drawRect(sx, sy, size - 1, size - 1);    
         }
-        // Restauration pour ne pas impacter les autres couches Swing.
-        g2.setTransform(originalTransform);
+    }
+
+    public boolean isAwaitingDestination() { return awaitingDestination; }
+
+    public void setDestinationPreview(int gx, int gy, float worldPX, float worldPY) {
+        destinationPreview = new int[]{gx, gy};
+        previewWorldPX = worldPX;
+        previewWorldPY = worldPY;
+        repaint();
+    }
+    public void clearDestinationPreview() { destinationPreview = null; repaint(); }
+
+    private void drawIndicatorForUnitPath(Graphics2D g2, int base) {
+        if (awaitingDestination && destinationPreview != null) {
+            int dpx = destinationPreview[0] * base;
+            int dpy = destinationPreview[1] * base;
+            g2.setColor(C_DEST_TINT);
+            g2.fillRect(dpx, dpy, base, base);
+            float[] dash = {4f, 3f};
+            g2.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 0, dash, 0));
+            g2.setColor(C_DEST_BORDER);
+            g2.drawRect(dpx + 1, dpy + 1, base - 2, base - 2);
+        }
+    }
+
+    private void drawPathIndicator(Graphics2D g2, int base) {
+        if (selectedElement instanceof Unite su) {
+            List<int[]> ch = su.getChemin();
+            int wp = su.getProchainWP();
+            if (ch != null && wp < ch.size()) 
+            drawCheminPreview(g2, su, ch.subList(wp, ch.size()), base);
+        }
+    }
+
+    private void drawCheminPreview(Graphics2D g2, Unite u, List<int[]> chemin, int base) {
+        g2.setColor(C_PATH_DOT);
+        float[] dash = {3f, 5f};
+        g2.setStroke(new BasicStroke(3f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 0, dash, 0));
+        int prevX = (int) u.getPX(), prevY = (int) u.getPY();
+        for (int[] wp : chemin) {
+            int wx = wp[0] * base + base / 2;
+            int wy = wp[1] * base + base / 2;
+            g2.drawLine(prevX, prevY, wx, wy);
+            prevX = wx; prevY = wy;
+        }
+        
+        if (u.getDestinationPX() >= 0) {
+            int fx = (int) u.getDestinationPX();
+            int fy = (int) u.getDestinationPY();
+            int m = base / 4;
+            g2.setColor(C_PATH_TARGET);
+            g2.setStroke(new BasicStroke(1.5f));
+            g2.drawLine(fx - m, fy, fx + m, fy);
+            g2.drawLine(fx, fy - m, fx, fy + m);
+            g2.drawOval(fx - m, fy - m, m*2, m*2);
+        }
     }
 }

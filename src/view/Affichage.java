@@ -4,6 +4,8 @@ import view.Camera;
 import model.Case;
 import model.Terrain;
 import model.unite.Unite;
+import model.Selectable;
+import java.util.List;
 import javax.swing.*;
 import java.awt.*;
  
@@ -70,18 +72,16 @@ public class Affichage extends JPanel {
     public int getLargeurGrille() { return largeurGrille; }
     public int getHauteurGrille() { return hauteurGrille; }
  
-    public void showMenu(Case c) {
-        // Le menu est alimenté à partir de la case sélectionnée.
-        menuPanel.setSelectedCase(c);
+    public void showMenu(Selectable s) {
+        menuPanel.setSelectedElement(s);
         menuPanel.refresh();
         menuPanel.setVisible(true);
     }
-    public void showMenu(Unite u) {
-        // Le menu est alimenté à partir de l'unité sélectionnée.
-        menuPanel.setSelectedUnite(u);
-        menuPanel.refresh();
-        menuPanel.setVisible(true);
-    }
+
+    // Speical case of showMenu since Unite has a callback for its menu actions.
+    public void setUnitCallback(UnitActionCallback cb) {
+        menuPanel.setUnitCallback(cb);
+    } 
 
     public void hideMenu() {
         menuPanel.setVisible(false);
@@ -96,4 +96,35 @@ public class Affichage extends JPanel {
         // on désactive donc l'optimisation Swing pour respecter le Z-order.
         return false; // Indique à Swing de conserver le calcul de superposition des couches.
     }
+
+    // Get unit at pixel coordinates (px, py). Returns null if no unit is present at these coordinates.
+    public Unite getUniteAtPixel(float px, float py) {
+        float unitBase = camera.effectiveCellSize() / 2;
+        List<Unite> unites = affichageTerrain.getTerrain().getUnites();
+        for (Unite u : unites) {
+            if (px >= u.getPX() - unitBase && px <= u.getPX() + unitBase
+                && py >= u.getPY() - unitBase / 2 && py <= u.getPY() + unitBase) {
+                return u;
+            }
+        }
+        return null;
+    }
+
+    public Selectable getElementAtPixel(float px, float py) {
+        // On privilégie le clic sur une unité
+        Unite u = getUniteAtPixel(px, py);
+        if (u != null) return u;
+        Terrain terrain = affichageTerrain.getTerrain();
+
+        // Sinon on retourne la case correspondante
+        int gx = (int)(px / camera.effectiveCellSize());
+        int gy = (int)(py / camera.effectiveCellSize());
+        if (gx < 0 || gx >= terrain.getTaille()  || gy < 0 || gy >= terrain.getTaille()) {
+            return null; // Hors du terrain
+        }
+        return terrain.getCase(gx, gy);
+    }
+
+
+
 }

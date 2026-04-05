@@ -2,6 +2,7 @@ package model;
 
 import common.AsyncExecutor;
 import common.Validation;
+import view.Affichage;
 
 /**
  * Représente une case de la grille de jeu.
@@ -67,6 +68,14 @@ public class Case implements Selectable {
    public int getY() {
       return y;
    }
+
+    public float getPX() {
+        return x * Affichage.TAILLE_CASE;
+    }
+
+    public float getPY() {
+        return y * Affichage.TAILLE_CASE;
+    }    
 
 
    /** Renvoie vrai si la case est vide, faux sinon */
@@ -169,6 +178,6 @@ public class Case implements Selectable {
         else if (aMinerai()) {
             return "Gisement extractible.";
         }
-        return "";
+        return "Aucun contenu";
     }
 }

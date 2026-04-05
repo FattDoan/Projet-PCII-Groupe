@@ -21,6 +21,7 @@ public class Unite implements Selectable {
     private List<int[]> chemin;       // cached points [gx, gy]
     private int prochainWP = 0;
     private boolean cheminEnAttente = false;
+    private float destinationPX, destinationPY; // en pixels, pour éviter de recalculer à chaque tick
 
     // Command queue pour ce unite. 
     // Les commandes sont exécutées séquentiellement, une par tick, jusqu'à ce que la queue soit vide.
@@ -43,8 +44,13 @@ public class Unite implements Selectable {
         }
     }
 
-    public void ajouterCommande(Commande c) { commandQueue.addLast(c); }
-    public void annulerCommandes()          { commandQueue.clear(); chemin = null; }
+    public void ajouterCommande(Commande c) {
+        commandQueue.addLast(c); 
+    }
+    public void annulerCommandes() { 
+        commandQueue.clear(); 
+        chemin = null; 
+    }
 
     // Les getters
     // GX et GY sont les coordonnées de grille (case) calculées à partir des coordonnées pixels.
@@ -55,7 +61,10 @@ public class Unite implements Selectable {
     public TypeUnite getType() { return typeUnite; }
     public Terrain getTerrain() { return terrain; }
     public float getSpeed() { return speed; }
-
+    public void setDestination(float px, float py) { destinationPX = px; destinationPY = py; }
+    public float getDestinationPX() { return destinationPX; }
+    public float getDestinationPY() { return destinationPY; }
+    
     // Appellee par CommandeDeplacement pour avancer vers la prochaine position en pixel
     public void avancer(float dx, float dy) { 
         px += dx; 
@@ -67,7 +76,9 @@ public class Unite implements Selectable {
         return chemin; 
     }
     public void setChemin(List<int[]> c) { 
-        this.chemin = c; prochainWP = 0; 
+        this.chemin = c; 
+        this.prochainWP = 0; 
+        if (c == null) { destinationPX = -1; destinationPY = -1; }
     }
     public int getProchainWP() { 
         return prochainWP; 

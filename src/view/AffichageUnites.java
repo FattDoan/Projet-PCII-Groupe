@@ -9,10 +9,10 @@ public class AffichageUnites {
     // une rectangle (de taille_case / 2 larguer, taille_case hauteur) de couleur purple pour les ouvriers
     // getGX(), getGY() pour récupérer les coordonnées de l'unité en terrain (int)
     // getPX(), getPY() pour récupérer les coordonnées de l'unité en pixels (float)
-    public static void afficheUnite(Graphics g, Unite u) {
+    public static void afficheUnite(Graphics g, Unite u, int base) {
         switch (u.getType()) {
             case OUVRIER:
-                afficheOuvrier(g, u);
+                afficheOuvrier(g, u, base);
                 break;
             // case SOLDAT:
             //     afficheSoldat(g, u);
@@ -26,16 +26,15 @@ public class AffichageUnites {
         }
     }
 
-    public static void afficheOuvrier(Graphics g, Unite u) {
+    public static void afficheOuvrier(Graphics g, Unite u, int base) {
         int x = (int)u.getPX(); // conversion des coordonnées de l'unité en pixels pour l'affichage
         int y = (int)u.getPY();
 
         // Choix visuel: purple pour les ouvriers, à ajuster selon les types d'unités que vous aurez
         g.setColor(java.awt.Color.MAGENTA); // Couleur de l'unité, ici magenta pour faire du purple
 
-        // Dessine un rectangle représentant l'unité. La taille peut être ajustée selon vos préférences.
-        int size = Affichage.TAILLE_CASE / 2; // Taille de l'unité, ici la moitié de la taille d'une case
-        g.fillRect(x - size / 2, y - size / 2, size, size); // Dessine un carré centré sur les coordonnées de l'unité 
+        // Draw a circle centered on the unit's pixel coordinates with diameter equal to TAILLE_UNITE
+        g.fillOval(x - base/2, y - base/2, base, base); // Dessine un cercle centré sur les coordonnées de l'unité
    }
 
 

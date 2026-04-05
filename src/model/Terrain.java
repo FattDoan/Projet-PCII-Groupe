@@ -1,6 +1,8 @@
 package model;
 
 import model.unite.Unite;
+import view.Affichage;
+import view.AffichageUnites;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -165,15 +167,9 @@ public class Terrain {
       return unites;
    }
 
-   // Get unit at pixel coordinates (px, py). Returns null if no unit is present at these coordinates.
-   public Unite getUniteAtPixel(float px, float py) {
+    public void updateUnites(double dt) {
         for (Unite u : unites) {
-            // On considère qu'une unité occupe une zone de taille_case/2 x taille_case/2 centrée sur ses coordonnées pixels.
-            float halfSize = Unite.CASE_SIZE / 4.0f; // moitié de la moitié de la taille d'une case 
-            if (Math.abs(u.getPX() - px) <= halfSize && Math.abs(u.getPY() - py) <= halfSize) {
-                return u;
-            }
+            u.update(dt);
         }
-        return null;
     }
 }

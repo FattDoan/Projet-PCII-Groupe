@@ -33,7 +33,7 @@ public class GameController {
         // Orchestration des interactions utilisateur.
         cameraController = new CameraController(camera, affichage);
         new ReactionClic(affichage, terrain, cameraController);
-        new ReactionHover(view, terrain, camera);
+        new ReactionHover(affichage, terrain, camera);
     }
  
     /**
