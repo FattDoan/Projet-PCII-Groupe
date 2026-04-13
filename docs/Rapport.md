@@ -314,14 +314,49 @@ TODO
 
 ### 5.2.3 : Affichage des filons de minerai et des bâtiments
 
-La classe `AffichageCases` contient des méthodes statiques pour afficher les différents types de cases (vide, minerai, bâtiment) à une position donnée sur la fenêtre. Chaque méthode prend en paramètre un objet Graphics et une Case pour dessiner l'élément correspondant à la position de la case sur la grille. Les coordonnées de la case sont converties en pixels pour l'affichage, et différentes couleurs sont utilisées pour différencier les types de cases.
+La classe `AffichageCases` contient des méthodes statiques pour afficher les différents types de cases (vide, minerai, bâtiment) à une position donnée sur la fenêtre. Chaque méthode prend en paramètre un objet Graphics et une Case pour dessiner l'élément correspondant à la position de la case sur la grille. Les coordonnées de la case sont converties en pixels pour l'affichage, et des images sont chargées depuis le fichier `images` pour différencier des cases.
 
-Chaque case a sa propre méthode d'affichage, ce qui permet de facilement ajouter de nouveaux types de cases et facilement modifier l'apparence de chaque type de case sans affecter les autres.
+Pour chaque type de case et chaque type de bâtiment, on stocke l'adresse de l'image correspondante dans une variable statique. On utilise un HashMap comme cache pour éviter de recharger la même image plusieurs fois.
 
 - Méthodes statiques :
   - `afficheCase(Graphics g, Case c)` : affiche une case en fonction de son type (vide, minerai, bâtiment) en appelant la méthode d'affichage correspondante.
   - `afficheCaseVide(Graphics g, Case c)` : affiche une case vide à la position de la case sur la fenêtre.
-  - `afficheMinerai(Graphics g, Case c)` : affiche un minerai à la position de la case sur la fenêtre.
+  - `afficheImageCase(Graphics g, Case c, String adresse)` : affiche l'image à l'emplacement `adresse` sur la case `c`. Récupère l'image dans le cache si on l'a déjà chargée.
+  - `afficheImageBatiment(Graphics g, Case c)` : affiche une image correspondant au bâtiment contenu dans la case `c` en appelant `afficheImageCase`.
+  - `afficheMineralIngot(Graphics g, Case c)` : affiche un minerai qui se déplace sur la route dans la case `c`.
+
+```mermaid
+classDiagram
+
+    class Fenetre {
+        +Fenetre(String titre, Terrain terrain)
+    }
+
+    class Affichage {
+        -terrain: Terrain
+        +paintComponent(Graphics g)
+    }
+
+    class AffichageCases {
+        +afficheCase(Graphics g, Case c)
+        +afficheCaseVide(Graphics g, Case c)
+        +afficheMinerai(Graphics g, Case c)
+    }
+
+    note for AffichageCases "récupères les images dans ./images/"
+
+    JFrame <|-- Fenetre : hérite de
+    JPanel <|-- Affichage : hérite de
+    Fenetre --> Affichage : contient
+    Affichage --> AffichageCases : utilisé pour afficher les cases
+```
+
+
+
+
+
+
+(`AffichageBatiments` : utilisée pour l'affichage temporaire, TODO !! à retirer dans la version finale du build !!)
 
 La classe `AffichageBatiments` contient des méthodes pour afficher les différents types de bâtiments (route, foreuse, etc.) à une position donnée sur la fenêtre. Chaque méthode prendra en paramètre un objet `Graphics` et une `Case` pour dessiner le bâtiment correspondant à la position de la case sur la grille. Ses méthodes sont appelées depuis `AffichageCases` en fonction du contenu de la case à afficher.
 
