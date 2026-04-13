@@ -5,10 +5,12 @@ import model.unite.Unite;
 
 //TODO
 public class CommandeMiner extends Commande {
-    private final int tx, ty; // destination en coordonnées de grille
+    private final int tx, ty; //  coordonnées de grille du minerait
+    private final int tMaitrex, tMaitreY; // coordonnées de grille du bâtiment maître
 
-    public CommandeMiner(int tx, int ty) {
-        this.tx = tx; this.ty = ty;
+    public CommandeMiner(Case Minerai, Case tMaitre) {
+        this.tx = Minerai.getX(); this.ty = Minerai.getY();
+        this.tMaitrex = tMaitre.getX(); this.tMaitreY = tMaitre.getY();
     }
 
     @Override
