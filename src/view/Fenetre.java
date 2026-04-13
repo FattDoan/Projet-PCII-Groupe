@@ -3,6 +3,7 @@ package view;
 import javax.swing.JFrame;
 
 import model.Terrain;
+import java.awt.Dimension;
 
 /** La fenêtre principale de l'application */
 public class Fenetre extends JFrame {
@@ -27,7 +28,21 @@ public class Fenetre extends JFrame {
         this.pack();
         this.setLocationRelativeTo(null);
         this.setVisible(true);
+
+        // if JFrame is resized, 
+        // we update all the components of the window to 
+        // fit the new size (especially MenuPanel)
+
+        this.addComponentListener(new java.awt.event.ComponentAdapter() {
+            @Override
+            public void componentResized(java.awt.event.ComponentEvent evt) {
+                affichage.revalidate();
+                affichage.repaint();
+            }
+        });
     }
+
+
 
     public Affichage getAffichage() {
         return this.affichage;

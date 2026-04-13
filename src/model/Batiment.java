@@ -52,6 +52,7 @@ public abstract class Batiment{
         // je remets hp = hpMax pour le fix temporairement
         this.hp = hp;
         //this.hp = hpMax;
+        //this.hp = hp;
     }
 
     /** Renvoie le type de bâtiment (USINE, FOREUSE, STOCKAGE, BATIMENT_MAITRE, ROUTE) */

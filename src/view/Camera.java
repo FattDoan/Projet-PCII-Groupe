@@ -11,8 +11,8 @@ public class Camera {
     private final int terrainPixelWidth;
     private final int terrainPixelHeight;
     private final int baseCellSize;
-    private final int viewWidth;
-    private final int viewHeight;
+    private int viewWidth;
+    private int viewHeight;
  
     public Camera(int terrainTaille, int baseCellSize, int viewWidth, int viewHeight) {
         this.baseCellSize       = baseCellSize;
@@ -58,5 +58,11 @@ public class Camera {
  
     private static int clamp(int v, int min, int max) {
         return Math.max(min, Math.min(max, v));
+    }
+
+    public void updateViewSize(int w, int h) {
+        this.viewWidth  = w;   // make these non-final
+        this.viewHeight = h;
+        setOffset(offsetX, offsetY); // re-clamp with new bounds
     }
 }

@@ -62,7 +62,22 @@ public class Affichage extends JPanel {
         setComponentZOrder(menuPanel, 0);
         setComponentZOrder(affichageTerrain, 1);
     }
-  
+ 
+    // Add this method to Affichage.java
+    @Override
+    public void doLayout() {
+        int w = getWidth();
+        int h = getHeight();
+        if (w == 0 || h == 0) return;
+
+        affichageTerrain.setBounds(0, 0, w, h);
+
+        int mw = (int)(w * RATIO_LARGEUR_MENU);
+        menuPanel.setBounds(w - mw, 0, mw, h);
+
+        if (camera != null) camera.updateViewSize(w, h);
+    }
+
     public void setCamera(Camera c) { this.camera = c; affichageTerrain.setCamera(c); }
     public Camera           getCamera()           { return camera; }
     public AffichageTerrain getAffichageTerrain() { return affichageTerrain; }
