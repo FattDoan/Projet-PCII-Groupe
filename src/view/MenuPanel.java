@@ -579,6 +579,9 @@ public class MenuPanel extends JPanel {
                 addBtn("MINER",  C_AMBER, () -> {
                     if (unitCallback != null) unitCallback.onMiner(u);
                 }); // TODO
+                addBtn("CONSTRUIRE", C_GREEN, () -> {
+                    if (unitCallback != null) unitCallback.onConstruire(u);
+                }); // TODO
                 addBtn("DÉFENDRE",  C_GREEN, () -> {
                     if (unitCallback != null) unitCallback.onDefendre(u);
                 }); // TODO

@@ -40,7 +40,7 @@ public class Route extends Batiment {
     public TypeBatiment type() {
         return TypeBatiment.ROUTE;
     }
-    @Override
+
     public int getCost() {
         return COUT_CONSTRUCTION;
     }
