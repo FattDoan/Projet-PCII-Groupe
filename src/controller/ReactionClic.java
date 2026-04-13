@@ -69,7 +69,7 @@ public class ReactionClic implements MouseListener, UnitActionCallback {
                 }
 
                 pendingUnite.annulerCommandes();
-                pendingUnite.ajouterCommande(new CommandeDeplacement(gx, gy, worldPX, worldPY));
+                pendingUnite.ajouterCommande(new CommandeDeplacement(worldPX, worldPY));
             }
             cancelMode();   // always exit this mode after a click
             return;

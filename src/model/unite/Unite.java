@@ -16,11 +16,8 @@ public class Unite implements Selectable {
     private int hp;
     private final TypeUnite typeUnite;
     private final Terrain terrain;
-
+    
     // L'etat de pathfinding 
-    private List<int[]> chemin;       // cached points [gx, gy]
-    private int prochainWP = 0;
-    private boolean cheminEnAttente = false;
     private float destinationPX, destinationPY; // en pixels, pour éviter de recalculer à chaque tick
 
     // Command queue pour ce unite. 
@@ -49,7 +46,6 @@ public class Unite implements Selectable {
     }
     public void annulerCommandes() { 
         commandQueue.clear(); 
-        chemin = null; 
     }
 
     // Les getters
@@ -61,39 +57,14 @@ public class Unite implements Selectable {
     public TypeUnite getType() { return typeUnite; }
     public Terrain getTerrain() { return terrain; }
     public float getSpeed() { return speed; }
-    public void setDestination(float px, float py) { destinationPX = px; destinationPY = py; }
     public float getDestinationPX() { return destinationPX; }
     public float getDestinationPY() { return destinationPY; }
-    
+
+
     // Appellee par CommandeDeplacement pour avancer vers la prochaine position en pixel
     public void avancer(float dx, float dy) { 
         px += dx; 
         py += dy; 
-    }
-
-    // Predicats et setters pour le pathfinding
-    public List<int[]> getChemin() { 
-        return chemin; 
-    }
-    public void setChemin(List<int[]> c) { 
-        this.chemin = c; 
-        this.prochainWP = 0; 
-        if (c == null) { destinationPX = -1; destinationPY = -1; }
-    }
-    public int getProchainWP() { 
-        return prochainWP; 
-    }
-    public void avancerWaypoint() { 
-        prochainWP++; 
-    }
-    public boolean cheminTermine() { 
-        return chemin == null || prochainWP >= chemin.size(); 
-    }
-    public boolean isCheminEnAttente() { 
-        return cheminEnAttente; 
-    }
-    public void setCheminEnAttente(boolean v) { 
-        this.cheminEnAttente = v; 
     }
 
     public void recevoirDegats(int degats) {

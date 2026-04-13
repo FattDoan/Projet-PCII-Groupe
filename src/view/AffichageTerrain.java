@@ -148,8 +148,6 @@ public class AffichageTerrain extends JPanel {
         // Encadrement renforcé de la case sélectionnée.
         drawSelectionIndicator(g2, base);
 
-        drawPathIndicator(g2, base);
-
         // Restauration pour ne pas impacter les autres couches Swing.
         g2.setTransform(originalTransform);
     
@@ -224,36 +222,4 @@ public class AffichageTerrain extends JPanel {
         }
     }
 
-    private void drawPathIndicator(Graphics2D g2, int base) {
-        if (selectedElement instanceof Unite su) {
-            List<int[]> ch = su.getChemin();
-            int wp = su.getProchainWP();
-            if (ch != null && wp < ch.size()) 
-            drawCheminPreview(g2, su, ch.subList(wp, ch.size()), base);
-        }
-    }
-
-    private void drawCheminPreview(Graphics2D g2, Unite u, List<int[]> chemin, int base) {
-        g2.setColor(C_PATH_DOT);
-        float[] dash = {3f, 5f};
-        g2.setStroke(new BasicStroke(3f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 0, dash, 0));
-        int prevX = (int) u.getPX(), prevY = (int) u.getPY();
-        for (int[] wp : chemin) {
-            int wx = wp[0] * base + base / 2;
-            int wy = wp[1] * base + base / 2;
-            g2.drawLine(prevX, prevY, wx, wy);
-            prevX = wx; prevY = wy;
-        }
-        
-        if (u.getDestinationPX() >= 0) {
-            int fx = (int) u.getDestinationPX();
-            int fy = (int) u.getDestinationPY();
-            int m = base / 4;
-            g2.setColor(C_PATH_TARGET);
-            g2.setStroke(new BasicStroke(1.5f));
-            g2.drawLine(fx - m, fy, fx + m, fy);
-            g2.drawLine(fx, fy - m, fx, fy + m);
-            g2.drawOval(fx - m, fy - m, m*2, m*2);
-        }
-    }
 }
