@@ -17,6 +17,8 @@ public class Unite implements Selectable, Runnable {
     private int hp;
     private final TypeUnite typeUnite;
     private final Terrain terrain;
+    private int stockage = 0; // quantité de minerai actuellement stockée dans l'unité
+    private static final int STOCKAGE_MAX = 5; // capacité maximale de stockage de l'unité
    
     // Drapeau d'arrêt coopératif du thread.
     private volatile boolean running = true;
@@ -64,6 +66,18 @@ public class Unite implements Selectable, Runnable {
     }
     public void annulerCommandes() { 
         commandQueue.clear(); 
+    }
+
+    /** Vérifie si le stockage est plein */
+    public boolean StockagePlein() {
+        return stockage >= STOCKAGE_MAX;
+    }
+
+    /** Ajoute du stockage */
+    public void addStockage() {
+        if (!StockagePlein()) {
+            stockage++;
+        }
     }
 
     // Les getters
