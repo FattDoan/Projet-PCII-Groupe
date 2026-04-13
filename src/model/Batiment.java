@@ -190,4 +190,10 @@ public abstract class Batiment{
         }
         return false;
     }
+
+        public synchronized void ajouterHP() {
+            if (hp < hpMax) {
+                hp += 1;
+            }
+        }
 }
