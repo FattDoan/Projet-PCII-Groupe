@@ -53,7 +53,8 @@ public class Camera {
     public int getBaseCellSize() { return baseCellSize; }
  
     public int effectiveCellSize() { return (int)(baseCellSize * zoom); }
- 
+
+
     // ── Utilitaires internes ───────────────────────────────────────────────
  
     private static int clamp(int v, int min, int max) {

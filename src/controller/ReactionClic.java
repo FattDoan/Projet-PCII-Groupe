@@ -63,6 +63,7 @@ public class ReactionClic implements MouseListener, UnitActionCallback {
         switch (mode) {
             case AWAITING_DESTINATION -> handleDestinationClick(gx, gy, worldPX, worldPY, e);
             case AWAITING_MINING_TARGET -> handleMiningTargetClick(gx, gy, worldPX, worldPY, e);
+            case AWAITING_BUILD_TARGET -> handleBuildTargetClick(gx, gy, worldPX, worldPY, e);
             case NORMAL -> handleNormalClick(gx, gy, worldPX, worldPY, e);
         }
     }

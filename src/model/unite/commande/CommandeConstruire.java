@@ -22,6 +22,7 @@ public class CommandeConstruire extends Commande {
             return true; // déjà plein, on considère la commande terminée
         }
         batiment.ajouterHP();
+        progression = 0; // reset pour le prochain tick de construction
         return false; // terminé
     }
 }
