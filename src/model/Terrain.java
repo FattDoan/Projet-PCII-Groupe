@@ -1,8 +1,6 @@
 package model;
 
 import model.unite.Unite;
-import view.Affichage;
-import view.AffichageUnites;
 
 import java.util.HashSet;
 import java.util.Set;

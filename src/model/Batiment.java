@@ -17,9 +17,6 @@ public abstract class Batiment{
     private final int capacite;
     private final Terrain terrain;
 
-    /** coût de construction */
-    private final int cout;
-
     /** bool finir de construitr */
     private boolean fini = false;
 
@@ -34,7 +31,7 @@ public abstract class Batiment{
      * @param capacite la capacité maximale de stockage, doit être >= 0
      * @throws IllegalArgumentException si capacite < 0 (en validation stricte)
      */
-    protected Batiment(int capacite, int x, int y, Terrain terrain, int cout,int hpMax, int hp, boolean fini) {
+    protected Batiment(int capacite, int x, int y, Terrain terrain, int hpMax, boolean fini) {
         // Validation : la capacité doit être positive
         Validation.requireArgument(capacite >= 0, "capacite=" + capacite);
         Validation.requireArgument(x >= 0 && y >= 0, "Position batiment invalide: x=" + x + ", y=" + y);
@@ -43,16 +40,14 @@ public abstract class Batiment{
         this.terrain = Objects.requireNonNull(terrain, "terrain=null");
         this.x = x;
         this.y = y;
-        this.cout = cout;
         this.hpMax = hpMax;
         this.fini = fini;
         
-        // TODO: si met hp = hp, tous les batiments deviennent ROUGES?
-        // je vous laisee a regler cela
-        // je remets hp = hpMax pour le fix temporairement
-        this.hp = hp;
-        //this.hp = hpMax;
-        //this.hp = hp;
+        if (fini) {
+            this.hp = hpMax; // batiment déjà construit, donc hp au max
+        } else {
+            this.hp = 1; // construction en cours, hp initial à 1 (peut être ajusté selon les besoins)
+        }
     }
 
     /** Renvoie le type de bâtiment (USINE, FOREUSE, STOCKAGE, BATIMENT_MAITRE, ROUTE) */
@@ -98,9 +93,7 @@ public abstract class Batiment{
     }
 
     /** Renvoie le coût de construction du bâtiment */
-    public int getCout() {
-        return cout;
-    }
+    public abstract int getCost();
 
 
     /**

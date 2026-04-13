@@ -26,13 +26,13 @@ public class AffichageBatiments {
                 afficheRoute(g, c);
                 break;
         }
-        // Si le bâtiment est en construction, on affiche une indication visuelle
-        if (!c.getBatiment().estFini()) {
-            afficheEnTravaux(g, c);
-        }
         // Si le bâtiment a prit des dégâts, on affiche une indication visuelle
         if (!c.getBatiment().atFullHP()) {
             afficheDegats(g, c);
+        }
+        // Si le bâtiment est en construction, on affiche une indication visuelle
+        if (!c.getBatiment().estFini()) {
+            afficheEnTravaux(g, c);
         }
     }
 
@@ -58,8 +58,8 @@ public class AffichageBatiments {
         // On affiche un carré rouge semi-transparent par dessus le bâtiment pour indiquer qu'il a prit des dégâts
         int x = c.getX() * Affichage.TAILLE_CASE; // conversion des coordonnées de la case en pixels pour l'affichage
         int y = c.getY() * Affichage.TAILLE_CASE;
-        double hpRatio = (double) c.getBatiment().getHP() / c.getBatiment().getHPMax(); // Calcul du ratio de points de vie restants
-        int alpha = (int) (30 + (1 - hpRatio) * 225); // Plus le bâtiment a de dégâts, plus le carré rouge est opaque
+        double hpRatio = ((double) c.getBatiment().getHP()) / ((double) c.getBatiment().getHPMax()); // Calcul du ratio de points de vie restants
+        int alpha = (int) (30 + (1 - hpRatio) * 200); // Plus le bâtiment a de dégâts, plus le carré rouge est opaque
         g.setColor(new java.awt.Color(255, 0, 0, alpha)); // Couleur rouge semi-transparente
         g.fillRect(x, y, Affichage.TAILLE_CASE, Affichage.TAILLE_CASE); // Dessine un carré par dessus le bâtiment
     }

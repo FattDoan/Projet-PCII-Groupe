@@ -11,6 +11,7 @@ import common.AsyncExecutor;
 public class Foreuse extends Batiment implements Runnable {
     public static final int DELAI_EXTRACTION_MS = 2000; // 2 seconde
     public static final int COUT_CONSTRUCTION = 10;
+    public static final int HP_MAX = 10; // Points de vie maximum de la foreuse
     private volatile boolean running = true; // Indique si le thread doit continuer à fonctionner
 
 
@@ -19,7 +20,7 @@ public class Foreuse extends Batiment implements Runnable {
      * La capacité de stockage est fixée à 1 (un minerai extrait en attente).
      */
     public Foreuse(int x, int y, Terrain terrain) {
-        super(1, x, y, terrain, COUT_CONSTRUCTION, 10, 1, false); // La foreuse a une capacité de 1, un coût de construction défini, et des HP max de 100.
+        super(1, x, y, terrain, HP_MAX, false); // La foreuse a une capacité de 1, un coût de construction et des HPmax définis.
     }
 
     @Override
@@ -63,6 +64,11 @@ public class Foreuse extends Batiment implements Runnable {
     public void detruire() {
         this.viderStockage(); // Vide le stockage avant de détruire la foreuse (pour l'instant sert pas à grand chose mais peut éviter des bugs)
         arreter(); // Arrête le thread de la foreuse
+    }
+
+    @Override
+    public int getCost() {
+        return COUT_CONSTRUCTION;
     }
 
 }

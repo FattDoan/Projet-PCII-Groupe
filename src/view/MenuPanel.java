@@ -301,8 +301,9 @@ public class MenuPanel extends JPanel {
     private class StatsPanel extends JPanel {
 
         // Références live pour les mises à jour légères (même case, stockage change)
-        private CapacityBar liveCapBar          = null;
-        private JLabel      liveStockageLabel   = null;
+        private CapacityBar liveCapBar           = null;
+        private HPBar       liveHpBar            = null;
+        private JLabel      liveStockageLabel    = null;
         private JLabel      liveUnitPosLabel     = null;
 
 
@@ -338,8 +339,8 @@ public class MenuPanel extends JPanel {
             lastElement  = s;
             removeAll();
             liveCapBar          = null;
+            liveHpBar           = null;
             liveStockageLabel   = null;
-
             if (s == null) {
                 addMsg("Cliquez sur une case.");
                 revalidate(); return;
@@ -358,6 +359,10 @@ public class MenuPanel extends JPanel {
             // ── Stats d'une case ──────────────────────────────────────────
             if (c != null && c.getBatiment() != null) {
                 Batiment b = c.getBatiment();
+
+                liveHpBar = new HPBar(b.getHP(), b.getHPMax());
+                add(liveHpBar);
+                addSpacer(4);
 
                 liveCapBar = new CapacityBar(b.getStockage(), b.getCapaciteMax());
                 add(liveCapBar);
@@ -397,6 +402,7 @@ public class MenuPanel extends JPanel {
         /** Mise à jour légère : met à jour seulement les valeurs qui changent à runtime */
         private void updateLiveStats(Batiment b) {
             if (liveCapBar        != null) liveCapBar.updateValues(b.getStockage(), b.getCapaciteMax());
+            if (liveHpBar         != null) liveHpBar.updateValues(b.getHP(), b.getHPMax());
             if (liveStockageLabel != null) liveStockageLabel.setText(String.valueOf(b.getStockage()));
         }
         private void updateUnitPosLabel(Unite u) {
@@ -472,6 +478,45 @@ public class MenuPanel extends JPanel {
             float newRatio = cap > 0 ? Math.min(1f, (float)stock / cap) : 0f;
             String newLabel = stock + " / " + cap;
             Color newBar = newRatio > 0.85f ? C_RED : newRatio > 0.5f ? C_AMBER : C_GREEN;
+            if (newRatio != ratio || !newLabel.equals(label)) {
+                ratio = newRatio; label = newLabel; bar = newBar;
+                repaint();
+            }
+        }
+
+        @Override protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            Graphics2D g2 = (Graphics2D) g; hint(g2);
+            int w = getWidth(), h = getHeight(), f = (int)(w * ratio);
+            g2.setColor(new Color(bar.getRed(), bar.getGreen(), bar.getBlue(), 40)); g2.fillRect(0, 0, w, h);
+            g2.setColor(new Color(bar.getRed(), bar.getGreen(), bar.getBlue(), 100)); g2.fillRect(0, 0, f, h);
+            g2.setColor(bar); g2.fillRect(0, h-3, f, 3);
+            g2.setFont(F_SMALL); g2.setColor(C_TEXT_SEC);
+            FontMetrics fm = g2.getFontMetrics();
+            g2.drawString(label, (w - fm.stringWidth(label))/2, (h + fm.getAscent() - fm.getDescent())/2);
+        }
+    }
+
+    // ═════════════════════════════════════════════════════════════════════
+    // HPBar
+    // ═════════════════════════════════════════════════════════════════════
+    private static class HPBar extends JPanel {
+        private float  ratio;
+        private String label;
+        private Color  bar;
+
+        HPBar(int hp, int maxHP) {
+            setPreferredSize(new Dimension(0, 28));
+            setMaximumSize(new Dimension(Integer.MAX_VALUE, 28));
+            setBackground(C_BASE);
+            updateValues(hp, maxHP);
+        }
+
+        /** Mise à jour sans reconstruction du composant */
+        public void updateValues(int hp, int maxHP) {
+            float newRatio = maxHP > 0 ? Math.min(1f, (float)hp / maxHP) : 0f;
+            String newLabel = hp + " / " + maxHP;
+            Color newBar = newRatio > 0.85f ? C_GREEN : newRatio > 0.5f ? C_AMBER : C_RED;
             if (newRatio != ratio || !newLabel.equals(label)) {
                 ratio = newRatio; label = newLabel; bar = newBar;
                 repaint();

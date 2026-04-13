@@ -9,6 +9,7 @@ import common.Validation;
  */
 public class Route extends Batiment {
     public static final int COUT_CONSTRUCTION = 1;
+    public static final int HP_MAX = 5; // Points de vie maximum de la route
 
     /** Direction dans laquelle la route achemine les minerais */
     private Direction direction;
@@ -22,7 +23,7 @@ public class Route extends Batiment {
      * @throws IllegalArgumentException si direction est null (en validation stricte)
      */
     public Route(Direction direction, int x, int y, Terrain terrain) {
-        super(1, x, y, terrain, COUT_CONSTRUCTION, 5, 1, false); // La route a une capacité de 1, un coût de construction défini, et des HP max de 100.
+        super(1, x, y, terrain, HP_MAX, false); // La route a une capacité de 1, un coût de construction défini, et des HP max de 100.
         // Validation : la direction ne peut pas être nulle
         Validation.requireArgument(direction != null, "direction=null");
         this.direction = direction;
@@ -39,6 +40,10 @@ public class Route extends Batiment {
     public TypeBatiment type() {
         return TypeBatiment.ROUTE;
     }
+    @Override
+    public int getCost() {
+        return COUT_CONSTRUCTION;
+    }
 
     @Override
     public void detruire() {
@@ -54,4 +59,5 @@ public class Route extends Batiment {
         if (d == null || d == direction) return;
         else direction = d;
     }
+
 }

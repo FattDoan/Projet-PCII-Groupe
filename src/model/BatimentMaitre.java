@@ -13,13 +13,16 @@ package model;
 public class BatimentMaitre extends Batiment {
     /** Capacité de stockage du bâtiment maître */
     private static final int CAPACITE = 100;
+    private static final int COUT_CONSTRUCTION = Integer.MAX_VALUE; // Coût de construction infini pour le bâtiment maître, car il est déjà présent au début du jeu.
+    private static final int HP_MAX = 100; // Points de vie maximum du bâtiment maître
 
     /**
      * Crée un nouveau bâtiment maître avec la capacité par défaut de 100 minerais.
      * Ce constructeur est utilisé une seule fois lors de la génération initiale du terrain. 
      */
     protected BatimentMaitre(int x, int y, Terrain terrain) {
-        super(CAPACITE, x, y, terrain, Integer.MAX_VALUE, 100, 100, true); // Le terrain est fourni directement au constructeur.
+        // Le bâtiment maître est déjà construit au départ, donc on fixe fini=true et un coût de construction infini pour empêcher sa construction par le joueur.
+        super(CAPACITE, x, y, terrain, HP_MAX, true); // Le terrain est fourni directement au constructeur.
     }
 
     @Override
@@ -32,5 +35,10 @@ public class BatimentMaitre extends Batiment {
         // impossible de détruire le bâtiment maître
         // on déclenche une erreur 
         throw new UnsupportedOperationException("Le bâtiment maître ne peut pas être détruit. Perte de la partie.");
+    }
+
+    @Override
+    public int getCost() {
+        return COUT_CONSTRUCTION;
     }
 }
