@@ -194,6 +194,9 @@ public abstract class Batiment{
         public synchronized void ajouterHP() {
             if (hp < hpMax) {
                 hp += 1;
+                if (hp == hpMax) {
+                    fini = true; // construction terminée quand hp atteint le max
+                }
             }
         }
 }
