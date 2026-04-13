@@ -41,4 +41,5 @@ public class BatimentMaitre extends Batiment {
     public int getCost() {
         return COUT_CONSTRUCTION;
     }
+
 }

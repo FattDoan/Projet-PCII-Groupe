@@ -304,8 +304,10 @@ public class MenuPanel extends JPanel {
         private CapacityBar liveCapBar           = null;
         private HPBar       liveHpBar            = null;
         private JLabel      liveStockageLabel    = null;
+        
+        // Unit info
         private JLabel      liveUnitPosLabel     = null;
-
+        private JLabel      liveUnitStockageLabel   = null;
 
         // Suivi de l'état pour différencier reconstruction complète / mise à jour légère
         private Selectable lastElement  = null;
@@ -330,7 +332,7 @@ public class MenuPanel extends JPanel {
                     return;
                 }
                 else if (u != null) {
-                    updateUnitPosLabel(u); 
+                    updateUnitInfo(u); 
                     return;
                 }
             }
@@ -340,7 +342,7 @@ public class MenuPanel extends JPanel {
             removeAll();
             liveCapBar          = null;
             liveHpBar           = null;
-            liveStockageLabel   = null;
+            liveStockageLabel   = null; 
             if (s == null) {
                 addMsg("Cliquez sur une case.");
                 revalidate(); return;
@@ -352,6 +354,7 @@ public class MenuPanel extends JPanel {
                 addRow("Type",     u.getDisplayName(), C_TEXT_PRI);
                 liveUnitPosLabel = addRow("Position", "(" + u.getGX() + ", " + u.getGY() + ")", C_TEXT_SEC);
                 addRow("Vitesse",  String.valueOf(u.getSpeed()), C_BLUE);
+                liveUnitStockageLabel = addRow("Stockage", String.valueOf(u.getStockage()), C_AMBER);
                 addSpacer(8);
                 revalidate(); return;
             }
@@ -405,8 +408,9 @@ public class MenuPanel extends JPanel {
             if (liveHpBar         != null) liveHpBar.updateValues(b.getHP(), b.getHPMax());
             if (liveStockageLabel != null) liveStockageLabel.setText(String.valueOf(b.getStockage()));
         }
-        private void updateUnitPosLabel(Unite u) {
+        private void updateUnitInfo(Unite u) {
             if (liveUnitPosLabel != null) liveUnitPosLabel.setText("(" + u.getGX() + ", " + u.getGY() + ")");
+            if (liveUnitStockageLabel != null) liveUnitStockageLabel.setText(String.valueOf(u.getStockage()));
         }
 
         // ── Helpers de construction ───────────────────────────────────────

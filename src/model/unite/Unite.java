@@ -47,12 +47,15 @@ public class Unite implements Selectable, Runnable {
         }
     }
 
+
     @Override
     public void run() {
         while (running && !Thread.currentThread().isInterrupted()) {
             try {
+                // we need to pass to update acutal time elapsed in milliseconds, not a fixed value, 
+                // to avoid issues if the thread is paused or delayed for some reason (e.g. GC pause)  
                 Thread.sleep(DELAI_THREAD_MS);
-                update(DELAI_THREAD_MS); // Convertir ms en secondes
+                update(DELAI_THREAD_MS);
             } catch (InterruptedException e) {
                 // Respect du contrat d'interruption: on remet le flag puis on sort.
                 Thread.currentThread().interrupt();
@@ -72,11 +75,19 @@ public class Unite implements Selectable, Runnable {
     public boolean StockagePlein() {
         return stockage >= STOCKAGE_MAX;
     }
+    public boolean StockageVide() {
+        return stockage <= 0;
+    }
 
     /** Ajoute du stockage */
     public void addStockage() {
         if (!StockagePlein()) {
             stockage++;
+        }
+    }
+    public void retirerStockage() {
+        if (stockage > 0) {
+            stockage--;
         }
     }
 
@@ -91,7 +102,7 @@ public class Unite implements Selectable, Runnable {
     public float getSpeed() { return speed; }
     public float getDestinationPX() { return destinationPX; }
     public float getDestinationPY() { return destinationPY; }
-
+    public int getStockage() { return stockage; }
 
     // Appellee par CommandeDeplacement pour avancer vers la prochaine position en pixel
     public void avancer(float dx, float dy) { 
