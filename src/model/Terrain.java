@@ -1,6 +1,9 @@
 package model;
 
 import model.unite.Unite;
+import view.Affichage;
+import view.AffichageUnites;
+import common.AsyncExecutor;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -159,6 +162,7 @@ public class Terrain {
    public void addUnite(Unite u) {
       Validation.requireArgument(u != null, "unite=null");
       unites.add(u);
+      AsyncExecutor.runAsync(u);
    }
 
    public List<Unite> getUnites() {

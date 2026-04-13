@@ -7,16 +7,20 @@ import java.util.List;
 import java.util.Deque;
 import java.util.ArrayDeque;
 
-public class Unite implements Selectable {
+public class Unite implements Selectable, Runnable {
     public static final int CASE_SIZE = Affichage.TAILLE_CASE; // pixels par case
 
+    private static final int DELAI_THREAD_MS = 16;
     // Coordonees continues (pixels)
     private float px, py;
     private float speed; // pixel par second
     private int hp;
     private final TypeUnite typeUnite;
     private final Terrain terrain;
-    
+   
+    // Drapeau d'arrêt coopératif du thread.
+    private volatile boolean running = true;
+
     // L'etat de pathfinding 
     private float destinationPX, destinationPY; // en pixels, pour éviter de recalculer à chaque tick
 
@@ -39,6 +43,20 @@ public class Unite implements Selectable {
             boolean done = commandQueue.peek().executer(this, dt);
             if (done) commandQueue.poll();
         }
+    }
+
+    @Override
+    public void run() {
+        while (running && !Thread.currentThread().isInterrupted()) {
+            try {
+                Thread.sleep(DELAI_THREAD_MS);
+                update(DELAI_THREAD_MS); // Convertir ms en secondes
+            } catch (InterruptedException e) {
+                // Respect du contrat d'interruption: on remet le flag puis on sort.
+                Thread.currentThread().interrupt();
+                break;
+            }
+        } 
     }
 
     public void ajouterCommande(Commande c) {

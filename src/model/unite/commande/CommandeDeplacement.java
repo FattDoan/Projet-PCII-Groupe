@@ -24,4 +24,5 @@ public class CommandeDeplacement extends Commande {
         unite.avancer((dx / dist) * step, (dy / dist) * step);
         return false;
     }
+
 }
