@@ -9,8 +9,8 @@ import model.unite.Unite;
  */
 public interface UnitActionCallback{
     void onDeplacer(Unite u);
-    void onMiner(Unite u);   // TODO
-    void onConstruire(Unite u);   // TODO
+    void onMiner(Unite u); 
+    void onConstruire(Unite u);  
     void onDefendre(Unite u);   // TODO
     void onAttaquer(Unite u);   // TODO
 }
