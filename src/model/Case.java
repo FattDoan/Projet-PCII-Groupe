@@ -75,7 +75,13 @@ public class Case implements Selectable {
 
     public float getPY() {
         return y * Affichage.TAILLE_CASE;
-    }    
+    }
+    
+   /** Renvoi vrai si il a pas de batiment */
+   public boolean estAccessible() {
+      return this.batiment == null;
+   }
+
 
 
    /** Renvoie vrai si la case est vide, faux sinon */

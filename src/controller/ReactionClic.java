@@ -3,10 +3,8 @@ package controller;
 import java.awt.event.*;
 import model.*;
 import view.*;
-import view.Camera;
 import model.unite.Unite;
 import model.unite.commande.*;
-import view.UnitActionCallback;
 /**
  * Gère les clics souris (bouton gauche, clic court) sur AffichageTerrain.
  * Utilise Camera.screenToGridX/Y pour tenir compte du pan ET du zoom.
@@ -62,7 +60,7 @@ public class ReactionClic implements MouseListener, UnitActionCallback {
                 gy >= 0 && gy < terrain.getTaille()) {
                 Selectable s = affichage.getElementAtPixel(worldPX, worldPY);
                 if (s instanceof Case c &&
-                    !(c.estVide() || (c.aBatiment() && c.getBatiment() instanceof Route))) {   
+                    !(c.estAccessible())) {   
                     // Clic sur une case non vide: interdit
                     affichage.getAffichageTerrain().showWarning("Case occupée, choisissez une autre destination.", e.getX(), e.getY());
                     return;
