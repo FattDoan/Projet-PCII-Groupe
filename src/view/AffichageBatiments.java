@@ -9,7 +9,7 @@ public class AffichageBatiments {
 
     /** Fonction d'affichage général pour une case contenant un bâtiment */
     public static void afficheBatiment(Graphics g, Case c) {
-        switch (c.getBatiment().type()) {
+        switch (c.getBatiment().getType()) {
             case USINE:
                 afficheUsine(g, c);
                 break;
@@ -163,19 +163,19 @@ public class AffichageBatiments {
         g.fillPolygon(xPoints, yPoints, 3); // Dessine une flèche dans la case correspondante
 
         // Si un minerai est en transit sur la route, on l'affiche (exemple : un carré bleu pour représenter le minerai)
-        if (c.getBatiment().type() == model.TypeBatiment.ROUTE && c.getBatiment().getStockage() > 0) { 
-            afficheMinerai(g, c);
+        if (c.getBatiment().getType() == model.TypeBatiment.ROUTE && c.getBatiment().getStockage() > 0) { 
+            AffichageCases.afficheMineralIngot(g, c);
         }
     }
 
     /** Affiche un minerai qui se déplace sur la case c */
-    private static void afficheMinerai(Graphics g, Case c) {
-        int N = Affichage.TAILLE_CASE / 3;
-        int x = c.getX() * Affichage.TAILLE_CASE; // conversion des coord
+    public static void afficheMinerai(Graphics g, Case c) {
+        int N = Affichage.TAILLE_CASE / 2;
+        int x = c.getX() * Affichage.TAILLE_CASE; // conversion des coordonnées de la case en pixels pour l'affichage
         int y = c.getY() * Affichage.TAILLE_CASE;
 
         g.setColor(java.awt.Color.BLUE); // Couleur du minerai
-        g.fillRect(x + N, y + N, Affichage.TAILLE_CASE/3, Affichage.TAILLE_CASE/3); // Dessine un carré dans la case correspondante
+        g.fillRect(x + N, y + N, N, N); // Dessine un carré dans la case correspondante
     }
 
 }

@@ -37,7 +37,7 @@ public class Route extends Batiment {
     }
 
     @Override
-    public TypeBatiment type() {
+    public TypeBatiment getType() {
         return TypeBatiment.ROUTE;
     }
 

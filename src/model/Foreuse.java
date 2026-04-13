@@ -24,7 +24,7 @@ public class Foreuse extends Batiment implements Runnable {
     }
 
     @Override
-    public TypeBatiment type() {
+    public TypeBatiment getType() {
         return TypeBatiment.FOREUSE;
     }
 

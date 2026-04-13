@@ -19,7 +19,7 @@ public class Stockage extends Batiment {
     }
 
     @Override
-    public TypeBatiment type() {
+    public TypeBatiment getType() {
         return TypeBatiment.STOCKAGE;
     }
 

@@ -51,7 +51,7 @@ public abstract class Batiment{
     }
 
     /** Renvoie le type de bâtiment (USINE, FOREUSE, STOCKAGE, BATIMENT_MAITRE, ROUTE) */
-    public abstract TypeBatiment type();
+    public abstract TypeBatiment getType();
 
 
     /****** GETTERS ******/

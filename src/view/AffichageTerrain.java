@@ -129,7 +129,7 @@ public class AffichageTerrain extends JPanel {
         // Affichage des cases
         for (int i = firstCol; i <= lastCol; i++) {
             for (int j = firstRow; j <= lastRow; j++) {
-                AffichageCases.afficheCase(g2, terrain.getCase(i, j));    
+                AffichageCases.afficheCase(g2, terrain.getCase(i, j));
             }
         }
 

@@ -156,7 +156,7 @@ public class Case implements Selectable {
     @Override
     public String getDisplayName() {
         if (aBatiment()) {
-            switch (getBatiment().type()) {
+            switch (getBatiment().getType()) {
                 case USINE           -> { return "USINE";    }
                 case FOREUSE         -> { return "FOREUSE";  }
                 case STOCKAGE        -> { return "STOCKAGE"; }
@@ -173,7 +173,7 @@ public class Case implements Selectable {
     @Override
     public String getDescription() {
         if (aBatiment()) {
-            switch (getBatiment().type()) {
+            switch (getBatiment().getType()) {
                 case USINE           -> { return "Fabrique des unités."; }
                 case FOREUSE         -> { return "Extrait le minerai."; }
                 case STOCKAGE        -> { return "Stocke les minerais."; }

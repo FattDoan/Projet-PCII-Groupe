@@ -180,7 +180,7 @@ public class MenuPanel extends JPanel {
                 desc  = new String[]{ c.getDescription() };
 
                 if (c.getBatiment() != null) {
-                    TypeBatiment type = c.getBatiment().type();
+                    TypeBatiment type = c.getBatiment().getType();
                     accent = switch (type) {
                         case USINE           -> C_BLUE;
                         case FOREUSE         -> C_AMBER;
@@ -372,10 +372,10 @@ public class MenuPanel extends JPanel {
                 addSpacer(6);
 
                 addSection("BÂTIMENT");
-                addRow("Classe", labelType(b.type()), C_TEXT_PRI);
+                addRow("Classe", labelType(b.getType()), C_TEXT_PRI);
                 liveStockageLabel = addRow("Stockage", String.valueOf(b.getStockage()), C_AMBER);
 
-                switch (b.type()) {
+                switch (b.getType()) {
                     case FOREUSE -> {
                         String cadence = Foreuse.DELAI_EXTRACTION_MS > 0
                             ? String.format("%.1f", 1000.0 / Foreuse.DELAI_EXTRACTION_MS) : "∞";
@@ -603,7 +603,7 @@ public class MenuPanel extends JPanel {
 
                 // Actions spécifiques au bâtiment présent
                 if (c.aBatiment()) {
-                    switch (c.getBatiment().type()) {
+                    switch (c.getBatiment().getType()) {
                         case USINE -> {
                             addBtn("AMÉLIORER", C_BLUE,       () -> {});
                             addBtn("PAUSE",     C_BORDER_LIT, () -> {});
@@ -622,7 +622,7 @@ public class MenuPanel extends JPanel {
                         case STOCKAGE -> {}
                     }
                     // Démolition pour tous sauf le bâtiment maître
-                    if (c.getBatiment().type() != TypeBatiment.BATIMENT_MAITRE)
+                    if (c.getBatiment().getType() != TypeBatiment.BATIMENT_MAITRE)
                         addBtn("DÉMOLIR", C_RED, () -> c.detruireBatiment());
                 }
             }
