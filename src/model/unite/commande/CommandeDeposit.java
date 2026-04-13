@@ -27,9 +27,11 @@ public class CommandeDeposit extends Commande {
             progression += dt;
             return false; // pas encore terminé
         }
-        unite.retirerStockage(); // retire un minerai de l'unité
-        batimentMaitre.ajouterMinerai(1); // ajoute un minerai au bâtiment maître
-        progression = 0; // reset pour le prochain minerai
+        if (!batimentMaitre.estPlein()) {
+            unite.retirerStockage(); // retire un minerai de l'unité
+            batimentMaitre.ajouterMinerai(1); // ajoute un minerai au bâtiment maître
+            progression = 0; // reset pour le prochain minerai
+        }
         return false;
     }
 
