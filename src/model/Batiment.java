@@ -47,10 +47,10 @@ public abstract class Batiment{
         this.hpMax = hpMax;
         this.fini = fini;
         
-        // TODO: si met hp = 1, tous les batiments deviennent ROUGES?
+        // TODO: si met hp = hp, tous les batiments deviennent ROUGES?
         // je vous laisee a regler cela
         // je remets hp = hpMax pour le fix temporairement
-        this.hp = 1;
+        this.hp = hp;
         //this.hp = hpMax;
     }
 
