@@ -2,13 +2,13 @@ package controller;
  
 import view.Camera;
 import model.Terrain;
+import model.Case;
 import view.Affichage;
 import view.AffichageTerrain;
  
 public class GameController {
  
     // Caméra unique de la session de jeu.
-    private final Camera           camera;
     // Conserve une référence pour le cycle de vie des listeners (drag clavier/souris).
     private final CameraController cameraController;
  
@@ -16,24 +16,20 @@ public class GameController {
  
         // Important: on initialise la caméra avec la taille de vue visible,
         // pas avec la taille totale de la map, sinon la caméra ne se déplace pas.
-        camera = new Camera(
+        Camera.getInstance().initCamera(
             terrain.getTaille(),
-            Affichage.TAILLE_CASE,
+            Case.TAILLE,
             affichage.getLargeurVue(),
             affichage.getHauteurVue()
         );
- 
+
         // Positionnement initial sur le bâtiment maître.
         centerOnHQ(terrain, affichage);
-        // Injection de la caméra dans la couche vue.
-        affichage.setCamera(camera);
- 
-        AffichageTerrain view = affichage.getAffichageTerrain();
- 
+  
         // Orchestration des interactions utilisateur.
-        cameraController = new CameraController(camera, affichage);
+        cameraController = new CameraController(affichage);
         new ReactionClic(affichage, terrain, cameraController);
-        new ReactionHover(affichage, terrain, camera);
+        new ReactionHover(affichage, terrain);
     }
  
     /**
@@ -46,7 +42,7 @@ public class GameController {
         * setOffset borne automatiquement dans [0, maxOffset].
      */
     private void centerOnHQ(Terrain terrain, Affichage affichage) {
-        int cellSize   = Affichage.TAILLE_CASE;
+        int cellSize   = Case.TAILLE;
         int hqGrid     = terrain.getTaille() / 2;
         // Centre pixel de la case HQ.
         int hqCenterPx = hqGrid * cellSize + cellSize / 2;
@@ -54,8 +50,7 @@ public class GameController {
         int offsetX    = hqCenterPx - affichage.getLargeurVue() / 2;
         int offsetY    = hqCenterPx - affichage.getHauteurVue() / 2;
         // La caméra clamp automatiquement dans les bornes valides.
-        camera.setOffset(offsetX, offsetY);
+        Camera.getInstance().setOffset(offsetX, offsetY);
     }
  
-    public Camera getCamera() { return camera; }
 }

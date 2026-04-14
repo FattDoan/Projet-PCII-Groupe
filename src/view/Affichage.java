@@ -1,8 +1,7 @@
 package view;
  
-import view.Camera;
-import model.Case;
 import model.Terrain;
+import model.Case;
 import model.unite.Unite;
 import model.Selectable;
 import java.util.List;
@@ -13,9 +12,7 @@ public class Affichage extends JPanel {
  
     public static final int    MAX_VIEW_W         = 1300;
     public static final int    MAX_VIEW_H         = 700;
-    public static final int    TAILLE_CASE        = 40;
     public static final double RATIO_LARGEUR_MENU = 0.30;
- 
     // Dimensions réelles du terrain en pixels (hors clipping fenêtre).
     private final int largeurGrille;
     private final int hauteurGrille;
@@ -28,15 +25,13 @@ public class Affichage extends JPanel {
     private final MenuPanel        menuPanel;
     private final int              menuW;
  
-    // Caméra injectée plus tard par le contrôleur de jeu.
-    private Camera camera = null;
  
     public Affichage(Terrain terrain) {
         super(null);
  
         // Conversion cases -> pixels.
-        largeurGrille = terrain.getTaille() * TAILLE_CASE;
-        hauteurGrille = terrain.getTaille() * TAILLE_CASE;
+        largeurGrille = terrain.getTaille() * Case.TAILLE; // init size
+        hauteurGrille = terrain.getTaille() * Case.TAILLE;
 
         // On borne la taille de vue pour garder une UI lisible et fluide.
         largeurVue = Math.min(largeurGrille, MAX_VIEW_W);
@@ -51,7 +46,7 @@ public class Affichage extends JPanel {
         affichageTerrain = new AffichageTerrain(terrain);
         affichageTerrain.setBounds(0, 0, largeurVue, hauteurVue);
         add(affichageTerrain);
- 
+
         // Couche 2: menu contextuel superposé.
         menuPanel = new MenuPanel(menuW, hauteurVue, this, terrain);
         menuPanel.setBounds(largeurVue - menuW, 0, menuW, hauteurVue);
@@ -75,11 +70,9 @@ public class Affichage extends JPanel {
         int mw = (int)(w * RATIO_LARGEUR_MENU);
         menuPanel.setBounds(w - mw, 0, mw, h);
 
-        if (camera != null) camera.updateViewSize(w, h);
+        Camera.getInstance().updateViewSize(w, h);
     }
 
-    public void setCamera(Camera c) { this.camera = c; affichageTerrain.setCamera(c); }
-    public Camera           getCamera()           { return camera; }
     public AffichageTerrain getAffichageTerrain() { return affichageTerrain; }
     public MenuPanel        getMenuPanel()        { return menuPanel; }
     public int getLargeurVue() { return largeurVue; }
@@ -114,7 +107,7 @@ public class Affichage extends JPanel {
 
     // Get unit at pixel coordinates (px, py). Returns null if no unit is present at these coordinates.
     public Unite getUniteAtPixel(float px, float py) {
-        float unitBase = camera.effectiveCellSize() / 2;
+        float unitBase = AffichageUnites.TAILLE_UNITE / 2f;
         List<Unite> unites = affichageTerrain.getTerrain().getUnites();
         for (Unite u : unites) {
             if (px >= u.getPX() - unitBase && px <= u.getPX() + unitBase
@@ -132,8 +125,8 @@ public class Affichage extends JPanel {
         Terrain terrain = affichageTerrain.getTerrain();
 
         // Sinon on retourne la case correspondante
-        int gx = (int)(px / camera.effectiveCellSize());
-        int gy = (int)(py / camera.effectiveCellSize());
+        int gx = (int)(px / Case.TAILLE);
+        int gy = (int)(py / Case.TAILLE);
         if (gx < 0 || gx >= terrain.getTaille()  || gy < 0 || gy >= terrain.getTaille()) {
             return null; // Hors du terrain
         }

@@ -2,7 +2,8 @@ package model.unite.commande;
 
 import model.*;
 import model.unite.Unite;
-import view.Affichage;
+import view.Camera;
+
 
 public class CommandeMiner extends Commande {
     private static final int TEMPS = 1000;
@@ -16,7 +17,8 @@ public class CommandeMiner extends Commande {
     @Override
     public boolean executer(Unite unite, double dt) {
         if (unite.StockagePlein()) {
-            unite.ajouterCommande(new CommandeDeplacement(batimentMaitre.getX() * Affichage.TAILLE_CASE, batimentMaitre.getY() * Affichage.TAILLE_CASE)); // retourne au bâtiment maître pour déposer
+            unite.ajouterCommande(new CommandeDeplacement(batimentMaitre.getX() * Case.TAILLE, 
+                                                          batimentMaitre.getY() * Case.TAILLE)); // retourne au bâtiment maître pour déposer
             unite.ajouterCommande(new CommandeDeposit(batimentMaitre, unite.getPX(), unite.getPY())); // ajoute une commande de dépôt après le minage
             return true; // déjà plein, on considère la commande terminée
         }

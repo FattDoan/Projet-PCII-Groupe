@@ -44,24 +44,24 @@ public class AffichageBatiments {
     /** Affichage par dessus un bâtiment pour indiquer qu'il n'est pas encore fini */
     private static void afficheEnTravaux(Graphics g, Case c) {
         // On affiches des lignes parallèles en diagonales pour indiquer que le bâtiment n'est pas encore fini
-        int x = c.getX() * Affichage.TAILLE_CASE; // conversion des coordonnées de la case en pixels pour l'affichage
-        int y = c.getY() * Affichage.TAILLE_CASE;
+        int x = c.getX() * Case.TAILLE; // conversion des coordonnées de la case en pixels pour l'affichage
+        int y = c.getY() * Case.TAILLE;
         g.setColor(java.awt.Color.BLACK); // Couleur des lignes (exemple : noir)
-        for (int i = 0; i < Affichage.TAILLE_CASE; i += 10) {
+        for (int i = 0; i < Case.TAILLE; i += 10) {
             g.drawLine(x + i, y, x, y + i); // Ligne diagonale de haut en bas
-            g.drawLine(x + Affichage.TAILLE_CASE, y + i, x + i, y + Affichage.TAILLE_CASE); // Ligne diagonale de bas en haut
+            g.drawLine(x + Case.TAILLE, y + i, x + i, y + Case.TAILLE); // Ligne diagonale de bas en haut
         }
     }
 
     /** Affichage par dessus un bâtiment pour indiquer qu'il a prit des dégâts */
     private static void afficheDegats(Graphics g, Case c) {
         // On affiche un carré rouge semi-transparent par dessus le bâtiment pour indiquer qu'il a prit des dégâts
-        int x = c.getX() * Affichage.TAILLE_CASE; // conversion des coordonnées de la case en pixels pour l'affichage
-        int y = c.getY() * Affichage.TAILLE_CASE;
+        int x = c.getX() * Case.TAILLE; // conversion des coordonnées de la case en pixels pour l'affichage
+        int y = c.getY() * Case.TAILLE;
         double hpRatio = ((double) c.getBatiment().getHP()) / ((double) c.getBatiment().getHPMax()); // Calcul du ratio de points de vie restants
         int alpha = (int) (30 + (1 - hpRatio) * 200); // Plus le bâtiment a de dégâts, plus le carré rouge est opaque
         g.setColor(new java.awt.Color(255, 0, 0, alpha)); // Couleur rouge semi-transparente
-        g.fillRect(x, y, Affichage.TAILLE_CASE, Affichage.TAILLE_CASE); // Dessine un carré par dessus le bâtiment
+        g.fillRect(x, y, Case.TAILLE, Case.TAILLE); // Dessine un carré par dessus le bâtiment
     }
 
 
@@ -73,61 +73,61 @@ public class AffichageBatiments {
 
     /** Affichage d'un bâtiment de type "usine" dans la case (x, y) sur la fenêtre */
     private static void afficheUsine(Graphics g, Case c) {
-        int x = c.getX() * Affichage.TAILLE_CASE; // conversion des coordonnées de la case en pixels pour l'affichage
-        int y = c.getY() * Affichage.TAILLE_CASE;
+        int x = c.getX() * Case.TAILLE; // conversion des coordonnées de la case en pixels pour l'affichage
+        int y = c.getY() * Case.TAILLE;
 
         g.setColor(java.awt.Color.GRAY); // Couleur de l'usine
-        g.fillRect(x, y, Affichage.TAILLE_CASE, Affichage.TAILLE_CASE); // Dessine un carré dans la case correspondante
+        g.fillRect(x, y, Case.TAILLE, Case.TAILLE); // Dessine un carré dans la case correspondante
 
         // affiche le nombre de minerais contenus dans le bâtiment maître
         g.setColor(java.awt.Color.BLACK); // Couleur du texte
-        g.drawString(Integer.toString(c.getBatiment().getStockage()), x + Affichage.TAILLE_CASE / 4, y + Affichage.TAILLE_CASE / 2); // Dessine le nombre de minéraux extraits au centre de la case
+        g.drawString(Integer.toString(c.getBatiment().getStockage()), x + Case.TAILLE / 4, y + Case.TAILLE / 2); // Dessine le nombre de minéraux extraits au centre de la case
     }
 
     /** Affichage d'un bâtiment de type "mine" dans la case (x, y) sur la fenêtre */
     private static void afficheForeuse(Graphics g, Case c) {
-        int x = c.getX() * Affichage.TAILLE_CASE; // conversion des coordonnées de la case en pixels pour l'affichage
-        int y = c.getY() * Affichage.TAILLE_CASE;
+        int x = c.getX() * Case.TAILLE; // conversion des coordonnées de la case en pixels pour l'affichage
+        int y = c.getY() * Case.TAILLE;
 
         g.setColor(java.awt.Color.YELLOW); // Couleur de la foreuse
-        g.fillRect(x, y, Affichage.TAILLE_CASE, Affichage.TAILLE_CASE); // Dessine un carré dans la case correspondante
+        g.fillRect(x, y, Case.TAILLE, Case.TAILLE); // Dessine un carré dans la case correspondante
 
         // affiche le nombre de minerais contenus dans le bâtiment maître
         g.setColor(java.awt.Color.BLACK); // Couleur du texte (ici noir pour que ce soit lisible sur le jaune)
-        g.drawString(Integer.toString(c.getBatiment().getStockage()), x + Affichage.TAILLE_CASE / 4, y + Affichage.TAILLE_CASE / 2); // Dessine le nombre de minéraux extraits au centre de la case
+        g.drawString(Integer.toString(c.getBatiment().getStockage()), x + Case.TAILLE / 4, y + Case.TAILLE / 2); // Dessine le nombre de minéraux extraits au centre de la case
     }
 
     /** Affichage d'un bâtiment de type "stockage" dans la case (x, y) sur la fenêtre */
     private static void afficheStockage(Graphics g, Case c) {
-        int x = c.getX() * Affichage.TAILLE_CASE; // conversion des coordonnées de la case en pixels pour l'affichage
-        int y = c.getY() * Affichage.TAILLE_CASE;
+        int x = c.getX() * Case.TAILLE; // conversion des coordonnées de la case en pixels pour l'affichage
+        int y = c.getY() * Case.TAILLE;
 
         g.setColor(java.awt.Color.ORANGE); // Couleur du stockage
-        g.fillRect(x, y, Affichage.TAILLE_CASE, Affichage.TAILLE_CASE); // Dessine un carré dans la case correspondante
+        g.fillRect(x, y, Case.TAILLE, Case.TAILLE); // Dessine un carré dans la case correspondante
 
         // affiche le nombre de minerais contenus dans le bâtiment maître
         g.setColor(java.awt.Color.WHITE); // Couleur du texte (exemple : blanc)
-        g.drawString(Integer.toString(c.getBatiment().getStockage()), x + Affichage.TAILLE_CASE / 4, y + Affichage.TAILLE_CASE / 2); // Dessine le nombre de minéraux extraits au centre de la case
+        g.drawString(Integer.toString(c.getBatiment().getStockage()), x + Case.TAILLE / 4, y + Case.TAILLE / 2); // Dessine le nombre de minéraux extraits au centre de la case
     }
 
     /** Affichage d'un bâtiment de type "batiment_maitre" dans la case (x, y) sur la fenêtre */
     private static void afficheBatimentMaitre(Graphics g, Case c) {
-        int x = c.getX() * Affichage.TAILLE_CASE; // conversion des coordonnées de la case en pixels pour l'affichage
-        int y = c.getY() * Affichage.TAILLE_CASE;
+        int x = c.getX() * Case.TAILLE; // conversion des coordonnées de la case en pixels pour l'affichage
+        int y = c.getY() * Case.TAILLE;
         g.setColor(java.awt.Color.RED); // Couleur du batiment_maitre
-        g.fillRect(x, y, Affichage.TAILLE_CASE, Affichage.TAILLE_CASE); // Dessine un carré dans la case correspondante
+        g.fillRect(x, y, Case.TAILLE, Case.TAILLE); // Dessine un carré dans la case correspondante
 
         // affiche le nombre de minerais contenus dans le bâtiment maître
         g.setColor(java.awt.Color.WHITE); // Couleur du texte (exemple : blanc)
-        g.drawString(Integer.toString(c.getBatiment().getStockage()), x + Affichage.TAILLE_CASE / 4, y + Affichage.TAILLE_CASE / 2); // Dessine le nombre de minéraux extraits au centre de la case
+        g.drawString(Integer.toString(c.getBatiment().getStockage()), x + Case.TAILLE / 4, y + Case.TAILLE / 2); // Dessine le nombre de minéraux extraits au centre de la case
     }
 
     /** Affichage d'une route dans la case (x, y) sur la fenêtre */
     private static void afficheRoute(Graphics g, Case c) {
-        int x = c.getX() * Affichage.TAILLE_CASE; // conversion des coordonnées de la case en pixels pour l'affichage
-        int y = c.getY() * Affichage.TAILLE_CASE;
+        int x = c.getX() * Case.TAILLE; // conversion des coordonnées de la case en pixels pour l'affichage
+        int y = c.getY() * Case.TAILLE;
         g.setColor(java.awt.Color.LIGHT_GRAY); // Couleur de la route (exemple : gris clair)
-        g.fillRect(x, y, Affichage.TAILLE_CASE, Affichage.TAILLE_CASE); // Dessine un carré dans la case correspondante
+        g.fillRect(x, y, Case.TAILLE, Case.TAILLE); // Dessine un carré dans la case correspondante
 
         // affiche une flèche pour indiquer la direction de la route (exemple : une flèche vers le bas)
         g.setColor(java.awt.Color.BLACK); // Couleur de la flèche (exemple : noir)
@@ -142,20 +142,20 @@ public class AffichageBatiments {
         int[] yPoints;
         switch (route.getDirection()) {
             case NORD:
-                xPoints = new int[]{x + Affichage.TAILLE_CASE / 2, x + Affichage.TAILLE_CASE / 4, x + 3 * Affichage.TAILLE_CASE / 4};
-                yPoints = new int[]{y + Affichage.TAILLE_CASE / 4, y + 3 * Affichage.TAILLE_CASE / 4, y + 3 * Affichage.TAILLE_CASE / 4};
+                xPoints = new int[]{x + Case.TAILLE / 2, x + Case.TAILLE / 4, x + 3 * Case.TAILLE / 4};
+                yPoints = new int[]{y + Case.TAILLE / 4, y + 3 * Case.TAILLE / 4, y + 3 * Case.TAILLE / 4};
                 break;
             case SUD:
-                xPoints = new int[]{x + Affichage.TAILLE_CASE / 2, x + Affichage.TAILLE_CASE / 4, x + 3 * Affichage.TAILLE_CASE / 4};
-                yPoints = new int[]{y + 3 * Affichage.TAILLE_CASE / 4, y + Affichage.TAILLE_CASE / 4, y + Affichage.TAILLE_CASE / 4};
+                xPoints = new int[]{x + Case.TAILLE / 2, x + Case.TAILLE / 4, x + 3 * Case.TAILLE / 4};
+                yPoints = new int[]{y + 3 * Case.TAILLE / 4, y + Case.TAILLE / 4, y + Case.TAILLE / 4};
                 break;
             case EST:
-                xPoints = new int[]{x + 3 * Affichage.TAILLE_CASE / 4, x + Affichage.TAILLE_CASE / 4, x + Affichage.TAILLE_CASE / 4};
-                yPoints = new int[]{y + Affichage.TAILLE_CASE / 2, y + Affichage.TAILLE_CASE / 4, y + 3 * Affichage.TAILLE_CASE / 4};
+                xPoints = new int[]{x + 3 * Case.TAILLE / 4, x + Case.TAILLE / 4, x + Case.TAILLE / 4};
+                yPoints = new int[]{y + Case.TAILLE / 2, y + Case.TAILLE / 4, y + 3 * Case.TAILLE / 4};
                 break;
             case OUEST:
-                xPoints = new int[]{x + Affichage.TAILLE_CASE / 4, x + 3 * Affichage.TAILLE_CASE / 4, x + 3 * Affichage.TAILLE_CASE / 4};
-                yPoints = new int[]{y + Affichage.TAILLE_CASE / 2, y + Affichage.TAILLE_CASE / 4, y + 3 * Affichage.TAILLE_CASE / 4};
+                xPoints = new int[]{x + Case.TAILLE / 4, x + 3 * Case.TAILLE / 4, x + 3 * Case.TAILLE / 4};
+                yPoints = new int[]{y + Case.TAILLE / 2, y + Case.TAILLE / 4, y + 3 * Case.TAILLE / 4};
                 break;
             default:
                 throw new IllegalArgumentException("Direction de route inconnue : " + route.getDirection());
@@ -170,9 +170,9 @@ public class AffichageBatiments {
 
     /** Affiche un minerai qui se déplace sur la case c */
     public static void afficheMinerai(Graphics g, Case c) {
-        int N = Affichage.TAILLE_CASE / 2;
-        int x = c.getX() * Affichage.TAILLE_CASE; // conversion des coordonnées de la case en pixels pour l'affichage
-        int y = c.getY() * Affichage.TAILLE_CASE;
+        int N = Case.TAILLE / 2;
+        int x = c.getX() * Case.TAILLE; // conversion des coordonnées de la case en pixels pour l'affichage
+        int y = c.getY() * Case.TAILLE;
 
         g.setColor(java.awt.Color.BLUE); // Couleur du minerai
         g.fillRect(x + N, y + N, N, N); // Dessine un carré dans la case correspondante

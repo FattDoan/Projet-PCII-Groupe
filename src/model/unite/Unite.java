@@ -6,9 +6,9 @@ import model.unite.commande.*;
 import java.util.List;
 import java.util.Deque;
 import java.util.ArrayDeque;
+import view.Camera;
 
 public class Unite implements Selectable, Runnable {
-    public static final int CASE_SIZE = Affichage.TAILLE_CASE; // pixels par case
 
     private static final int DELAI_THREAD_MS = 16;
     // Coordonees continues (pixels)
@@ -93,8 +93,8 @@ public class Unite implements Selectable, Runnable {
 
     // Les getters
     // GX et GY sont les coordonnées de grille (case) calculées à partir des coordonnées pixels.
-    public int getGX() { return (int)(px / CASE_SIZE); }
-    public int getGY() { return (int)(py / CASE_SIZE); }
+    public int getGX() { return (int)(px / Case.TAILLE); }
+    public int getGY() { return (int)(py / Case.TAILLE); }
     public float getPX() { return px; }
     public float getPY() { return py; }
     public TypeUnite getType() { return typeUnite; }

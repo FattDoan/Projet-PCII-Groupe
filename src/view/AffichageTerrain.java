@@ -13,7 +13,6 @@ import model.unite.Unite;
 public class AffichageTerrain extends JPanel {
 
     private final Terrain terrain;
-    private Camera camera = null;   // null jusqu'à l'injection par GameController
 
     private Selectable selectedElement = null; // peut être une Case ou une Unite
     private Selectable hoveredElement = null;  // peut être une Case ou une Unite
@@ -29,8 +28,6 @@ public class AffichageTerrain extends JPanel {
     private static final Color C_AMBER = new Color(255, 185, 30, 80);
     private static final Color C_DEST_TINT    = new Color(100, 180, 255,  40);
     private static final Color C_DEST_BORDER  = new Color(100, 180, 255, 190);
-    private static final Color C_PATH_DOT     = new Color(180, 140, 255, 180);
-    private static final Color C_PATH_TARGET  = new Color(180, 140, 255, 220);
 
     public AffichageTerrain(Terrain terrain) {
         super();
@@ -55,15 +52,6 @@ public class AffichageTerrain extends JPanel {
         });
     }
     public Terrain getTerrain() { return terrain; }
-    // ── Injection caméra (après construction) ────────────────────────────
-
-    /** Appelé par Affichage.setCamera(), lui-même appelé par GameController. */
-    public void setCamera(Camera camera) {
-        this.camera = camera;
-    }
-
-    public Camera getCamera() { return camera; }
-
     // ── Gestion du survol ─────────────────────────────────────────────────
 
     public void setHoveredElement(Selectable s) {
@@ -98,33 +86,33 @@ public class AffichageTerrain extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        // Garde: la caméra peut ne pas être injectée lors d'un premier repaint.
-        if (camera == null) return;
 
         Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,      RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
         g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,     RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
+        int cellSize = Case.TAILLE;
+        int unitSize = AffichageUnites.TAILLE_UNITE;
+        
         // Sauvegarde de la transformation pour restaurer correctement les overlays.
         AffineTransform originalTransform = g2.getTransform();
 
-        int   offsetX  = camera.getOffsetX();
-        int   offsetY  = camera.getOffsetY();
-        float cellSize = camera.effectiveCellSize();
-        int   base     = camera.getBaseCellSize();
-        // Anything thats need CASE_TAILLE must be inquired through 
-        // camera.getBaseCellSize() and camera.getEffectiveCellSize() to accomodate zooming
-
+        int offsetX  = Camera.getInstance().getOffsetX();
+        int offsetY  = Camera.getInstance().getOffsetY();
+        float zoom = Camera.getInstance().getZoom(); 
 
         // Translation globale selon l'offset caméra.
         g2.translate(-offsetX, -offsetY);
-
+        g2.scale(zoom, zoom);
+    
         // Élagage du rendu: ne dessine que les cases visibles (partielles incluses).
-        int firstCol = Math.max(0, (int)(offsetX / cellSize));
-        int firstRow = Math.max(0, (int)(offsetY / cellSize));
-        int lastCol  = Math.min(terrain.getTaille() - 1, (int)((offsetX + getWidth())  / cellSize));
-        int lastRow  = Math.min(terrain.getTaille() - 1, (int)((offsetY + getHeight()) / cellSize));
+        int firstCol = Math.max(0, (int)(Camera.getInstance().screenToWorldX(0) / cellSize));
+        int firstRow = Math.max(0, (int)(Camera.getInstance().screenToWorldY(0) / cellSize));
+        int lastCol  = Math.min(terrain.getTaille() - 1, 
+                                (int)((Camera.getInstance().screenToWorldX(getWidth())  / cellSize)));
+        int lastRow  = Math.min(terrain.getTaille() - 1, 
+                                (int)((Camera.getInstance().screenToWorldY(getHeight()) / cellSize)));
 
         // Affichage des cases
         for (int i = firstCol; i <= lastCol; i++) {
@@ -136,17 +124,16 @@ public class AffichageTerrain extends JPanel {
         //Affichage des unites
         List <Unite> unites = terrain.getUnites();
         for (Unite u : unites) {
-            AffichageUnites.afficheUnite(g2, u, base/2);
-            // Unite de taille base/2
+            AffichageUnites.afficheUnite(g2, u);
         }
 
-        drawIndicatorForUnitPath(g2, base);
+        drawIndicatorForUnitPath(g2, cellSize);
 
         // Surbrillance légère de la case survolée.
-        drawHoverIndicator(g2, base);
+        drawHoverIndicator(g2, cellSize, unitSize);
 
         // Encadrement renforcé de la case sélectionnée.
-        drawSelectionIndicator(g2, base);
+        drawSelectionIndicator(g2, cellSize, unitSize);
 
         // Restauration pour ne pas impacter les autres couches Swing.
         g2.setTransform(originalTransform);
@@ -156,16 +143,16 @@ public class AffichageTerrain extends JPanel {
     }
 
     // TODO: Unit hovered should be circle, not square like Case
-    private void drawHoverIndicator(Graphics2D g2, int base) {
+    private void drawHoverIndicator(Graphics2D g2, int cellSize, int unitSize) {
         if (hoveredElement != null && hoveredElement != selectedElement) {
             int hx = (int)hoveredElement.getPX();
-            int hy = (int)hoveredElement.getPY();
+            int hy = (int)hoveredElement.getPY(); 
 
-            int size = base;
+            int size = cellSize;
             if (hoveredElement instanceof Unite) {
-                size = base/2; // Unite de taille base/2
-                hx -= size/2;
-                hy -= size/2;
+                size = unitSize;
+                hx -= unitSize/2;
+                hy -= unitSize/2;
             }
 
             g2.setColor(new Color(255, 255, 255, 45)); 
@@ -177,12 +164,12 @@ public class AffichageTerrain extends JPanel {
         }
     }
 
-    private void drawSelectionIndicator(Graphics2D g2, int base) {
+    private void drawSelectionIndicator(Graphics2D g2, int cellSize, int unitSize) {
         if (selectedElement != null) {
             int sx = (int)selectedElement.getPX();
             int sy = (int)selectedElement.getPY();
  
-            int size = base;
+            int size = cellSize;
             if (selectedElement instanceof Unite) {
                 size = size/2; 
                 sx -= size/2;
@@ -209,16 +196,16 @@ public class AffichageTerrain extends JPanel {
     }
     public void clearDestinationPreview() { destinationPreview = null; repaint(); }
 
-    private void drawIndicatorForUnitPath(Graphics2D g2, int base) {
+    private void drawIndicatorForUnitPath(Graphics2D g2, int cellSize) {
         if (awaitingDestination && destinationPreview != null) {
-            int dpx = destinationPreview[0] * base;
-            int dpy = destinationPreview[1] * base;
+            int dpx = destinationPreview[0] * cellSize;
+            int dpy = destinationPreview[1] * cellSize;
             g2.setColor(C_DEST_TINT);
-            g2.fillRect(dpx, dpy, base, base);
+            g2.fillRect(dpx, dpy, cellSize, cellSize);
             float[] dash = {4f, 3f};
             g2.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 0, dash, 0));
             g2.setColor(C_DEST_BORDER);
-            g2.drawRect(dpx + 1, dpy + 1, base - 2, base - 2);
+            g2.drawRect(dpx + 1, dpy + 1, cellSize - 2, cellSize - 2);
         }
     }
 

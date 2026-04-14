@@ -1,7 +1,7 @@
 package model.unite.commande;
 
+import view.Camera;
 import model.unite.Unite;
-import view.Affichage;
 import model.*;
 
 public class CommandeDeplacementEnnemi extends Commande {
@@ -13,8 +13,8 @@ public class CommandeDeplacementEnnemi extends Commande {
     public CommandeDeplacementEnnemi(Terrain terrain) {
         Batiment batimentMaitre = terrain.getBatimentMaitre();
 
-        this.batimentMaitrePX = batimentMaitre.getX() * Affichage.TAILLE_CASE;
-        this.batimentMaitrePY = batimentMaitre.getY() * Affichage.TAILLE_CASE;
+        this.batimentMaitrePX = batimentMaitre.getX() * Case.TAILLE + Case.TAILLE / 2;
+        this.batimentMaitrePY = batimentMaitre.getY() * Case.TAILLE + Case.TAILLE / 2;
     }
 
 
@@ -23,8 +23,8 @@ public class CommandeDeplacementEnnemi extends Commande {
         Selectable closestTarget = null;
         float closestDist = Float.MAX_VALUE;
 
-        int centerX = (int) (unite.getPX() / Affichage.TAILLE_CASE);
-        int centerY = (int) (unite.getPY() / Affichage.TAILLE_CASE);
+        int centerX = (int) (unite.getPX() / Case.TAILLE);
+        int centerY = (int) (unite.getPY() / Case.TAILLE);
 
         for (int dx = -SCAN_RADIUS; dx <= SCAN_RADIUS; dx++) {
             for (int dy = -SCAN_RADIUS; dy <= SCAN_RADIUS; dy++) {

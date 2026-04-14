@@ -72,28 +72,31 @@ public class AffichageCases {
 
     /** Affiche une case vide à la position (x, y) sur la fenêtre */
     private static void afficheCaseVide(Graphics g, Case c) {
-        int x = c.getX() * Affichage.TAILLE_CASE; // conversion des coordonnées de la case en pixels pour l'affichage
-        int y = c.getY() * Affichage.TAILLE_CASE;
+        int cellSize = Case.TAILLE;
+        int x = c.getX() * cellSize; // conversion des coordonnées de la case en pixels pour l'affichage
+        int y = c.getY() * cellSize;
 
         // Choix visuel: vert foncé pour évoquer l'herbe.
         g.setColor(DARK_GREEN); // Couleur d'une case vide, ici vert pour faire de l'herbe
-        g.fillRect(x, y, Affichage.TAILLE_CASE, Affichage.TAILLE_CASE); // Dessine un carré dans la case correspondante
+        g.fillRect(x, y, cellSize, cellSize); // Dessine un carré dans la case correspondante
     }
 
     /** Affiche un gisement de minerai (/!\ PAS UN MINERAI QUI SE DEPLACE SUR UNE ROUTE/!\) à la position (x, y) sur la fenêtre */
     private static void _afficheMinerai(Graphics g, Case c) {
-        int x = c.getX() * Affichage.TAILLE_CASE; // conversion des coordonnées de la case en pixels pour l'affichage
-        int y = c.getY() * Affichage.TAILLE_CASE;
+        int cellSize = Case.TAILLE;
+        int x = c.getX() * cellSize; // conversion des coordonnées de la case en pixels pour l'affichage
+        int y = c.getY() * cellSize;
 
         g.setColor(java.awt.Color.BLUE); // Couleur du minerai
-        g.fillRect(x, y, Affichage.TAILLE_CASE, Affichage.TAILLE_CASE); // Dessine un carré dans la case correspondante
+        g.fillRect(x, y, cellSize, cellSize); // Dessine un carré dans la case correspondante
     }
 
     /** Affiche l'image correspondant à une case */
     private static void afficheImageCase(Graphics g, Case c, String adress) {
         // Affichage d'une image de minerai (ex: une roche grise) au lieu d'un simple carré bleu
-        int x = c.getX() * Affichage.TAILLE_CASE; // conversion des coordonnées de la case en pixels pour l'affichage
-        int y = c.getY() * Affichage.TAILLE_CASE;
+        int cellSize = Case.TAILLE;
+        int x = c.getX() * cellSize; // conversion des coordonnées de la case en pixels pour l'affichage
+        int y = c.getY() * cellSize;
         // on récupère l'image du minerai (ex: une roche grise) et on l'affiche à la place du carré bleu
         java.awt.Image img;
 
@@ -106,7 +109,7 @@ public class AffichageCases {
                 img = javax.imageio.ImageIO.read(new java.io.File(adress));
                 IMAGES_CACHE.put(adress, img); // Stocke l'image dans le cache pour les futurs affichages
             }
-            g.drawImage(img, x, y, Affichage.TAILLE_CASE, Affichage.TAILLE_CASE, null); // Dessine l'image du minerai dans la case correspondante
+            g.drawImage(img, x, y, cellSize, cellSize, null); // Dessine l'image du minerai dans la case correspondante
 
         } catch (IOException e) {
             // Si l'image n'a pas pu être chargée, on n'affiche rien (la case restera vide) et on logue l'erreur pour pouvoir la corriger plus tard
@@ -116,10 +119,11 @@ public class AffichageCases {
         }
     }
 
-    public static void afficheMineralIngot(Graphics g, Case c) {
-        int N = Affichage.TAILLE_CASE / 3;
-        int x = c.getX() * Affichage.TAILLE_CASE; // conversion des coordonnées de la case en pixels pour l'affichage
-        int y = c.getY() * Affichage.TAILLE_CASE;
+    public static void afficheMineralIngot(Graphics g, Case c) { 
+        int cellSize = Case.TAILLE;
+        int N = cellSize / 3;
+        int x = c.getX() * cellSize; // conversion des coordonnées de la case en pixels pour l'affichage
+        int y = c.getY() * cellSize;
 
         java.awt.Image img;
 
@@ -132,7 +136,7 @@ public class AffichageCases {
                 img = javax.imageio.ImageIO.read(new java.io.File(ADRESSE_MINERAL_INGOT));
                 IMAGES_CACHE.put(ADRESSE_MINERAL_INGOT, img); // Stocke l'image dans le cache pour les futurs affichages
             }
-            g.drawImage(img, x + N, y + N, Affichage.TAILLE_CASE/3, Affichage.TAILLE_CASE/3, null); // Dessine l'image du minerai dans la case correspondante
+            g.drawImage(img, x + N, y + N, cellSize/3, cellSize/3, null); // Dessine l'image du minerai dans la case correspondante
 
         } catch (IOException e) {
             // Si l'image n'a pas pu être chargée, on n'affiche rien (la case restera vide) et on logue l'erreur pour pouvoir la corriger plus tard

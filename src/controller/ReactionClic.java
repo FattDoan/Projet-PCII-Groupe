@@ -49,15 +49,12 @@ public class ReactionClic implements MouseListener, UnitActionCallback {
         // Ignore l'événement s'il s'agissait d'un glisser et non d'un clic.
         if (cameraController.isDragging()) return;
  
-        Camera cam = affichage.getCamera();
-        if (cam == null) return;
-
-        int gx = cam.screenToGridX(e.getX());
-        int gy = cam.screenToGridY(e.getY());
+        int gx = Camera.getInstance().screenToGridX(e.getX());
+        int gy = Camera.getInstance().screenToGridY(e.getY());
 
         // C'est ce que comprend getUniteAtPixel().
-        float worldPX = e.getX() + cam.getOffsetX();
-        float worldPY = e.getY() + cam.getOffsetY();
+        float worldPX = Camera.getInstance().screenToWorldX(e.getX());
+        float worldPY = Camera.getInstance().screenToWorldY(e.getY());
 
         // ── Mode: AWAITING_DESTINATION ────────────────────────────────
         switch (mode) {

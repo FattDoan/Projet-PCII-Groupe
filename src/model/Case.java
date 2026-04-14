@@ -2,6 +2,7 @@ package model;
 
 import common.AsyncExecutor;
 import common.Validation;
+import view.Camera;
 import view.Affichage;
 
 /**
@@ -20,6 +21,9 @@ public class Case implements Selectable {
 
    /** Bâtiment présent sur la case */
    private Batiment batiment;
+
+    /** Taille d'une case en pixels */
+    public static int TAILLE = 40;
 
    /**
     * Crée une nouvelle case vide aux coordonnées spécifiées.
@@ -70,11 +74,11 @@ public class Case implements Selectable {
    }
 
     public float getPX() {
-        return x * Affichage.TAILLE_CASE;
+        return x * Case.TAILLE;
     }
 
     public float getPY() {
-        return y * Affichage.TAILLE_CASE;
+        return y * Case.TAILLE;
     }
     
    /** Renvoi vrai si il a pas de batiment */
