@@ -24,7 +24,7 @@ public class AffichageCases {
     public static final String BASE_ADRESSE_IMAGE = FileSystems.getDefault().getPath("").toAbsolutePath().toString() + "/images/";
     // adresses spécifiques pour chaque type de case
     private static final String ADRESSE_MINERAL_DEPOSIT = BASE_ADRESSE_IMAGE + "mineral_deposit_sprite.png";
-    private static final String ADRESSE_MINERAL_INGOT   = BASE_ADRESSE_IMAGE + "ingot_sprite.png";
+    private static final String ADRESSE_MINERAL_INGOT   = BASE_ADRESSE_IMAGE + "sprite_crystal.png";
     private static final String ADRESSE_FOREUSE         = BASE_ADRESSE_IMAGE + "drill_sprite.png";
     private static final String ADRESSE_MAITRE          = BASE_ADRESSE_IMAGE + "mineral_ingot_raw.jpg";
     private static final String ADRESSE_STOCKAGE        = BASE_ADRESSE_IMAGE + "stockage_sprite.png";
@@ -34,6 +34,11 @@ public class AffichageCases {
         BASE_ADRESSE_IMAGE + "sprite_batiment_route_sud.png",
         BASE_ADRESSE_IMAGE + "sprite_batiment_route_est.png",
         BASE_ADRESSE_IMAGE + "sprite_batiment_route_ouest.png"
+    };
+    private static final String[] ADRESSES_STOCKAGE = {
+        BASE_ADRESSE_IMAGE + "sprite_batiment_silot_vide.png",
+        BASE_ADRESSE_IMAGE + "sprite_batiment_silot_moitie.png",
+        BASE_ADRESSE_IMAGE + "sprite_batiment_silot_plein.png"
     };
 
 
@@ -60,7 +65,15 @@ public class AffichageCases {
                 imageName = ADRESSE_FOREUSE;
                 break;
             case STOCKAGE:
-                imageName = ADRESSE_STOCKAGE;
+                // En fonction de la quantité de minerai stockée, on affiche une image différente
+                model.Stockage stockage = (model.Stockage) c.getBatiment();
+                if (stockage.estVide()) {
+                    imageName = ADRESSES_STOCKAGE[0]; // Stockage vide
+                } else if (stockage.estPlein()) {
+                    imageName = ADRESSES_STOCKAGE[2]; // Stockage plein
+                } else {
+                    imageName = ADRESSES_STOCKAGE[1]; // Cas de base
+                }
                 break;
             case USINE:
                 imageName = ADRESSE_USINE;
@@ -68,6 +81,11 @@ public class AffichageCases {
             case ROUTE:
                 model.Route route = (model.Route) c.getBatiment();
                 imageName = ADRESSES_ROUTE[route.getDirection().toInt()];
+                if (route.estPlein()) {
+                    // Si la route contient un minerai, on affiche la route puis on affiche un minerai par dessus pour représenter le minerai qui se déplace sur la route
+                    afficheImageCase(g, c, imageName); // Affiche la route
+                    imageName = ADRESSE_MINERAL_INGOT; // Affiche le minerai par dessus la route
+                }
                 break;
             default:
                 System.err.println("Type de bâtiment inconnu: " + c.getBatiment().getType());
@@ -97,13 +115,13 @@ public class AffichageCases {
         g.fillRect(x, y, cellSize, cellSize); // Dessine un carré dans la case correspondante
     }
 
-    /** Affiche l'image correspondant à une case */
+    /** Affiche l'image passée en paramètre à la position de la case */
     private static void afficheImageCase(Graphics g, Case c, String adress) {
-        // Affichage d'une image de minerai (ex: une roche grise) au lieu d'un simple carré bleu
+        // Affichage l'image passée en paramètre à la position de la case, en redimensionnant l'image pour qu'elle remplisse toute la case
         int cellSize = Case.TAILLE;
         int x = c.getX() * cellSize; // conversion des coordonnées de la case en pixels pour l'affichage
         int y = c.getY() * cellSize;
-        // on récupère l'image du minerai (ex: une roche grise) et on l'affiche à la place du carré bleu
+
         java.awt.Image img;
 
         try {
