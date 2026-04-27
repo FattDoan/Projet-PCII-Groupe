@@ -27,6 +27,14 @@ public enum Direction {
             case EST -> "Est →"; 
             case OUEST -> "Ouest ←"; 
         };
+    }
 
+    public int toInt() {
+        return switch (this) { 
+            case NORD -> 0; 
+            case SUD -> 1; 
+            case EST -> 2; 
+            case OUEST -> 3; 
+        };
     }
 }

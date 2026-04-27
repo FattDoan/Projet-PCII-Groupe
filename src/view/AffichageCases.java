@@ -21,14 +21,20 @@ public class AffichageCases {
     private static final HashMap<String, java.awt.Image> IMAGES_CACHE = new HashMap<>();
 
     // adresse de base pour les images, à laquelle on ajoute le nom de l'image spécifique pour chaque type de case (ex: gisement de minerai, foreuse, etc.)
-    public static final String BASE_ADRESSE = FileSystems.getDefault().getPath("").toAbsolutePath().toString() + "/images/";
+    public static final String BASE_ADRESSE_IMAGE = FileSystems.getDefault().getPath("").toAbsolutePath().toString() + "/images/";
     // adresses spécifiques pour chaque type de case
-    private static final String ADRESSE_MINERAL_DEPOSIT = BASE_ADRESSE + "mineral_deposit_sprite.png";
-    private static final String ADRESSE_MINERAL_INGOT   = BASE_ADRESSE + "ingot_sprite.png";
-    private static final String ADRESSE_FOREUSE         = BASE_ADRESSE + "drill_sprite.png";
-    private static final String ADRESSE_MAITRE          = BASE_ADRESSE + "mineral_ingot_raw.jpg";
-    private static final String ADRESSE_STOCKAGE        = BASE_ADRESSE + "stockage_sprite.png";
-    private static final String ADRESSE_USINE           = BASE_ADRESSE + "usine_sprite.png";
+    private static final String ADRESSE_MINERAL_DEPOSIT = BASE_ADRESSE_IMAGE + "mineral_deposit_sprite.png";
+    private static final String ADRESSE_MINERAL_INGOT   = BASE_ADRESSE_IMAGE + "ingot_sprite.png";
+    private static final String ADRESSE_FOREUSE         = BASE_ADRESSE_IMAGE + "drill_sprite.png";
+    private static final String ADRESSE_MAITRE          = BASE_ADRESSE_IMAGE + "mineral_ingot_raw.jpg";
+    private static final String ADRESSE_STOCKAGE        = BASE_ADRESSE_IMAGE + "stockage_sprite.png";
+    private static final String ADRESSE_USINE           = BASE_ADRESSE_IMAGE + "usine_sprite.png";
+    private static final String[] ADRESSES_ROUTE = {
+        BASE_ADRESSE_IMAGE + "sprite_batiment_route_nord.png",
+        BASE_ADRESSE_IMAGE + "sprite_batiment_route_sud.png",
+        BASE_ADRESSE_IMAGE + "sprite_batiment_route_est.png",
+        BASE_ADRESSE_IMAGE + "sprite_batiment_route_ouest.png"
+    };
 
 
     /****** FONCTIONS D'AFFICHAGE *******/
@@ -45,10 +51,6 @@ public class AffichageCases {
     }
 
     private static void afficheImageBatiment(Graphics g, Case c) {
-        if (c.getBatiment().getType() == TypeBatiment.ROUTE) {
-            // TODO : affichage propre de la route, pour l'instant affichage de base
-            AffichageBatiments.afficheBatiment(g, c);
-        }
         String imageName;
         switch (c.getBatiment().getType()) {
             case BATIMENT_MAITRE:
@@ -62,6 +64,10 @@ public class AffichageCases {
                 break;
             case USINE:
                 imageName = ADRESSE_USINE;
+                break;
+            case ROUTE:
+                model.Route route = (model.Route) c.getBatiment();
+                imageName = ADRESSES_ROUTE[route.getDirection().toInt()];
                 break;
             default:
                 System.err.println("Type de bâtiment inconnu: " + c.getBatiment().getType());
