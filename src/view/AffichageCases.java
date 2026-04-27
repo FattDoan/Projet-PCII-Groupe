@@ -21,25 +21,23 @@ public class AffichageCases {
     private static final HashMap<String, java.awt.Image> IMAGES_CACHE = new HashMap<>();
 
     // adresse de base pour les images, à laquelle on ajoute le nom de l'image spécifique pour chaque type de case (ex: gisement de minerai, foreuse, etc.)
-    public static final String BASE_ADRESSE_IMAGE = FileSystems.getDefault().getPath("").toAbsolutePath().toString() + "/images/";
-    // adresses spécifiques pour chaque type de case
-    private static final String ADRESSE_MINERAL_DEPOSIT = BASE_ADRESSE_IMAGE + "mineral_deposit_sprite.png";
-    private static final String ADRESSE_MINERAL_INGOT   = BASE_ADRESSE_IMAGE + "sprite_crystal.png";
-    private static final String ADRESSE_FOREUSE         = BASE_ADRESSE_IMAGE + "drill_sprite.png";
-    private static final String ADRESSE_MAITRE          = BASE_ADRESSE_IMAGE + "mineral_ingot_raw.jpg";
-    private static final String ADRESSE_STOCKAGE        = BASE_ADRESSE_IMAGE + "stockage_sprite.png";
-    private static final String ADRESSE_USINE           = BASE_ADRESSE_IMAGE + "usine_sprite.png";
-    private static final String[] ADRESSES_ROUTE = {
-        BASE_ADRESSE_IMAGE + "sprite_batiment_route_nord.png",
-        BASE_ADRESSE_IMAGE + "sprite_batiment_route_sud.png",
-        BASE_ADRESSE_IMAGE + "sprite_batiment_route_est.png",
-        BASE_ADRESSE_IMAGE + "sprite_batiment_route_ouest.png"
-    };
-    private static final String[] ADRESSES_STOCKAGE = {
-        BASE_ADRESSE_IMAGE + "sprite_batiment_silot_vide.png",
-        BASE_ADRESSE_IMAGE + "sprite_batiment_silot_moitie.png",
-        BASE_ADRESSE_IMAGE + "sprite_batiment_silot_plein.png"
-    };
+    public static final String BASE_ADRESSE_IMAGES = FileSystems.getDefault().getPath("").toAbsolutePath().toString() + "/images/";
+
+
+
+    /******* ADRESSES DES IMAGES *******/
+
+
+    // Misc
+    private static final String ADRESSE_MINERAL_DEPOSIT = BASE_ADRESSE_IMAGES + "sprite_gisement_minerai.png";
+    private static final String ADRESSE_MINERAL_INGOT   = BASE_ADRESSE_IMAGES + "sprite_crystal_terne.png";
+    private static final String ADRESSE_EN_CONSTRUCTION = BASE_ADRESSE_IMAGES + "sprite_en_construction.png";
+
+
+    private static final String ADRESSE_FOREUSE         = BASE_ADRESSE_IMAGES + "drill_sprite.png";
+    private static final String ADRESSE_MAITRE          = BASE_ADRESSE_IMAGES + "mineral_ingot_raw.jpg";
+    private static final String ADRESSE_USINE           = BASE_ADRESSE_IMAGES + "fhuifsberlukfberufkse(placeholder).png";
+
 
 
     /****** FONCTIONS D'AFFICHAGE *******/
@@ -56,42 +54,33 @@ public class AffichageCases {
     }
 
     private static void afficheImageBatiment(Graphics g, Case c) {
-        String imageName;
         switch (c.getBatiment().getType()) {
             case BATIMENT_MAITRE:
-                imageName = ADRESSE_MAITRE;
+                afficheImageCase(g, c, ADRESSE_MAITRE);
                 break;
             case FOREUSE:
-                imageName = ADRESSE_FOREUSE;
+                model.Foreuse foreuse = (model.Foreuse) c.getBatiment();
+                AffichageBatiments.afficheForeuse(g, c, foreuse);
                 break;
             case STOCKAGE:
-                // En fonction de la quantité de minerai stockée, on affiche une image différente
                 model.Stockage stockage = (model.Stockage) c.getBatiment();
-                if (stockage.estVide()) {
-                    imageName = ADRESSES_STOCKAGE[0]; // Stockage vide
-                } else if (stockage.estPlein()) {
-                    imageName = ADRESSES_STOCKAGE[2]; // Stockage plein
-                } else {
-                    imageName = ADRESSES_STOCKAGE[1]; // Cas de base
-                }
+                AffichageBatiments.afficheStockage(g, c, stockage);
                 break;
             case USINE:
-                imageName = ADRESSE_USINE;
+                model.Usine usine = (model.Usine) c.getBatiment();
+                AffichageBatiments.afficheUsine(g, c, usine);
                 break;
             case ROUTE:
                 model.Route route = (model.Route) c.getBatiment();
-                imageName = ADRESSES_ROUTE[route.getDirection().toInt()];
-                if (route.estPlein()) {
-                    // Si la route contient un minerai, on affiche la route puis on affiche un minerai par dessus pour représenter le minerai qui se déplace sur la route
-                    afficheImageCase(g, c, imageName); // Affiche la route
-                    imageName = ADRESSE_MINERAL_INGOT; // Affiche le minerai par dessus la route
-                }
+                AffichageBatiments.afficheRoute(g, c, route);
                 break;
             default:
                 System.err.println("Type de bâtiment inconnu: " + c.getBatiment().getType());
                 return; // Si le type de bâtiment est inconnu, on n'affiche rien et on logue l'erreur pour pouvoir la corriger plus tard
         }
-        afficheImageCase(g, c, imageName);
+        if (!c.getBatiment().estFini()) {
+            AffichageCases.afficheImageCase(g, c, ADRESSE_EN_CONSTRUCTION); // Affiche une image d'en construction par dessus le bâtiment pour indiquer qu'il n'est pas encore fini
+        }
     }
 
     /** Affiche une case vide à la position (x, y) sur la fenêtre */
@@ -116,7 +105,7 @@ public class AffichageCases {
     }
 
     /** Affiche l'image passée en paramètre à la position de la case */
-    private static void afficheImageCase(Graphics g, Case c, String adress) {
+    public static void afficheImageCase(Graphics g, Case c, String adress) {
         // Affichage l'image passée en paramètre à la position de la case, en redimensionnant l'image pour qu'elle remplisse toute la case
         int cellSize = Case.TAILLE;
         int x = c.getX() * cellSize; // conversion des coordonnées de la case en pixels pour l'affichage
@@ -139,7 +128,7 @@ public class AffichageCases {
             // Si l'image n'a pas pu être chargée, on n'affiche rien (la case restera vide) et on logue l'erreur pour pouvoir la corriger plus tard
             System.err.println("Erreur lors du chargement de l'image: " + adress + ". Vérifiez que le projet a été lancé depuis sa racine (Projet-PCII-Groupe) et que le dossier images est bien présent.");
             e.printStackTrace(System.err);
-            AffichageBatiments.afficheBatiment(g, c); // Affichage de base du bâtiment si l'image n'a pas pu être chargée
+            _AffichageBatiments.afficheBatiment(g, c); // Affichage de base du bâtiment si l'image n'a pas pu être chargée
         }
     }
 
@@ -166,7 +155,7 @@ public class AffichageCases {
             // Si l'image n'a pas pu être chargée, on n'affiche rien (la case restera vide) et on logue l'erreur pour pouvoir la corriger plus tard
             System.err.println("Erreur lors du chargement de l'image: " + ADRESSE_MINERAL_INGOT + ". Vérifiez que le projet a été lancé depuis sa racine (Projet-PCII-Groupe) et que le dossier images est bien présent.");
             e.printStackTrace(System.err);
-            AffichageBatiments.afficheMinerai(g, c); // Affichage de base du bâtiment si l'image n'a pas pu être chargée
+            _AffichageBatiments.afficheMinerai(g, c); // Affichage de base du bâtiment si l'image n'a pas pu être chargée
         }
     }
 

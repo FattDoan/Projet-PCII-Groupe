@@ -50,11 +50,14 @@ public abstract class Batiment{
         }
     }
 
+
+    /****** GETTERS ******/
+
     /** Renvoie le type de bâtiment (USINE, FOREUSE, STOCKAGE, BATIMENT_MAITRE, ROUTE) */
     public abstract TypeBatiment getType();
 
-
-    /****** GETTERS ******/
+    /** Renvoie le coût de construction du bâtiment */
+    public abstract int getCost();
 
     /** Renvoie la quantité de minerai stockée actuellement */
     public synchronized int getStockage() {
@@ -92,10 +95,6 @@ public abstract class Batiment{
         return hp == hpMax;
     }
 
-    /** Renvoie le coût de construction du bâtiment */
-    public abstract int getCost();
-
-
     /**
      * Vérifie si le bâtiment est vide (aucun minerai stocké).
      * 
@@ -104,7 +103,6 @@ public abstract class Batiment{
     public synchronized boolean estVide() {
         return stockage == 0;
     }
-
     /**
      * Vérifie si le bâtiment est plein (capacité maximale atteinte).
      * 
@@ -118,16 +116,19 @@ public abstract class Batiment{
     public synchronized boolean estFini() {
         return fini;
     }
+    /** Renvoie vrai si le bâtiment est détruit (points de vie à zéro). Le bâtiment ne fait donc normalement plus rien */
+    public synchronized boolean estDetruit() {
+        return hp <= 0 || (hp <= 1 && !estFini()); // bâtiment créé avec 1 hp, donc si hp <= 1, c'est qu'il est détruit ou en cours de construction (mais dans les deux cas il ne fait rien)
+    } // TODO : s'assurer que c'est le cas pour tous les bâtiments
+
+
+
+    /***** SETTERS *****/
 
     /** Marque la construction du batiment comme terminee. */
     public synchronized void terminerConstruction() {
         this.fini = true;
     }
-
-
-
-
-    /***** SETTERS *****/
 
     /** Effectue les actions nécessaires pour détruire le bâtiment */
     public abstract void detruire();
@@ -180,7 +181,7 @@ public abstract class Batiment{
         return false;
     }
 
-     public synchronized boolean essayerRetirerMinerai(int quantite) {
+    public synchronized boolean essayerRetirerMinerai(int quantite) {
         if (quantite < 0) {
             return false;
         }
@@ -191,12 +192,12 @@ public abstract class Batiment{
         return false;
     }
 
-        public synchronized void ajouterHP() {
-            if (hp < hpMax) {
-                hp += 1;
-                if (hp == hpMax) {
-                    fini = true; // construction terminée quand hp atteint le max
-                }
+    public synchronized void ajouterHP() {
+        if (hp < hpMax) {
+            hp += 1;
+            if (hp == hpMax) {
+                fini = true; // construction terminée quand hp atteint le max
             }
         }
+    }
 }

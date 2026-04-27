@@ -71,4 +71,9 @@ public class Foreuse extends Batiment implements Runnable {
         return COUT_CONSTRUCTION;
     }
 
+    /** Renvoie vrai si la foreuse est en train d'extraire du minerai */
+    public boolean isRunning() {
+        return running && estFini() && !Thread.currentThread().isInterrupted() && !estPlein();
+    }
+
 }
