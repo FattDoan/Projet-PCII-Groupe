@@ -23,6 +23,12 @@ public class AffichageBatiments {
         BASE_ADRESSE_IMAGES + "sprite_batiment_route_destroyed_h.png",
         BASE_ADRESSE_IMAGES + "sprite_batiment_route_destroyed_v.png"
     };
+    private static final String[] ADRESSES_MAITRE = {
+        BASE_ADRESSE_IMAGES + "sprite_batiment_maitre_vide.png",
+        BASE_ADRESSE_IMAGES + "sprite_batiment_maitre_moitie.png",
+        BASE_ADRESSE_IMAGES + "sprite_batiment_maitre_plein.png",
+        BASE_ADRESSE_IMAGES + "sprite_batiment_maitre_destroyed.png"
+    };
     private static final String[] ADRESSES_STOCKAGE = {
         BASE_ADRESSE_IMAGES + "sprite_batiment_silot_vide.png",
         BASE_ADRESSE_IMAGES + "sprite_batiment_silot_moitie.png",
@@ -33,6 +39,11 @@ public class AffichageBatiments {
         BASE_ADRESSE_IMAGES + "sprite_batiment_foreuse.png",
         BASE_ADRESSE_IMAGES + "sprite_batiment_foreuse_working.png",
         BASE_ADRESSE_IMAGES + "sprite_batiment_foreuse_destroyed.png"
+    };
+    private static final String[] ADRESSES_USINE = {
+        BASE_ADRESSE_IMAGES + "sprite_batiment_usine.png",
+        BASE_ADRESSE_IMAGES + "sprite_batiment_usine_working.png",
+        BASE_ADRESSE_IMAGES + "sprite_batiment_usine_destroyed.png"
     };
 
     private static final String ADRESSE_USINE = BASE_ADRESSE_IMAGES + "usine_sprites.png";
@@ -45,6 +56,10 @@ public class AffichageBatiments {
         BASE_ADRESSE_IMAGES + "sprite_batiment_route_damaged1_v.png",
         BASE_ADRESSE_IMAGES + "sprite_batiment_route_damaged2_v.png"
     };
+    private static final String[] ADRESSES_MAITRE_DAMAGED = {
+        BASE_ADRESSE_IMAGES + "sprite_batiment_maitre_damaged1.png",
+        BASE_ADRESSE_IMAGES + "sprite_batiment_maitre_damaged2.png"
+    };
     private static final String[] ADRESSES_STOCKAGE_DAMAGED = {
         BASE_ADRESSE_IMAGES + "sprite_batiment_silot_damaged1.png",
         BASE_ADRESSE_IMAGES + "sprite_batiment_silot_damaged2.png"
@@ -53,10 +68,40 @@ public class AffichageBatiments {
         BASE_ADRESSE_IMAGES + "sprite_batiment_foreuse_damaged1.png",
         BASE_ADRESSE_IMAGES + "sprite_batiment_foreuse_damaged2.png"
     };
+    private static final String[] ADRESSES_USINE_DAMAGED = {
+        BASE_ADRESSE_IMAGES + "sprite_batiment_usine_damaged1.png",
+        BASE_ADRESSE_IMAGES + "sprite_batiment_usine_damaged2.png"
+    };
 
 
-    public static void afficheBatimentMaitre(Graphics g, Case c, BatimentMaitre r) {
-        // TODO : afficher bâtiment maître
+    /** Affiche le batiment maitre passée en argument sur la case c 
+     * @param g le contexte graphique sur lequel dessiner
+     * @param c la case sur laquelle dessiner le stockage
+     * @param maitre le batiment maitre à afficher, qui contient les informations nécessaires pour déterminer l'image à afficher (niveau de remplissage, dégats, etc)
+    */
+    public static void afficheBatimentMaitre(Graphics g, Case c, BatimentMaitre maitre) {
+        if (maitre.estDetruit()) {
+            AffichageCases.afficheImageCase(g, c, ADRESSES_MAITRE[3]);
+            return;
+        }
+
+        String imageName;
+        // Affichage de base du stockage : l'image représente visuellement le niveau de remplissage du stockage
+        if (maitre.estVide()) {
+            imageName = ADRESSES_MAITRE[0]; // Vide
+        } else if (maitre.estPlein()) {
+            imageName = ADRESSES_MAITRE[2]; // Plein
+        } else {
+            imageName = ADRESSES_MAITRE[1]; // Cas de base
+        }
+        AffichageCases.afficheImageCase(g, c, imageName);
+
+        if (!maitre.atFullHP()) {
+            // Si le batiment a prit des dégâts, on affiche une image endommagée par dessus l'image de base pour représenter les dégâts
+            float hpRatio = (float) maitre.getHP() / maitre.getHPMax();
+            int id = hpRatio > 0.5f ? 0 : 1; // On détermine le niveau de dégâts (léger ou lourd) en fonction du ratio de points de vie restants
+            AffichageCases.afficheImageCase(g, c, ADRESSES_MAITRE_DAMAGED[id]);
+        }
     }
 
 
@@ -66,7 +111,6 @@ public class AffichageBatiments {
      * @param stockage le stockage à afficher, qui contient les informations nécessaires pour déterminer l'image à afficher (niveau de remplissage, dégats, etc)
     */
     public static void afficheStockage(Graphics g, Case c, Stockage stockage) {
-
         if (stockage.estDetruit()) {
             AffichageCases.afficheImageCase(g, c, ADRESSES_STOCKAGE[3]);
             return;
@@ -92,9 +136,27 @@ public class AffichageBatiments {
     }
 
 
-    public static void afficheUsine(Graphics g, Case c, Usine r) {
-        // Affichage simple de l'usine via son sprite principal
-        AffichageCases.afficheImageCase(g, c, ADRESSE_USINE);
+    public static void afficheUsine(Graphics g, Case c, Usine usine) {
+        if (usine.estDetruit()) {
+            AffichageCases.afficheImageCase(g, c, ADRESSES_USINE[2]);
+            return;
+        }
+
+        String imageName;
+        // Affichage de base du stockage : l'image représente visuellement le niveau de remplissage du stockage
+        if (usine.isRunning()) {
+            imageName = ADRESSES_USINE[1]; // Usine en marche (extrait du minerai)
+        } else {
+            imageName = ADRESSES_USINE[0]; // Usine à l'arrêt (soit parce qu'elle est pleine, soit parce qu'elle n'est pas en état de fonctionner)
+        }
+        AffichageCases.afficheImageCase(g, c, imageName);
+
+        if (!usine.atFullHP()) {
+            // Si l'usine a prit des dégâts, on affiche une image d'usine endommagée par dessus l'image de base de l'usine pour représenter les dégâts
+            float hpRatio = (float) usine.getHP() / usine.getHPMax();
+            int id = hpRatio > 0.5f ? 0 : 1; // On détermine le niveau de dégâts (léger ou lourd) en fonction du ratio de points de vie restants
+            AffichageCases.afficheImageCase(g, c, ADRESSES_USINE_DAMAGED[id]);
+        }
     }
 
 
