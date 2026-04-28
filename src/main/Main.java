@@ -4,6 +4,7 @@ import common.AsyncExecutor;
 import controller.GameController;
 import javax.swing.SwingUtilities;
 import model.Terrain;
+import model.GestionnaireVagues;
 import view.Fenetre;
 import view.TimerView;
 import model.unite.*;
@@ -13,6 +14,9 @@ public class Main {
     private static final int DEFAULT_SIZE = 50;
     // Taille minimale pour garantir un terrain jouable.
     private static final int MIN_SIZE = 5;
+    
+    // Gestionnaire de vagues d'ennemis (unique pour toute la partie)
+    private static GestionnaireVagues gestionnaireVagues;
 
     public static void main(String[] args) {
         // Filet de sécurité global: toute exception non capturée est loguée.
@@ -26,14 +30,14 @@ public class Main {
         // 1) argument CLI, 2) propriété JVM, 3) valeur par défaut.
         int terrainSize = resolveTerrainSize(args);
         Terrain terrain = new Terrain(terrainSize);
+        
         // ajoute une unite en ce moment pour tester 
         terrain.addUnite(new Ouvrier(terrainSize/2 + 5, terrainSize/2 + 5, terrain));
 
-        // ajoute un ennemi pour tester 
-        // TODO: add automatic spawning of enemies in the future
-        terrain.addUnite(new Ennemi(5, 5, terrain));
+        // Initialisation du gestionnaire de vagues d'ennemis
+        gestionnaireVagues = new GestionnaireVagues(terrain);
+        gestionnaireVagues.demarrer();
         
-
         // Le shutdown hook garantit l'arrêt des threads asynchrones même
         // si la fenêtre est fermée brutalement.
         installShutdownHook();
@@ -46,6 +50,7 @@ public class Main {
         // problèmes de concurrence UI.
         SwingUtilities.invokeLater(() -> {
             Fenetre fenetre = new Fenetre("Advanced Logistics Demo", terrain);
+            fenetre.setGestionnaireVagues(gestionnaireVagues);
             new TimerView(fenetre);
             new GameController(terrain, fenetre.getAffichage());
         });
@@ -83,6 +88,12 @@ public class Main {
 
     private static void installShutdownHook() {
         // Nomme explicitement le thread pour faciliter le diagnostic.
-        Runtime.getRuntime().addShutdownHook(new Thread(AsyncExecutor::shutdown, "shutdown-async-executor"));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            // Arrêter le gestionnaire de vagues
+            if (gestionnaireVagues != null) {
+                gestionnaireVagues.arreter();
+            }
+            AsyncExecutor.shutdown();
+        }, "shutdown-async-executor"));
     }
 }

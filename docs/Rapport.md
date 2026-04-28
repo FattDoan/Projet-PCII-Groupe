@@ -694,11 +694,93 @@ classDiagram
     Minerai --> BatimentMaitre : depose le minerai
 ```
 
-## 5.4 : Création, déplacements et actions des ennemis (TODO a refaire c'est un broiuilon pour aide)
+## 5.4 : Création, déplacements et actions des ennemis
+
+### 5.4.0 : Gestion des vagues d'ennemis
+
+Le jeu implémente un système de **vagues d'ennemis** qui attaquent le bâtiment maître à intervalles réguliers.
+
+#### Structures de données et constantes
+- **Classe `GestionnaireVagues`** : Gère la génération périodique des vagues d'ennemis
+  - `DELAI_ENTRE_VAGUES_MS`: 3 minutes (180 000 ms) entre chaque vague
+  - `numeroVague`: compte le nombre de vagues écoulées
+  - `tempsRestantMs`: temps restant avant la prochaine vague
+- **Classe `Ennemi`** : Représente un ennemi avec :
+  - `HP_INITIAL`: 8 points de vie
+  - `VITESSE`: 0.25 (vitesse de déplacement)
+  - `DEGATS`: 2 (dégâts infligés par attaque)
+  - `ATTACK_RANGE`: taille d'une case (portée d'attaque)
+- **Classe `VagueInfoPanel`** : Panneau d'interface affichant :
+  - Le numéro de la prochaine vague
+  - Le compte à rebours (MM:SS)
+  - Un bouton "Sauter le temps" pour déclencher manuellement la prochaine vague
+
+#### Algorithme
+1. **Initialisation** : Le `GestionnaireVagues` est créée et démarrée dans `Main`
+2. **Déclenchement des vagues** : Toutes les 3 minutes, une nouvelle vague est déclenchée
+3. **Nombre d'ennemis par vague** : La vague n°N contient N ennemis (vague 1 = 1 ennemi, vague 2 = 2 ennemis, etc.)
+4. **Positionnement** : Les ennemis apparaissent aléatoirement sur les bords de la carte (haut, bas, gauche, droite)
+5. **Comportement** : Chaque ennemi se déplace vers le bâtiment maître via `CommandeDeplacementEnnemi`
+6. **Gestion du cycle de vie** : Les threads des ennemis sont gérés par `AsyncExecutor` via `Terrain.addUnite()`
+7. **Affichage du compteur** : Un timer séparé met à jour le temps restant chaque seconde, affiché dans `VagueInfoPanel`
+8. **Bouton de saut** : L'utilisateur peut cliquer sur "Sauter le temps" pour déclencher immédiatement la prochaine vague
+
+#### Diagramme de classes
+```mermaid
+classDiagram
+    class GestionnaireVagues {
+        -DELAI_ENTRE_VAGUES_MS: long
+        -numeroVague: int
+        -tempsRestantMs: long
+        +demarrer()
+        +arreter()
+        +declencherProchaineVague()
+        +getTempsRestantSecondes()
+        +getProchaineVague()
+        -declencherVague()
+        -genererPositionBord()
+    }
+    
+    class Ennemi {
+        -HP_INITIAL: int
+        -VITESSE: float
+        -DEGATS: int
+        +Ennemi(int GX, int GY, Terrain terrain)
+    }
+    
+    class Terrain {
+        +addUnite(Unite u)
+    }
+    
+    class CommandeDeplacementEnnemi {
+        +executer(Unite unite, double dt): boolean
+    }
+    
+    class VagueInfoPanel {
+        -gestionnaireVagues: GestionnaireVagues
+        -infoLabel: JLabel
+        -skipButton: JButton
+        +majAffichage()
+    }
+    
+    class Fenetre {
+        -vagueInfoPanel: VagueInfoPanel
+        +setGestionnaireVagues(GestionnaireVagues)
+        +afficherEcranGameOver()
+    }
+    
+    GestionnaireVagues --> Terrain : addUnite()
+    GestionnaireVagues --> Ennemi : crée
+    Ennemi --> CommandeDeplacementEnnemi : utilise
+    Ennemi --|> Unite
+    Unite <.. AsyncExecutor : exécuté par
+    Fenetre --> VagueInfoPanel : contient
+    VagueInfoPanel --> GestionnaireVagues : observe
+```
 
 ### 5.4.1 : Génération automatique des ennemis par vagues
 
-Les ennemis sont générés automatiquement et se déplacent vers le bâtiment maître. Leur comportement est géré par la classe `CommandeDeplacementEnnemi`, qui utilise un algorithme de recherche pour cibler les bâtiments ou unités ennemies.
+Les ennemis sont générés automatiquement par le `GestionnaireVagues` toutes les 3 minutes. Chaque vague contient un nombre croissant d'ennemis (1 pour la première vague, 2 pour la deuxième, etc.).
 
 ### 5.4.2 : Déplacement des ennemis vers le bâtiment maître
 
@@ -1182,6 +1264,7 @@ Des tests unitaires ont été implémentés pour valider les fonctionnalités cr
 - `MineraiTest` : Vérifie le transport du minerai.
 - `ReactionClicTest` : Vérifie la gestion des clics utilisateur.
 - `TestGameOver` : Teste la fonctionnalité de fin de partie en simulant des attaques sur le bâtiment maître jusqu'à sa destruction et l'affichage de l'écran Game Over.
+- Les vagues d'ennemis peuvent être testées en exécutant le jeu principal et en observant le compteur en haut de l'écran. Le bouton "Sauter le temps" permet de tester rapidement plusieurs vagues.
 
 Ces tests garantissent la robustesse du code et facilitent la maintenance.
 

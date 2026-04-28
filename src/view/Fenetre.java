@@ -5,6 +5,7 @@ import javax.swing.JPanel;
 import javax.swing.JLabel;
 
 import model.Terrain;
+import model.GestionnaireVagues;
 import java.awt.Dimension;
 import java.awt.Color;
 import java.awt.Font;
@@ -17,6 +18,8 @@ public class Fenetre extends JFrame {
     
     private final Terrain terrain;          // le terrain de jeu affiché dans la fenêtre
     private boolean gameOver = false;
+    private VagueInfoPanel vagueInfoPanel;
+    
     /** Constructeur de la fenêtre principale. Génère un affichage de la grille et du menu à partir du terrain donné.
      * @param titre le titre de la fenêtre
      * @param terrain le terrain à afficher dans la fenêtre
@@ -26,8 +29,12 @@ public class Fenetre extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         this.terrain = terrain;
+        
+        // Utiliser un BorderLayout pour organiser les composants
+        setLayout(new BorderLayout());
+        
         affichage = new Affichage(terrain);
-        this.add(affichage);
+        this.add(affichage, BorderLayout.CENTER);
 
         // TODO : ajouter ici les autres elements de fenetre (barre d'outils,
         // raccourcis clavier globaux, etc.) selon les besoins produit.
@@ -46,6 +53,20 @@ public class Fenetre extends JFrame {
                 affichage.repaint();
             }
         });
+    }
+    
+    /**
+     * Définit le gestionnaire de vagues pour afficher le compteur.
+     * Doit être appelé après la création de la fenêtre.
+     */
+    public void setGestionnaireVagues(GestionnaireVagues gestionnaire) {
+        if (vagueInfoPanel != null) {
+            remove(vagueInfoPanel);
+        }
+        vagueInfoPanel = new VagueInfoPanel(gestionnaire, getWidth());
+        add(vagueInfoPanel, BorderLayout.NORTH);
+        revalidate();
+        repaint();
     }
 
 
