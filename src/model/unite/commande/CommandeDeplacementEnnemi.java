@@ -1,6 +1,5 @@
 package model.unite.commande;
 
-import view.Camera;
 import model.unite.Unite;
 import model.*;
 
@@ -11,6 +10,7 @@ public class CommandeDeplacementEnnemi extends Commande {
     private static final int SCAN_RADIUS = 1; // 2 cases de rayon de scan pour trouver des cibles ennemies
 
     public CommandeDeplacementEnnemi(Terrain terrain) {
+        this.terrain = terrain;
         Batiment batimentMaitre = terrain.getBatimentMaitre();
 
         this.batimentMaitrePX = batimentMaitre.getX() * Case.TAILLE + Case.TAILLE / 2;
@@ -18,7 +18,7 @@ public class CommandeDeplacementEnnemi extends Commande {
     }
 
 
-    //recherche autour de l'unité pour trouver la cible ennemie la plus proche (batiment ou unité)
+    // Recherche autour de l'unite pour trouver la cible ennemie la plus proche (batiment ou unite)
     public Selectable scanNearby(Unite unite) {
         Selectable closestTarget = null;
         float closestDist = Float.MAX_VALUE;
@@ -48,10 +48,10 @@ public class CommandeDeplacementEnnemi extends Commande {
         float step = unite.getSpeed() * (float) dt;
 
         if (dist <= step) {
-            unite.avancer(dx, dy);   // snap exactly to destination
+            unite.avancer(dx, dy);   // ajuste exactement sur la destination
         }
 
-        // Search around for the nearest building or unit to attack
+        // Recherche la cible la plus proche (batiment ou unite) a attaquer
 
 
 

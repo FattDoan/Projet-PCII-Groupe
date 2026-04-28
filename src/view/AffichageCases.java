@@ -28,7 +28,7 @@ public class AffichageCases {
     /******* ADRESSES DES IMAGES *******/
 
 
-    // Misc
+    // Divers
     private static final String ADRESSE_MINERAL_DEPOSIT = BASE_ADRESSE_IMAGES + "sprite_gisement_minerai.png";
     private static final String ADRESSE_MINERAL_INGOT   = BASE_ADRESSE_IMAGES + "sprite_crystal_terne.png";
     private static final String ADRESSE_EN_CONSTRUCTION = BASE_ADRESSE_IMAGES + "sprite_en_construction.png";
@@ -78,7 +78,7 @@ public class AffichageCases {
                 System.err.println("Type de bâtiment inconnu: " + c.getBatiment().getType());
                 return; // Si le type de bâtiment est inconnu, on n'affiche rien et on logue l'erreur pour pouvoir la corriger plus tard
         }
-        if (!c.getBatiment().estFini()) {
+        if (c.getBatiment().estEnConstruction()) {
             AffichageCases.afficheImageCase(g, c, ADRESSE_EN_CONSTRUCTION); // Affiche une image d'en construction par dessus le bâtiment pour indiquer qu'il n'est pas encore fini
         }
     }

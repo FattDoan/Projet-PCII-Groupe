@@ -2,7 +2,6 @@ package model.unite.commande;
 
 import model.*;
 import model.unite.Unite;
-import view.Camera;
 
 
 public class CommandeMiner extends Commande {
@@ -16,6 +15,16 @@ public class CommandeMiner extends Commande {
 
     @Override
     public boolean executer(Unite unite, double dt) {
+        int gx = unite.getGX();
+        int gy = unite.getGY();
+        Terrain terrain = unite.getTerrain();
+        if (gx < 0 || gy < 0 || gx >= terrain.getTaille() || gy >= terrain.getTaille()) {
+            return true;
+        }
+        Case currentCase = terrain.getCase(gx, gy);
+        if (currentCase == null || !currentCase.aMinerai()) {
+            return true; // ne mine pas hors d'un gisement
+        }
         if (unite.StockagePlein()) {
             unite.ajouterCommande(new CommandeDeplacement(batimentMaitre.getX() * Case.TAILLE, 
                                                           batimentMaitre.getY() * Case.TAILLE)); // retourne au bâtiment maître pour déposer

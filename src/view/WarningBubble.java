@@ -7,12 +7,12 @@ import java.util.List;
 
 public class WarningBubble {
 
-    // ── Dimensions ────────────────────────────────────────────────────────
+    // ── Dimensions ─────────────────────────────────────────────────────
     private static final int W       = 230;
     private static final int PAD     = 12;
     private static final int RADIUS  = 8;
     private static final int LINE_H  = 17;
-    private static final int MAX_TEXT_W = W - PAD * 2 - 26; // room for X button
+    private static final int MAX_TEXT_W = W - PAD * 2 - 26; // reserve pour le bouton X
 
     // ── Palette ───────────────────────────────────────────────────────────
     private static final Color BG     = new Color( 40,  30,  30, 235);
@@ -21,11 +21,11 @@ public class WarningBubble {
     private static final Color X_COL  = new Color(160, 130, 130);
     private static final Color X_HOV  = new Color(220,  80,  70);
 
-    // ── Fonts ─────────────────────────────────────────────────────────────
+    // ── Polices ───────────────────────────────────────────────────────
     private static final Font FONT   = new Font("Dialog", Font.PLAIN, 12);
     private static final Font FONT_X = new Font("Dialog", Font.BOLD,  13);
 
-    // ── State ─────────────────────────────────────────────────────────────
+    // ── Etat ───────────────────────────────────────────────────────────
     private String       message    = "";
     private List<String> lines      = new ArrayList<>();
     private int          screenX, screenY;
@@ -34,33 +34,33 @@ public class WarningBubble {
     private boolean      xHovered   = false;
     private Timer        timer;
 
-    // ── Public API ────────────────────────────────────────────────────────
+    // ── API publique ──────────────────────────────────────────────────
 
     public boolean isVisible() { return visible; }
 
     public void setXHovered(boolean b) { xHovered = b; }
 
-    /** Close-button rect in panel (screen) coords. */
+    /** Rectangle du bouton de fermeture en coordonnees ecran. */
     public Rectangle getCloseRect() {
         return new Rectangle(screenX + W - 22, screenY + 4, 18, 18);
     }
 
     /**
-     * Show the toast near the cursor.
-     * cursorX/Y are raw mouse coords inside AffichageTerrain (screen space).
-     * panelW/H are the panel dimensions for overflow clamping.
+     * Affiche la bulle pres du curseur.
+     * cursorX/Y : coordonnees souris brutes dans AffichageTerrain (espace ecran).
+     * panelW/H : dimensions du panneau pour limiter le debordement.
      */
     public void show(String msg, int cursorX, int cursorY, int panelW, int panelH) {
         this.message = msg;
 
-        // Pre-wrap with a dummy FontMetrics so we can estimate height before paint.
-        // We use a Canvas as a cheap FM source — no component needed.
+        // Pre-wrap avec un FontMetrics factice pour estimer la hauteur.
+        // Canvas sert de source simple, sans composant visible.
         Canvas dummy = new Canvas();
         FontMetrics fm = dummy.getFontMetrics(FONT);
         lines = wrapText(fm, msg);
         currentH = PAD + lines.size() * LINE_H + PAD;
 
-        // Position: bottom-right of cursor; flip if it would overflow.
+        // Position : bas-droite du curseur ; on inverse si depassement.
         int tx = cursorX + 14;
         int ty = cursorY + 14;
         if (tx + W       > panelW) tx = cursorX - W - 6;
@@ -92,20 +92,20 @@ public class WarningBubble {
         lines = wrapText(fm, message);
         currentH = PAD + lines.size() * LINE_H + PAD;
 
-        // ── Background ────────────────────────────────────────────────────
+        // ── Fond ───────────────────────────────────────────────────────
         g2.setColor(BG);
         g2.fillRoundRect(screenX, screenY, W, currentH, RADIUS, RADIUS);
 
-        // ── Border ────────────────────────────────────────────────────────
+        // ── Bordure ───────────────────────────────────────────────────
         g2.setColor(BORDER);
         g2.setStroke(new BasicStroke(1.2f));
         g2.drawRoundRect(screenX, screenY, W, currentH, RADIUS, RADIUS);
 
-        // ── Left accent bar ───────────────────────────────────────────────
+        // ── Barre d'accent a gauche ────────────────────────────────────
         g2.setColor(BORDER);
         g2.fillRoundRect(screenX, screenY, 3, currentH, 3, 3);
 
-        // ── Message lines ─────────────────────────────────────────────────
+        // ── Lignes de message ──────────────────────────────────────────
         g2.setFont(FONT);
         g2.setColor(FG);
         int textY = screenY + PAD + fm.getAscent() - 1;
@@ -114,7 +114,7 @@ public class WarningBubble {
             textY += LINE_H;
         }
 
-        // ── X button ──────────────────────────────────────────────────────
+        // ── Bouton X ───────────────────────────────────────────────────
         Rectangle xr = getCloseRect();
         if (xHovered) {
             g2.setColor(X_HOV);
@@ -125,11 +125,11 @@ public class WarningBubble {
         g2.drawString("×", xr.x + 3, xr.y + fm.getAscent());
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────
+    // ── Aides ─────────────────────────────────────────────────────────
 
     private List<String> wrapText(FontMetrics fm, String text) {
         List<String> result = new ArrayList<>();
-        // Respect explicit newlines first
+        // Respecte d'abord les retours a la ligne explicites
         for (String paragraph : text.split("\n")) {
             String[] words = paragraph.split(" ");
             StringBuilder cur = new StringBuilder();
@@ -139,7 +139,7 @@ public class WarningBubble {
                     cur = new StringBuilder(test);
                 } else {
                     if (!cur.isEmpty()) result.add(cur.toString());
-                    // Word itself wider than max? Hard-clip it.
+                    // Mot plus large que la limite : on le tronque.
                     cur = new StringBuilder(hardClip(fm, word));
                 }
             }
@@ -148,7 +148,7 @@ public class WarningBubble {
         return result;
     }
 
-    /** Truncates a single word that is wider than MAX_TEXT_W. */
+    /** Tronque un mot plus large que MAX_TEXT_W. */
     private String hardClip(FontMetrics fm, String word) {
         while (word.length() > 1 && fm.stringWidth(word + "…") > MAX_TEXT_W)
             word = word.substring(0, word.length() - 1);

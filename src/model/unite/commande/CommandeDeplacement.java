@@ -17,8 +17,8 @@ public class CommandeDeplacement extends Commande {
         float step = unite.getSpeed() * (float) dt;
 
         if (dist <= step) {
-            unite.avancer(dx, dy);   // snap exactly to destination
-            return true;             // done
+            unite.avancer(dx, dy);   // ajuste exactement sur la destination
+            return true;             // termine
         }
 
         unite.avancer((dx / dist) * step, (dy / dist) * step);

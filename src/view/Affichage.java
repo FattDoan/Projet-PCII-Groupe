@@ -30,7 +30,7 @@ public class Affichage extends JPanel {
         super(null);
  
         // Conversion cases -> pixels.
-        largeurGrille = terrain.getTaille() * Case.TAILLE; // init size
+        largeurGrille = terrain.getTaille() * Case.TAILLE; // taille initiale
         hauteurGrille = terrain.getTaille() * Case.TAILLE;
 
         // On borne la taille de vue pour garder une UI lisible et fluide.
@@ -42,23 +42,23 @@ public class Affichage extends JPanel {
  
         setPreferredSize(new Dimension(largeurVue, hauteurVue));
  
-        // Couche 1: terrain principal.
+        // Couche 1 : terrain principal.
         affichageTerrain = new AffichageTerrain(terrain);
         affichageTerrain.setBounds(0, 0, largeurVue, hauteurVue);
         add(affichageTerrain);
 
-        // Couche 2: menu contextuel superposé.
+        // Couche 2 : menu contextuel superpose.
         menuPanel = new MenuPanel(menuW, hauteurVue, this, terrain);
         menuPanel.setBounds(largeurVue - menuW, 0, menuW, hauteurVue);
         menuPanel.setVisible(false);
         add(menuPanel);
 
-        // Z-order explicite pour éviter les surprises de rendu.
+        // Z-order explicite pour eviter les surprises de rendu.
         setComponentZOrder(menuPanel, 0);
         setComponentZOrder(affichageTerrain, 1);
     }
  
-    // Add this method to Affichage.java
+    // Methode d'adaptation de layout
     @Override
     public void doLayout() {
         int w = getWidth();
@@ -86,7 +86,7 @@ public class Affichage extends JPanel {
         menuPanel.setVisible(true);
     }
 
-    // Speical case of showMenu since Unite has a callback for its menu actions.
+    // Cas special : Unite a un callback pour ses actions de menu.
     public void setUnitCallback(UnitActionCallback cb) {
         menuPanel.setUnitCallback(cb);
     } 
@@ -100,12 +100,12 @@ public class Affichage extends JPanel {
 
     @Override
     public boolean isOptimizedDrawingEnabled() {
-        // Les composants se chevauchent volontairement (terrain + menu overlay),
-        // on désactive donc l'optimisation Swing pour respecter le Z-order.
+        // Les composants se chevauchent volontairement (terrain + menu superpose),
+        // on desactive donc l'optimisation Swing pour respecter le Z-order.
         return false; // Indique à Swing de conserver le calcul de superposition des couches.
     }
 
-    // Get unit at pixel coordinates (px, py). Returns null if no unit is present at these coordinates.
+    // Retourne l'unite aux coordonnees pixels (px, py), ou null si absente.
     public Unite getUniteAtPixel(float px, float py) {
         float unitBase = AffichageUnites.TAILLE_UNITE / 2f;
         List<Unite> unites = affichageTerrain.getTerrain().getUnites();

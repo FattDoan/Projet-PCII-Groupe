@@ -10,9 +10,11 @@ public class MineraiTest {
         Terrain terrain = new Terrain(7);
         // Ajout d'une foreuse en (2,2)
         Foreuse foreuse = new Foreuse(2, 2, terrain);
+        foreuse.terminerConstruction();
         terrain.getCase(2, 2).setBatiment(foreuse);
         // Ajout d'une seule route vers le sud pour atteindre (3,3)
         Route route1 = new Route(Direction.SUD, 3, 2, terrain);
+        route1.terminerConstruction();
         terrain.getCase(3, 2).setBatiment(route1);
         // Récupération du bâtiment maître déjà placé sur le terrain (3, 3)
         BatimentMaitre batimentMaitre = (BatimentMaitre) terrain.getCase(3, 3).getBatiment();

@@ -22,16 +22,15 @@ public class Fenetre extends JFrame {
         affichage = new Affichage(terrain);
         this.add(affichage);
 
-        // TODO: ajouter ici les autres éléments de fenêtre (barre d'outils,
+        // TODO : ajouter ici les autres elements de fenetre (barre d'outils,
         // raccourcis clavier globaux, etc.) selon les besoins produit.
 
         this.pack();
         this.setLocationRelativeTo(null);
         this.setVisible(true);
 
-        // if JFrame is resized, 
-        // we update all the components of the window to 
-        // fit the new size (especially MenuPanel)
+        // Si la fenetre est redimensionnee, on met a jour les composants
+        // pour s'adapter a la nouvelle taille (notamment MenuPanel)
 
         this.addComponentListener(new java.awt.event.ComponentAdapter() {
             @Override

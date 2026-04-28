@@ -33,7 +33,7 @@ public class ReactionClic implements MouseListener, UnitActionCallback {
         this.cameraController = cameraController;
         affichage.getAffichageTerrain().addMouseListener(this);
 
-        // ESC cancels destination-picking without doing anything
+        // ESC annule la selection de destination sans action.
         affichage.getAffichageTerrain().addKeyListener(new KeyAdapter() {
             @Override public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE) cancelMode();
@@ -56,7 +56,7 @@ public class ReactionClic implements MouseListener, UnitActionCallback {
         float worldPX = Camera.getInstance().screenToWorldX(e.getX());
         float worldPY = Camera.getInstance().screenToWorldY(e.getY());
 
-        // ── Mode: AWAITING_DESTINATION ────────────────────────────────
+        // ── Mode : AWAITING_DESTINATION ────────────────────────────────
         switch (mode) {
             case AWAITING_DESTINATION -> handleDestinationClick(gx, gy, worldPX, worldPY, e);
             case AWAITING_MINING_TARGET -> handleMiningTargetClick(gx, gy, worldPX, worldPY, e);
@@ -82,7 +82,7 @@ public class ReactionClic implements MouseListener, UnitActionCallback {
         pendingUnite.annulerCommandes();
         pendingUnite.ajouterCommande(new CommandeDeplacement(worldPX, worldPY));
 
-        cancelMode();   // always exit this mode after a click
+        cancelMode();   // on sort toujours de ce mode apres un clic
     }
 
     private void handleNormalClick(int gx, int gy, float worldPX, float worldPY, MouseEvent e) {
@@ -96,7 +96,7 @@ public class ReactionClic implements MouseListener, UnitActionCallback {
         if (s != null) {
             affichage.getAffichageTerrain().setSelectedElement(s);
             if (s instanceof Unite) {
-                affichage.setUnitCallback(this); // pour que les boutons du menu d'unité appellent nos méthodes onDeplacer, onMiner, etc.
+                affichage.setUnitCallback(this); // pour que les boutons du menu d'unite appellent onDeplacer/onMiner/etc.
             } 
             affichage.showMenu(s);
         }
@@ -120,7 +120,7 @@ public class ReactionClic implements MouseListener, UnitActionCallback {
         pendingUnite.ajouterCommande(new CommandeDeplacement(worldPX, worldPY));
         pendingUnite.ajouterCommande(new CommandeMiner(terrain.getBatimentMaitre()));;
 
-        cancelMode();   // always exit this mode after a click
+        cancelMode();   // on sort toujours de ce mode apres un clic
     }
 
     private void handleBuildTargetClick(int gx, int gy, float worldPX, float worldPY, MouseEvent e) {
@@ -143,11 +143,11 @@ public class ReactionClic implements MouseListener, UnitActionCallback {
         pendingUnite.ajouterCommande(new CommandeDeplacement(worldPX, worldPY));
         pendingUnite.ajouterCommande(new CommandeConstruire(target));
 
-        cancelMode();   // always exit this mode after a click
+        cancelMode();   // on sort toujours de ce mode apres un clic
     }
 
 
-    // ── Called by unit menu "Deplacer" button 
+    // ── Appelé par le bouton "Deplacer" du menu d'unite
     public void enterDeplacementMode(Unite u) {
         mode         = Mode.AWAITING_DESTINATION;
         pendingUnite = u;

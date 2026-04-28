@@ -67,7 +67,7 @@ public class Camera {
         return Math.round(worldY * zoom - offsetY);
     }
 
-        // ── Accesseurs ─────────────────────────────────────────────────────────
+    // ── Accesseurs ─────────────────────────────────────────────────────
  
     public int getOffsetX()      { return offsetX; }
     public int getOffsetY()      { return offsetY; }
@@ -82,9 +82,9 @@ public class Camera {
     }
 
     public void updateViewSize(int w, int h) {
-        this.viewWidth  = w;   // make these non-final
+        this.viewWidth  = w;   // mise a jour dynamique
         this.viewHeight = h;
-        setOffset(offsetX, offsetY); // re-clamp with new bounds
+        setOffset(offsetX, offsetY); // re-borne avec les nouvelles limites
     }
 
     public static final float ZOOM_MIN  = 0.8f;
@@ -97,13 +97,13 @@ public class Camera {
         float newZoom = clamp(oldZoom + delta, ZOOM_MIN, ZOOM_MAX);
         if (newZoom == oldZoom) return;
 
-        // World position under cursor BEFORE zoom
+        // Position monde sous le curseur AVANT le zoom
         float worldX = (screenX + offsetX) / oldZoom;
         float worldY = (screenY + offsetY) / oldZoom;
 
         zoom = newZoom;
 
-        // Adjust offset so cursor stays on same world point
+        // Ajuste l'offset pour conserver le meme point sous le curseur
         int newOffsetX = Math.round(worldX * zoom - screenX);
         int newOffsetY = Math.round(worldY * zoom - screenY);
 

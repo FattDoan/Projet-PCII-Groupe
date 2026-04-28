@@ -11,9 +11,9 @@ import view.Camera;
 public class Unite implements Selectable, Runnable {
 
     private static final int DELAI_THREAD_MS = 16;
-    // Coordonees continues (pixels)
+    // Coordonnees continues (pixels)
     private float px, py;
-    private float speed; // pixel par second
+    private float speed; // pixels par seconde
     private int hp;
     private final TypeUnite typeUnite;
     private final Terrain terrain;
@@ -23,11 +23,11 @@ public class Unite implements Selectable, Runnable {
     // Drapeau d'arrêt coopératif du thread.
     private volatile boolean running = true;
 
-    // L'etat de pathfinding 
+    // Etat courant de deplacement
     private float destinationPX, destinationPY; // en pixels, pour éviter de recalculer à chaque tick
 
-    // Command queue pour ce unite. 
-    // Les commandes sont exécutées séquentiellement, une par tick, jusqu'à ce que la queue soit vide.
+    // File de commandes pour l'unite.
+    // Elles sont executees sequentiellement, une par tick, jusqu'a epuisement.
     private final Deque<Commande> commandQueue = new ArrayDeque<>();
 
     protected Unite(float px, float py, float speed, int hp, TypeUnite type, Terrain terrain) {
@@ -39,7 +39,7 @@ public class Unite implements Selectable, Runnable {
         this.terrain = terrain;
     }
 
-    /** A appele tick par tick terrain.updateUnites(dt) sur l'EDT */
+    /** Appele a chaque tick par terrain.updateUnites(dt) sur l'EDT */
     public void update(double dt) {
         if (!commandQueue.isEmpty()) {
             boolean done = commandQueue.peek().executer(this, dt);
@@ -52,8 +52,8 @@ public class Unite implements Selectable, Runnable {
     public void run() {
         while (running && !Thread.currentThread().isInterrupted()) {
             try {
-                // we need to pass to update acutal time elapsed in milliseconds, not a fixed value, 
-                // to avoid issues if the thread is paused or delayed for some reason (e.g. GC pause)  
+                // On passe un temps ecoule en millisecondes pour limiter les ecarts
+                // si le thread est bloque ou retarde (ex : pause GC).
                 Thread.sleep(DELAI_THREAD_MS);
                 update(DELAI_THREAD_MS);
             } catch (InterruptedException e) {
@@ -91,7 +91,7 @@ public class Unite implements Selectable, Runnable {
         }
     }
 
-    // Les getters
+    // Getters
     // GX et GY sont les coordonnées de grille (case) calculées à partir des coordonnées pixels.
     public int getGX() { return (int)(px / Case.TAILLE); }
     public int getGY() { return (int)(py / Case.TAILLE); }
@@ -104,7 +104,7 @@ public class Unite implements Selectable, Runnable {
     public float getDestinationPY() { return destinationPY; }
     public int getStockage() { return stockage; }
 
-    // Appellee par CommandeDeplacement pour avancer vers la prochaine position en pixel
+    // Appellee par CommandeDeplacement pour avancer en pixels
     public void avancer(float dx, float dy) { 
         px += dx; 
         py += dy; 

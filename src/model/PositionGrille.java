@@ -8,7 +8,7 @@ package model;
  * @param y coordonnée verticale (ligne)
  */
 public record PositionGrille(int x, int y) {
-    // Compatibilite avec le code existant utilisant getX/getY.
+    // Compatibilite avec le code existant qui utilise getX/getY.
     public int getX() {
         return x;
     }

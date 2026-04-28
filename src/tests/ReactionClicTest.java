@@ -17,14 +17,16 @@ public class ReactionClicTest {
 
         setupForeuse(terrain, mid - 2, mid);
 
-        terrain.getCase(mid - 1, mid)
-               .setBatiment(new Route(Direction.EST, mid - 1, mid, terrain));
+        Route route = new Route(Direction.EST, mid - 1, mid, terrain);
+        route.terminerConstruction();
+        terrain.getCase(mid - 1, mid).setBatiment(route);
         new GameController(terrain, fenetre.getAffichage());
     }
 
     private static void setupForeuse(Terrain t, int x, int y) {
         t.definirTypeCase(x, y, TypeCase.MINERAI);
         Foreuse f = new Foreuse(x, y, t);
+        f.terminerConstruction();
         t.getCase(x, y).setBatiment(f);
         AsyncExecutor.runAsync(f); 
     }

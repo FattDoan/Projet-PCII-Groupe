@@ -14,7 +14,7 @@ public class GameController {
  
     public GameController(Terrain terrain, Affichage affichage) {
  
-        // Important: on initialise la caméra avec la taille de vue visible,
+        // Important : on initialise la camera avec la taille de vue visible,
         // pas avec la taille totale de la map, sinon la caméra ne se déplace pas.
         Camera.getInstance().initCamera(
             terrain.getTaille(),
@@ -32,15 +32,15 @@ public class GameController {
         new ReactionHover(affichage, terrain);
     }
  
-    /**
-        * Centre la caméra sur la case du QG (terrain.getTaille() / 2).
-     *
-        * Formule:
-        *   centrePixelQG = hqGrid * tailleCase + tailleCase/2
-        *   offsetX = centrePixelQG - largeurVue/2
-     *
-        * setOffset borne automatiquement dans [0, maxOffset].
-     */
+     /**
+      * Centre la camera sur la case du QG (terrain.getTaille() / 2).
+      *
+      * Formule :
+      *   centrePixelQG = hqGrid * tailleCase + tailleCase/2
+      *   offsetX = centrePixelQG - largeurVue/2
+      *
+      * setOffset borne automatiquement dans [0, maxOffset].
+      */
     private void centerOnHQ(Terrain terrain, Affichage affichage) {
         int cellSize   = Case.TAILLE;
         int hqGrid     = terrain.getTaille() / 2;

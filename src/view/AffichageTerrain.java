@@ -17,10 +17,10 @@ public class AffichageTerrain extends JPanel {
     private Selectable selectedElement = null; // peut être une Case ou une Unite
     private Selectable hoveredElement = null;  // peut être une Case ou une Unite
 
-    // Destination-picking mode (after "Deplacer" is clicked in unit menu)
+    // Mode selection de destination (apres "Deplacer" dans le menu unite)
     private boolean awaitingDestination = false;
-    private int[] destinationPreview = null; // grid coords [gx, gy] of hovered cell while picking
-    private float previewWorldPX, previewWorldPY; // world coords of mouse cursor during destination picking (for warning bubble positioning)
+    private int[] destinationPreview = null; // coordonnees grille [gx, gy] survolee
+    private float previewWorldPX, previewWorldPY; // coordonnees monde pour positionner le warning
 
     // Avertissement affiché temporairement en cas d'action interdite (ex: déplacement hors portée).
     private final WarningBubble warning = new WarningBubble();
@@ -34,7 +34,7 @@ public class AffichageTerrain extends JPanel {
         this.terrain = terrain;
         setFocusable(true);
 
-        // For warning bubble: if its out of bounds, reposition it
+        // Ajuste la bulle si elle sort du panneau
         addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             @Override public void mouseMoved(java.awt.event.MouseEvent e) {
                 boolean wasHov = warning.isVisible() && warning.getCloseRect().contains(e.getPoint());
@@ -138,11 +138,11 @@ public class AffichageTerrain extends JPanel {
         // Restauration pour ne pas impacter les autres couches Swing.
         g2.setTransform(originalTransform);
     
-        // Warning bubble must be displayed in screen space, not world(model) space
+        // La bulle d'avertissement est en coordonnees ecran, pas monde
         warning.paint(g2);
     }
 
-    // TODO: Unit hovered should be circle, not square like Case
+    // TODO : le survol d'une unite devrait etre un cercle, pas un carre
     private void drawHoverIndicator(Graphics2D g2, int cellSize, int unitSize) {
         if (hoveredElement != null && hoveredElement != selectedElement) {
             int hx = (int)hoveredElement.getPX();

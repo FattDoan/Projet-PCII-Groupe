@@ -7,11 +7,10 @@ import java.util.Objects;
  * Gestionnaire centralise des taches asynchrones du jeu.
  */
 public final class AsyncExecutor {
-    // Java 21 lightweight Virtual Threads for simple async tasks
+    // Java 21 : threads virtuels pour les taches asynchrones legeres.
     private static final ExecutorService VIRTUAL_EXECUTOR = Executors.newVirtualThreadPerTaskExecutor();
 
-    // We still keep a ScheduledExecutor for things that need a specific delay,
-    // but we'll use it to "trigger" virtual threads.
+    // Scheduler conserve pour les delais; il declenche ensuite un thread virtuel.
     private static final ScheduledExecutorService SCHEDULER = 
         Executors.newScheduledThreadPool(1, namedFactory("pcii-scheduler-"));
 
@@ -26,7 +25,7 @@ public final class AsyncExecutor {
     }
 
     /**
-     * Runs a task in a lightweight Virtual Thread.
+     * Lance une tache dans un thread virtuel.
      */
     public static void runAsync(Runnable task) {
         Objects.requireNonNull(task);
@@ -34,7 +33,7 @@ public final class AsyncExecutor {
     }
 
     /**
-     * Replaces your schedule logic. After delayMs, it starts a Virtual Thread.
+     * Remplace un schedule classique : apres delayMs, lance un thread virtuel.
      */
     public static void schedule(Runnable task, long delayMs) {
         SCHEDULER.schedule(() -> runAsync(task), delayMs, TimeUnit.MILLISECONDS);

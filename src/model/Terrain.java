@@ -1,14 +1,12 @@
 package model;
 
 import model.unite.Unite;
-import view.Affichage;
-import view.AffichageUnites;
 import common.AsyncExecutor;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import common.Validation;
 
@@ -39,7 +37,7 @@ public class Terrain {
    // DOTO: ajouter une liste d'unités (mineurs, camions) présentes sur le terrain pour pouvoir les gérer plus facilement.
    /** batiment maître */
    private BatimentMaitre batimentMaitre;
-   private List<Unite> unites = new ArrayList<>();
+   private final List<Unite> unites = new CopyOnWriteArrayList<>();
 
    /**
     * Crée une nouvelle grille carrée de la taille spécifiée.
@@ -166,7 +164,7 @@ public class Terrain {
    }
 
    public List<Unite> getUnites() {
-      return unites;
+      return List.copyOf(unites);
    }
 
     public void updateUnites(double dt) {

@@ -71,7 +71,7 @@ public class CameraController implements MouseListener, MouseMotionListener, Mou
     public void keyPressed(KeyEvent e) {
         int dx = 0, dy = 0;
 
-        // 1. Get the mouse position relative to the view (Default to center if window isn't ready)
+        // 1) Position de la souris relative a la vue (centre par defaut si la fenetre n'est pas prete)
         int mouseX = view.getWidth() / 2;
         int mouseY = view.getHeight() / 2;
         
@@ -82,7 +82,7 @@ public class CameraController implements MouseListener, MouseMotionListener, Mou
             mouseY = mouseLoc.y - viewLoc.y;
         }
 
-        // 2. Handle the keys
+        // 2) Gestion des touches
         switch (e.getKeyCode()) {
             case KeyEvent.VK_LEFT -> dx = -PAN_KEY_SPEED;
             case KeyEvent.VK_RIGHT -> dx =  PAN_KEY_SPEED;

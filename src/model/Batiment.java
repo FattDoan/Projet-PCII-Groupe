@@ -116,10 +116,15 @@ public abstract class Batiment{
     public synchronized boolean estFini() {
         return fini;
     }
-    /** Renvoie vrai si le bâtiment est détruit (points de vie à zéro). Le bâtiment ne fait donc normalement plus rien */
+    /** Renvoie vrai si le bâtiment est détruit (points de vie à zéro). */
     public synchronized boolean estDetruit() {
-        return hp <= 0 || (hp <= 1 && !estFini()); // bâtiment créé avec 1 hp, donc si hp <= 1, c'est qu'il est détruit ou en cours de construction (mais dans les deux cas il ne fait rien)
-    } // TODO : s'assurer que c'est le cas pour tous les bâtiments
+        return hp <= 0;
+    }
+
+    /** Renvoie vrai si le bâtiment est en construction (pas fini mais pas détruit). */
+    public synchronized boolean estEnConstruction() {
+        return !fini && hp > 0;
+    }
 
 
 

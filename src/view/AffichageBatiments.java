@@ -35,6 +35,8 @@ public class AffichageBatiments {
         BASE_ADRESSE_IMAGES + "sprite_batiment_foreuse_destroyed.png"
     };
 
+    private static final String ADRESSE_USINE = BASE_ADRESSE_IMAGES + "usine_sprites.png";
+
     /** Images supplémentaires pour les dégats (à ajouter en plus de l'image de base) */
 
     private static final String[] ADRESSES_ROUTE_DAMAGED = {
@@ -91,8 +93,8 @@ public class AffichageBatiments {
 
 
     public static void afficheUsine(Graphics g, Case c, Usine r) {
-        // TODO : afficher une route
-        throw new UnsupportedOperationException("Affichage de l'usine non implémenté");
+        // Affichage simple de l'usine via son sprite principal
+        AffichageCases.afficheImageCase(g, c, ADRESSE_USINE);
     }
 
 

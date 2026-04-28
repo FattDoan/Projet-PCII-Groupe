@@ -548,6 +548,7 @@ public class MenuPanel extends JPanel {
         // Suivi pour éviter les reconstructions inutiles
         private Selectable lastElement  = null;
         private Batiment   lastBatiment = null;
+        private Boolean    lastUsinePaused = null;
 
         ActionsPanel() {
             setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -559,11 +560,20 @@ public class MenuPanel extends JPanel {
 
         void afficher(Selectable s) {
             Batiment currentBatiment = (s instanceof Case c) ? c.getBatiment() : null;
+            Boolean usinePaused = null;
+            if (currentBatiment instanceof Usine usine) {
+                usinePaused = usine.isPaused();
+            }
 
             // Même élément, même bâtiment → rien à faire
-            if (s == lastElement && currentBatiment == lastBatiment) return;
+            if (s == lastElement && currentBatiment == lastBatiment
+                && ((usinePaused == null && lastUsinePaused == null)
+                    || (usinePaused != null && usinePaused.equals(lastUsinePaused)))) {
+                return;
+            }
             lastElement  = s;
             lastBatiment = currentBatiment;
+            lastUsinePaused = usinePaused;
 
             removeAll();
             if (s == null) { revalidate(); repaint(); return; }
@@ -599,14 +609,20 @@ public class MenuPanel extends JPanel {
                         addBtn("CONSTRUIRE FOREUSE",  C_AMBER, () -> construireBatiment(c, TypeBatiment.FOREUSE));
                     addBtn("CONSTRUIRE STOCKAGE",     C_GREEN, () -> construireBatiment(c, TypeBatiment.STOCKAGE));
                     addBtn("CONSTRUIRE ROUTE",        C_BLUE,  () -> construireBatiment(c, TypeBatiment.ROUTE));
+                    if (c.getType() == TypeCase.VIDE)
+                        addBtn("CONSTRUIRE USINE",    C_BLUE,  () -> construireBatiment(c, TypeBatiment.USINE));
                 }
 
                 // Actions spécifiques au bâtiment présent
                 if (c.aBatiment()) {
                     switch (c.getBatiment().getType()) {
                         case USINE -> {
-                            addBtn("AMÉLIORER", C_BLUE,       () -> {});
-                            addBtn("PAUSE",     C_BORDER_LIT, () -> {});
+                            Usine usine = (Usine) c.getBatiment();
+                            String label = usine.isPaused() ? "REDEMARRER" : "PAUSE";
+                            addBtn(label, C_BORDER_LIT, () -> {
+                                usine.togglePause();
+                                MenuPanel.this.refresh();
+                            });
                         }
                         case FOREUSE -> {
                             addBtn("RÉGLER VITESSE", C_AMBER,       () -> {});
@@ -634,7 +650,7 @@ public class MenuPanel extends JPanel {
 
         private void construireBatiment(Case c, TypeBatiment type) {
             switch (type) {
-                case USINE    -> {}
+                case USINE    -> c.construireUsine(terrain);
                 case FOREUSE  -> c.construireForeuse(terrain);
                 case STOCKAGE -> c.construireStockage(terrain);
                 case BATIMENT_MAITRE -> throw new IllegalArgumentException("Le bâtiment maître ne peut pas être construit manuellement.");

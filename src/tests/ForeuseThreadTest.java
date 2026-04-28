@@ -6,11 +6,12 @@ public class ForeuseThreadTest {
         // Test automatisable : vérifie qu'une foreuse extrait bien un minerai après un cycle.
         model.Terrain terrain = new model.Terrain(5);
         Foreuse foreuse = new Foreuse(0, 0, terrain);
+        foreuse.terminerConstruction();
         Thread t = new Thread(foreuse);
         t.start();
 
-        // La foreuse extrait toutes les 1000 ms.
-        Thread.sleep(1000);
+        // La foreuse extrait toutes les DELAI_EXTRACTION_MS.
+        Thread.sleep(Foreuse.DELAI_EXTRACTION_MS);
 
         int stockage = foreuse.getStockage();
         if (stockage != 1) {

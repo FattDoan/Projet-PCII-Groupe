@@ -157,6 +157,13 @@ public class Case implements Selectable {
       this.setBatiment(route);
    }
 
+   public void construireUsine(Terrain terrain) {
+      if (this.getBatiment() != null || this.getType() != TypeCase.VIDE) return;
+      Usine usine = new Usine(this.getX(), this.getY(), terrain);
+      this.setBatiment(usine);
+      AsyncExecutor.runAsync(usine);
+   }
+
     @Override
     public String getDisplayName() {
         if (aBatiment()) {
