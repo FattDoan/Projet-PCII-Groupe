@@ -89,7 +89,7 @@ public class Usine extends Batiment implements Runnable {
     }
 
     public boolean isRunning() {
-        return running && estFini() && !Thread.currentThread().isInterrupted();
+        return running && !paused && estFini() && !Thread.currentThread().isInterrupted();
     }
 
     public boolean isPaused() {

@@ -6,7 +6,6 @@ import java.nio.file.FileSystems;
 import java.util.HashMap;
 import java.awt.Color;
 import model.Case;
-import model.TypeBatiment;
 
 /** Classe qui contient les méthodes d'affichage des cases du terrain */
 public class AffichageCases {
@@ -30,14 +29,7 @@ public class AffichageCases {
 
     // Divers
     private static final String ADRESSE_MINERAL_DEPOSIT = BASE_ADRESSE_IMAGES + "sprite_gisement_minerai.png";
-    private static final String ADRESSE_MINERAL_INGOT   = BASE_ADRESSE_IMAGES + "sprite_crystal_terne.png";
     private static final String ADRESSE_EN_CONSTRUCTION = BASE_ADRESSE_IMAGES + "sprite_en_construction.png";
-
-
-    private static final String ADRESSE_FOREUSE         = BASE_ADRESSE_IMAGES + "drill_sprite.png";
-    private static final String ADRESSE_MAITRE          = BASE_ADRESSE_IMAGES + "mineral_ingot_raw.jpg";
-    private static final String ADRESSE_USINE           = BASE_ADRESSE_IMAGES + "fhuifsberlukfberufkse(placeholder).png";
-
 
 
     /****** FONCTIONS D'AFFICHAGE *******/
@@ -56,7 +48,8 @@ public class AffichageCases {
     private static void afficheImageBatiment(Graphics g, Case c) {
         switch (c.getBatiment().getType()) {
             case BATIMENT_MAITRE:
-                afficheImageCase(g, c, ADRESSE_MAITRE);
+                model.BatimentMaitre maitre = (model.BatimentMaitre) c.getBatiment();
+                AffichageBatiments.afficheBatimentMaitre(g, c, maitre);
                 break;
             case FOREUSE:
                 model.Foreuse foreuse = (model.Foreuse) c.getBatiment();
@@ -94,16 +87,6 @@ public class AffichageCases {
         g.fillRect(x, y, cellSize, cellSize); // Dessine un carré dans la case correspondante
     }
 
-    /** Affiche un gisement de minerai (/!\ PAS UN MINERAI QUI SE DEPLACE SUR UNE ROUTE/!\) à la position (x, y) sur la fenêtre */
-    private static void _afficheMinerai(Graphics g, Case c) {
-        int cellSize = Case.TAILLE;
-        int x = c.getX() * cellSize; // conversion des coordonnées de la case en pixels pour l'affichage
-        int y = c.getY() * cellSize;
-
-        g.setColor(java.awt.Color.BLUE); // Couleur du minerai
-        g.fillRect(x, y, cellSize, cellSize); // Dessine un carré dans la case correspondante
-    }
-
     /** Affiche l'image passée en paramètre à la position de la case */
     public static void afficheImageCase(Graphics g, Case c, String adress) {
         // Affichage l'image passée en paramètre à la position de la case, en redimensionnant l'image pour qu'elle remplisse toute la case
@@ -128,35 +111,21 @@ public class AffichageCases {
             // Si l'image n'a pas pu être chargée, on n'affiche rien (la case restera vide) et on logue l'erreur pour pouvoir la corriger plus tard
             System.err.println("Erreur lors du chargement de l'image: " + adress + ". Vérifiez que le projet a été lancé depuis sa racine (Projet-PCII-Groupe) et que le dossier images est bien présent.");
             e.printStackTrace(System.err);
-            _AffichageBatiments.afficheBatiment(g, c); // Affichage de base du bâtiment si l'image n'a pas pu être chargée
+            afficheCaseDebug(g, c); // Affiche rien si marche pas
         }
     }
 
-    public static void afficheMineralIngot(Graphics g, Case c) { 
+    /** Affiche une case magenta, utilisé si l'image n'a pas pu être chargée 
+     * @param g le contexte graphique sur lequel dessiner
+     * @param c la case sur laquelle dessiner le debug
+    */
+    public static void afficheCaseDebug(Graphics g, Case c) {
         int cellSize = Case.TAILLE;
-        int N = cellSize / 3;
         int x = c.getX() * cellSize; // conversion des coordonnées de la case en pixels pour l'affichage
         int y = c.getY() * cellSize;
 
-        java.awt.Image img;
-
-        try {
-            if (IMAGES_CACHE.containsKey(ADRESSE_MINERAL_INGOT)) {
-                // Récupère l'image depuis le cache si elle a déjà été chargée
-                img = IMAGES_CACHE.get(ADRESSE_MINERAL_INGOT);
-            } else {
-                // Chargement de l'image depuis le fichier
-                img = javax.imageio.ImageIO.read(new java.io.File(ADRESSE_MINERAL_INGOT));
-                IMAGES_CACHE.put(ADRESSE_MINERAL_INGOT, img); // Stocke l'image dans le cache pour les futurs affichages
-            }
-            g.drawImage(img, x + N, y + N, cellSize/3, cellSize/3, null); // Dessine l'image du minerai dans la case correspondante
-
-        } catch (IOException e) {
-            // Si l'image n'a pas pu être chargée, on n'affiche rien (la case restera vide) et on logue l'erreur pour pouvoir la corriger plus tard
-            System.err.println("Erreur lors du chargement de l'image: " + ADRESSE_MINERAL_INGOT + ". Vérifiez que le projet a été lancé depuis sa racine (Projet-PCII-Groupe) et que le dossier images est bien présent.");
-            e.printStackTrace(System.err);
-            _AffichageBatiments.afficheMinerai(g, c); // Affichage de base du bâtiment si l'image n'a pas pu être chargée
-        }
+        g.setColor(Color.MAGENTA);
+        g.drawRect(x, y, cellSize, cellSize); // Dessine un carré magenta autour de la case pour le debug
     }
 
 }

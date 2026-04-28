@@ -6,7 +6,7 @@ import model.*;
 /** Classe qui contient toutes les méthodes d'affichage des bâtiments */
 public class AffichageBatiments {
 
-
+    /** Adresse de base pour les images, récupérée depuis AffichageCases */
     private static final String BASE_ADRESSE_IMAGES = AffichageCases.BASE_ADRESSE_IMAGES;
 
     /** Image à placer sur la route lorsqu'elle transporte un minerai */
@@ -46,7 +46,6 @@ public class AffichageBatiments {
         BASE_ADRESSE_IMAGES + "sprite_batiment_usine_destroyed.png"
     };
 
-    private static final String ADRESSE_USINE = BASE_ADRESSE_IMAGES + "usine_sprites.png";
 
     /** Images supplémentaires pour les dégats (à ajouter en plus de l'image de base) */
 
@@ -72,6 +71,9 @@ public class AffichageBatiments {
         BASE_ADRESSE_IMAGES + "sprite_batiment_usine_damaged1.png",
         BASE_ADRESSE_IMAGES + "sprite_batiment_usine_damaged2.png"
     };
+
+
+    /****** FONCTIONS ******/
 
 
     /** Affiche le batiment maitre passée en argument sur la case c 
