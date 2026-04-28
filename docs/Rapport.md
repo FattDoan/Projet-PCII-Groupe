@@ -460,6 +460,58 @@ classDiagram
     MenuPanel --> Case : donne l'ordre de détruire le bâtiment
 ```
 
+### 5.3.5 : Fin de partie (Game Over)
+
+Le jeu se termine automatiquement lorsque le bâtiment maître est détruit (HP atteignant 0). Un écran de Game Over s'affiche alors par-dessus l'interface du jeu sans Fermer l'application.
+
+#### Structures de données et constantes
+- **Classe `BatimentMaitre`** : Gère les points de vie du bâtiment principal
+  - `HP_MAX`: points de vie maximum (100 par défaut)
+  - `isDestroyed()`: méthode héritée de `Batiment` pour vérifier si HP ≤ 0
+- **Classe `Fenetre`** : Gère l'affichage de l'écran de fin de partie
+  - `gameOver`: booléen indiquant si le jeu est terminé
+  - `afficherEcranGameOver()`: affiche un écran semi-transparent rouge avec le message "GAME OVER"
+- **Classe `TaskRedessine`** : Détecte la fin de partie et déclenche l'affichage
+  - Vérifie à chaque tick si `batimentMaitre.isDestroyed()`
+  - Utilise le GlassPane de JFrame pour superposer l'écran de Game Over
+
+#### Algorithme
+1. À chaque cycle de rendu (16ms), `TaskRedessine.run()` vérifie l'état du bâtiment maître
+2. Si le bâtiment maître est détruit (`isDestroyed() == true`) et que le Game Over n'a pas encore été affiché :
+   - Appelle `Fenetre.afficherEcranGameOver()`
+   - Marque `gameOverDisplayed = true` pour éviter les affichages multiples
+3. L'écran de Game Over utilise le **GlassPane** de Swing pour superposer un panneau semi-transparent rouge par-dessus tout le jeu
+4. Le jeu continue de s'exécuter en arrière-plan (les threads ne sont pas arrêtés)
+
+#### Utilisation
+- La destruction du bâtiment maître peut être déclenchée par :
+  - `batimentMaitre.receiveDamage(X)`: inflige X dégâts au bâtiment
+  - `batimentMaitre.detruire()`: détruit immédiatement le bâtiment (met HP à 0)
+- L'écran de Game Over est purement visuel et n'affecte pas la logique du jeu
+
+```mermaid
+classDiagram
+    class BatimentMaitre {
+        -hp: int
+        +isDestroyed()
+        +receiveDamage(int)
+    }
+    
+    class Fenetre {
+        -gameOver: boolean
+        +afficherEcranGameOver()
+    }
+    
+    class TaskRedessine {
+        -gameOverDisplayed: boolean
+        +run()
+    }
+    
+    TaskRedessine --> BatimentMaitre : vérifie isDestroyed()
+    TaskRedessine --> Fenetre : afficherEcranGameOver()
+    BatimentMaitre --|> Batiment
+```
+
 ### 5.3.1 : Usine
 
 La classe `Usine` produit des unités à partir de minerai. Elle fonctionne en arrière-plan via un thread qui consomme des minerais et crée des unités à intervalles réguliers. L'usine peut être mise en pause ou arrêtée.
@@ -1099,7 +1151,16 @@ Case --> Batiment
 
 ### 5.7.4 : Vue d'ensemble des données (minerais, unités, bâtiments) (optionnel)
 
-TODO
+Cette fonctionnalité n'a pas été implémentée dans la version actuelle. Cependant, l'interface actuelle permet déjà de visualiser :
+- Les bâtiments et leurs états (normal, en construction) via le menu contextuel à droite
+- La case sélectionnée avec un encadrement orange
+- La case survolée avec un surlignage blanc
+- L'écran de Game Over quand le bâtiment maître est détruit
+
+Une future version pourrait inclure un panneau d overview affichant :
+- Le nombre total de minerais collectés
+- Le nombre d'unités actives
+- L'état de tous les bâtiments (HP, production, stockage)
 
 ## 6. Résultats
 
@@ -1120,6 +1181,7 @@ Des tests unitaires ont été implémentés pour valider les fonctionnalités cr
 - `ForeuseThreadTest` : Vérifie que la foreuse extrait correctement du minerai.
 - `MineraiTest` : Vérifie le transport du minerai.
 - `ReactionClicTest` : Vérifie la gestion des clics utilisateur.
+- `TestGameOver` : Teste la fonctionnalité de fin de partie en simulant des attaques sur le bâtiment maître jusqu'à sa destruction et l'affichage de l'écran Game Over.
 
 Ces tests garantissent la robustesse du code et facilitent la maintenance.
 

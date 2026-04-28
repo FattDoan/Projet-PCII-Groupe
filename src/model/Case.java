@@ -155,8 +155,14 @@ public class Case implements Selectable {
 
    /** Détruit le bâtiment présent sur la case */
    public void detruireBatiment() {
-      if (this.batiment != null) this.batiment.detruire();
-      this.batiment = null;
+      if (this.batiment != null) {
+          this.batiment.detruire();
+          // Ne pas retirer le bâtiment maître de la case pour garder son affichage
+          // (même détruit, on veut pouvoir afficher son état)
+          if (this.batiment.getType() != TypeBatiment.BATIMENT_MAITRE) {
+              this.batiment = null;
+          }
+      }
    }
 
    /** Construction de batiments */

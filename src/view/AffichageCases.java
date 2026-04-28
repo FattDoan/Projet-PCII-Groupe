@@ -1,10 +1,11 @@
 package view;
 
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Color;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.util.HashMap;
-import java.awt.Color;
 import model.Case;
 
 /** Classe qui contient les méthodes d'affichage des cases du terrain */
@@ -46,17 +47,20 @@ public class AffichageCases {
     }
 
     private static void afficheImageBatiment(Graphics g, Case c) {
-        switch (c.getBatiment().getType()) {
+        model.Batiment batiment = c.getBatiment();
+        
+        // Afficher le bâtiment normalement selon son type
+        switch (batiment.getType()) {
             case BATIMENT_MAITRE:
-                model.BatimentMaitre maitre = (model.BatimentMaitre) c.getBatiment();
+                model.BatimentMaitre maitre = (model.BatimentMaitre) batiment;
                 AffichageBatiments.afficheBatimentMaitre(g, c, maitre);
                 break;
             case FOREUSE:
-                model.Foreuse foreuse = (model.Foreuse) c.getBatiment();
+                model.Foreuse foreuse = (model.Foreuse) batiment;
                 AffichageBatiments.afficheForeuse(g, c, foreuse);
                 break;
             case STOCKAGE:
-                model.Stockage stockage = (model.Stockage) c.getBatiment();
+                model.Stockage stockage = (model.Stockage) batiment;
                 AffichageBatiments.afficheStockage(g, c, stockage);
                 break;
             case USINE:
@@ -68,11 +72,13 @@ public class AffichageCases {
                 AffichageBatiments.afficheRoute(g, c, route);
                 break;
             default:
-                System.err.println("Type de bâtiment inconnu: " + c.getBatiment().getType());
-                return; // Si le type de bâtiment est inconnu, on n'affiche rien et on logue l'erreur pour pouvoir la corriger plus tard
+                System.err.println("Type de bâtiment inconnu: " + batiment.getType());
+                return;
         }
-        if (c.getBatiment().estEnConstruction()) {
-            AffichageCases.afficheImageCase(g, c, ADRESSE_EN_CONSTRUCTION); // Affiche une image d'en construction par dessus le bâtiment pour indiquer qu'il n'est pas encore fini
+        
+        // Afficher l'indicateur d'en construction
+        if (batiment.estEnConstruction()) {
+            AffichageCases.afficheImageCase(g, c, ADRESSE_EN_CONSTRUCTION);
         }
     }
 

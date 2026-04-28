@@ -32,9 +32,17 @@ public class BatimentMaitre extends Batiment {
 
     @Override
     public void detruire() {
-        // impossible de détruire le bâtiment maître
-        // on déclenche une erreur 
-        throw new UnsupportedOperationException("Le bâtiment maître ne peut pas être détruit. Perte de la partie.");
+        // Le bâtiment maître peut être détruit par les ennemis
+        // Cela déclenche la fin de la partie
+        receiveDamage(getHP()); // Met les HP à 0
+    }
+    
+    /**
+     * Vérifie si le bâtiment maître est détruit (Game Over).
+     * @return true si le bâtiment maître est détruit
+     */
+    public boolean estGameOver() {
+        return estDetruit();
     }
 
     @Override
