@@ -133,6 +133,11 @@ public class Unite implements Selectable, Runnable {
 
     public synchronized void receiveDamage(int degats) {
         hp -= degats;
+        if (hp <= 0) {
+            hp = 0; // Evite les valeurs negatives
+            running = false; // Arrete le thread de l'unite
+            terrain.removeUnite(this); // Retire l'unite du terrain
+        }
     }
 
     public boolean isDestroyed() {

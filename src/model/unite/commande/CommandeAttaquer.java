@@ -19,7 +19,7 @@ public class CommandeAttaquer extends Commande {
 
     @Override
     public boolean executer(Unite unite, double dt) {
-        if (cible.isDestroyed()) {
+        if (cible.isDestroyed() || (cible instanceof Case && !((Case) cible).aBatiment())) {
             // après la destruction, recommence à chercher une cible
             unite.ajouterCommande(new CommandeDeplacementEnnemi(unite.getTerrain())); 
             return true; // cible déjà détruite, on considère la commande terminée

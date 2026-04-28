@@ -163,6 +163,11 @@ public class Terrain {
       AsyncExecutor.runAsync(u);
    }
 
+    public void removeUnite(Unite u) {
+        Validation.requireArgument(u != null, "unite=null");
+        unites.remove(u);
+    }
+
    public List<Unite> getUnites() {
       return List.copyOf(unites);
    }

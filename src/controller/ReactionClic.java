@@ -189,7 +189,7 @@ public class ReactionClic implements MouseListener, UnitActionCallback {
     }
     
     public void enterDefenseMode(Unite u) {
-        mode = Mode.AWAITING_DESTINATION; // same behavior as deplacement
+        mode = Mode.AWAITING_DEFENSE_TARGET; // same behavior as deplacement
         pendingUnite = u;
         affichage.getAffichageTerrain().setAwaitingDestination(true);
     }

@@ -93,6 +93,9 @@ public class Case implements Selectable {
     public void receiveDamage(int damage) {
         if (batiment != null) {
             batiment.receiveDamage(damage);
+            if (batiment.isDestroyed()) {
+                detruireBatiment();
+            }
         }
         else {
             System.out.println("[CRITICAL] La case (" + x + ", " + y + ") a reçu des dégâts mais n'a pas de bâtiment pour les absorber !");
