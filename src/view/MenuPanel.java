@@ -657,17 +657,14 @@ public class MenuPanel extends JPanel {
                                 MenuPanel.this.refresh();
                             });
                         }
-                        case FOREUSE -> {
-                            addBtn("RÉGLER VITESSE", C_AMBER,       () -> {});
-                            addBtn("PAUSE",          C_BORDER_LIT,  () -> {});
-                        }
+                        case FOREUSE -> {}
                         case ROUTE -> {
                             addBtn("CHANGER DIRECTION", C_BLUE, () -> {
                                 Direction newD = demanderDirectionRoute();
                                 if (newD != null) ((Route) c.getBatiment()).changeDirection(newD);
                             });
                         }
-                        case BATIMENT_MAITRE -> addBtn("INVENTAIRE", C_GREEN, () -> {});
+                        case BATIMENT_MAITRE -> {}
                         case STOCKAGE -> {}
                     }
                     // Démolition pour tous sauf le bâtiment maître
