@@ -31,26 +31,9 @@ public class CommandeDeplacementEnnemi extends Commande {
             for (int dy = -SCAN_RADIUS; dy <= SCAN_RADIUS; dy++) {
                 int x = centerX + dx;
                 int y = centerY + dy;
-                /*
-                System.out.println("Ennemi scanning nearby at case (" + x + ", " + y + ")");
-                System.out.println("ENTER getTaille");
-                int taille;
-                synchronized (terrain) {
-                    System.out.println("INSIDE terrain lock");
-                    taille = terrain.getTaille();
-                }
-                System.out.println("EXIT terrain lock");
-                if (x < 0 || y < 0 || x >= terrain.getTaille() || y >= terrain.getTaille()) {
-                    System.out.println("Case (" + x + ", " + y + ") is out of bounds, skipping...");
-                    continue; // hors de la carte
-                }
-                */
 
-                System.out.println("Attempting to scan case (" + x + ", " + y + ") for targets...");
-                // Vérifie si sur la case (x, y) il y a une unité ennemie ou un bâtiment ennemi
                 Selectable target = terrain.getSelectableAt(x, y);
-                System.out.println("Scanned case (" + x + ", " + y + ") and found: " + (target != null ? target.getClass().getSimpleName() : "none"));
-                if (target != null && target != unite) { // s'assure que ce n'est pas l'unité elle-même
+                if (target != null && !(target instanceof Ennemi)) { // s'assure que ce n'est pas l'unité elle-même
                     float targetPX = target.getPX();
                     float targetPY = target.getPY();
                     float dist = (float) Math.hypot(targetPX - unite.getPX(), targetPY - unite.getPY());
@@ -61,13 +44,11 @@ public class CommandeDeplacementEnnemi extends Commande {
                 }  
             }
         }
-        System.out.println("Ennemi scanned nearby and found closest target: " + (closestTarget != null ? "FOUND " : "none"));
         return closestTarget;
     }
 
     @Override
     public boolean executer(Unite unite, double dt) {
-        System.out.println("Ennemi executing CommandeDeplacementEnnemi towards (" + batimentMaitrePX + ", " + batimentMaitrePY + ")");
         float dx = batimentMaitrePX - unite.getPX();
         float dy = batimentMaitrePY - unite.getPY();
         float dist = (float) Math.hypot(dx, dy);
@@ -75,7 +56,6 @@ public class CommandeDeplacementEnnemi extends Commande {
 
         // Search around for the nearest building or unit to attack
         Selectable target = scanNearby(unite);
-        System.out.println("Ennemi scanned for targets and found: " + (target != null ? target.getClass().getSimpleName() : "none"));
         if (target != null) {
             // If found the target, move towards it and attack
             // we dont move directly to the target, 

@@ -75,7 +75,7 @@ public class CommandeDefendre extends Commande {
                 float newY = cibleEnnemi.getPY() - (dy / dist) * Ouvrier.DEFENSE_RANGE;
                 unite.addToFrontCommande(new CommandeDeplacement(newX, newY)); // move towards the target but stop at attack range 
             }
-        }   
+        }  
         
         // if no enemy, move towards the defense position
         // but only if we are not already there (to avoid jittering)

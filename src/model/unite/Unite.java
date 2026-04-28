@@ -70,7 +70,7 @@ public class Unite implements Selectable, Runnable {
 
     // Only for CommandeDefendre
     public void addToFrontCommande(Commande c) {
-        commandQueue.addFirst(c); 
+        commandQueue.addFirst(c);
     }
 
     public void annulerCommandes() { 

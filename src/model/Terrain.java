@@ -180,16 +180,12 @@ public class Terrain {
 
     // (x,y) sont les coordonnées de la case ciblée, pas les coordonnées en pixels
     public Selectable getSelectableAt(int x, int y) {
-        System.out.println("getSelectableAt called with coordinates: (" + x + ", " + y + ")");
         if (x < 0 || y < 0 || x >= taille || y >= taille) {
-            System.out.println("getSelectableAt: coordinates (" + x + ", " + y + ") are out of bounds");
             return null; // coordonnées hors limites
         }
 
         // Vérifie d'abord les unités présentes sur le terrain
-        System.out.println("Size of unites: " + unites.size());        
         for (Unite u : unites) {
-            System.out.println("Checking unit at (" + u.getGX() + ", " + u.getGY() + ") against target (" + x + ", " + y + ")");
             if (u.getGX() == x && u.getGY() == y) {
                 return (Selectable)u;
             }
@@ -201,7 +197,6 @@ public class Terrain {
             return (Selectable)c;
         }
 
-        System.out.println("getSelectableAt: no selectable found at (" + x + ", " + y + ")");
         return null; // Aucun selectable trouvé à cette position
     }
 
