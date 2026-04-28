@@ -11,6 +11,5 @@ public interface UnitActionCallback{
     void onDeplacer(Unite u);
     void onMiner(Unite u); 
     void onConstruire(Unite u);  
-    void onDefendre(Unite u);   // TODO
-    void onAttaquer(Unite u);   // TODO
+    void onDefendre(Unite u);
 }

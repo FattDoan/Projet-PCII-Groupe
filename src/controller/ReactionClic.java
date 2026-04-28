@@ -20,7 +20,8 @@ public class ReactionClic implements MouseListener, UnitActionCallback {
         NORMAL, 
         AWAITING_DESTINATION,
         AWAITING_MINING_TARGET,
-        AWAITING_BUILD_TARGET
+        AWAITING_BUILD_TARGET,
+        AWAITING_DEFENSE_TARGET
     }
     private Mode mode = Mode.NORMAL;
     private Unite pendingUnite = null; // l'unité qui a demandé un ordre de déplacement 
@@ -61,6 +62,7 @@ public class ReactionClic implements MouseListener, UnitActionCallback {
             case AWAITING_DESTINATION -> handleDestinationClick(gx, gy, worldPX, worldPY, e);
             case AWAITING_MINING_TARGET -> handleMiningTargetClick(gx, gy, worldPX, worldPY, e);
             case AWAITING_BUILD_TARGET -> handleBuildTargetClick(gx, gy, worldPX, worldPY, e);
+            case AWAITING_DEFENSE_TARGET -> handleDefenseTargetClick(gx, gy, worldPX, worldPY, e); // même comportement que déplacement normal pour l'instant
             case NORMAL -> handleNormalClick(gx, gy, worldPX, worldPY, e);
         }
     }
@@ -83,6 +85,26 @@ public class ReactionClic implements MouseListener, UnitActionCallback {
         pendingUnite.ajouterCommande(new CommandeDeplacement(worldPX, worldPY));
 
         cancelMode();   // on sort toujours de ce mode apres un clic
+    }
+
+    private void handleDefenseTargetClick(int gx, int gy, float worldPX, float worldPY, MouseEvent e) {
+        if (gx < 0 || gx >= terrain.getTaille() ||
+            gy < 0 || gy >= terrain.getTaille()) {
+            affichage.getAffichageTerrain().showWarning("Destination hors carte, choisissez une autre destination.", e.getX(), e.getY());
+            return;
+        }
+        Selectable s = affichage.getElementAtPixel(worldPX, worldPY);
+        if (s instanceof Case c &&
+            !(c.estAccessible())) {   
+            // Clic sur une case non vide: interdit
+            affichage.getAffichageTerrain().showWarning("Case occupée, choisissez une autre destination.", e.getX(), e.getY());
+            return;
+        }
+
+        pendingUnite.annulerCommandes();
+        pendingUnite.ajouterCommande(new CommandeDefendre(worldPX, worldPY));
+
+        cancelMode();   // always exit this mode after a click
     }
 
     private void handleNormalClick(int gx, int gy, float worldPX, float worldPY, MouseEvent e) {
@@ -149,7 +171,7 @@ public class ReactionClic implements MouseListener, UnitActionCallback {
 
     // ── Appelé par le bouton "Deplacer" du menu d'unite
     public void enterDeplacementMode(Unite u) {
-        mode         = Mode.AWAITING_DESTINATION;
+        mode = Mode.AWAITING_DESTINATION;
         pendingUnite = u;
         affichage.getAffichageTerrain().setAwaitingDestination(true);
     }
@@ -165,6 +187,13 @@ public class ReactionClic implements MouseListener, UnitActionCallback {
         pendingUnite = u;
         affichage.getAffichageTerrain().setAwaitingDestination(true);
     }
+    
+    public void enterDefenseMode(Unite u) {
+        mode = Mode.AWAITING_DESTINATION; // same behavior as deplacement
+        pendingUnite = u;
+        affichage.getAffichageTerrain().setAwaitingDestination(true);
+    }
+    
 
     public void cancelMode() {
         mode         = Mode.NORMAL;
@@ -184,11 +213,9 @@ public class ReactionClic implements MouseListener, UnitActionCallback {
     }
 
     @Override
-    public void onAttaquer(Unite u) {
+    public void onDefendre(Unite u) {
+        enterDefenseMode(u);
     }
-
-    @Override
-    public void onDefendre(Unite u) {}
 
     @Override 
     public void onConstruire(Unite u) {

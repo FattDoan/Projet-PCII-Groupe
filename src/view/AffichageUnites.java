@@ -14,11 +14,31 @@ public class AffichageUnites {
             case OUVRIER:
                 afficheOuvrier(g, u);
                 break;
+            
+            case ENNEMI:
+                afficheEnnemi(g, u);
+                break;
 
             default:
                 // Si le type d'unité n'est pas reconnu, on peut choisir de ne rien afficher ou d'afficher une unité générique
                 break;
         }
+    }
+
+    public static void afficheEnnemi(Graphics g, Unite u) {
+        int x = (int)u.getPX(); // conversion des coordonnées de l'unité en pixels pour l'affichage
+        int y = (int)u.getPY();
+
+        // Choix visuel: red pour les ennemis, à ajuster selon les types d'unités que vous aurez
+        g.setColor(java.awt.Color.RED); // Couleur de l'unité, ici rouge pour les ennemis
+
+        // Draw a triangle centered on the unit's pixel coordinates with size equal to TAILLE_UNITE
+        int halfSize = TAILLE_UNITE / 2;
+        int[] xPoints = {x, x - halfSize, x + halfSize};
+        int[] yPoints = {y - halfSize, y + halfSize, y + halfSize};
+        g.fillPolygon(xPoints, yPoints, 3); // Dessine un
+                                            // triangle centré sur les coordonnées de l'unité
+                                            // le triangle pointe vers le haut, à ajuster selon vos préférences
     }
 
     public static void afficheOuvrier(Graphics g, Unite u) {

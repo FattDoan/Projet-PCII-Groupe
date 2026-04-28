@@ -35,4 +35,8 @@ public class CommandeDeposit extends Commande {
         return false;
     }
 
+    @Override
+    public String getNom() {
+        return "Deposit";
+    }
 }

@@ -2,6 +2,7 @@ package view;
 
 import model.*;
 import model.unite.Unite;
+import model.unite.TypeUnite;
 import javax.swing.*;
 import javax.swing.border.*;
 import java.awt.*;
@@ -301,13 +302,15 @@ public class MenuPanel extends JPanel {
     private class StatsPanel extends JPanel {
 
         // Références live pour les mises à jour légères (même case, stockage change)
-        private CapacityBar liveCapBar           = null;
-        private HPBar       liveHpBar            = null;
-        private JLabel      liveStockageLabel    = null;
-        
+        private CapacityBar liveCapBar = null;
+        private HPBar liveHpBar = null;
+        private JLabel liveStockageLabel = null;
+
         // Unit info
-        private JLabel      liveUnitPosLabel     = null;
-        private JLabel      liveUnitStockageLabel   = null;
+        private JLabel liveUnitPosLabel     = null;
+        private JLabel liveUnitStockageLabel   = null;
+        private HPBar liveUnitHpBar = null;
+        private JLabel liveCommandLabel = null;
 
         // Suivi de l'état pour différencier reconstruction complète / mise à jour légère
         private Selectable lastElement  = null;
@@ -353,9 +356,21 @@ public class MenuPanel extends JPanel {
                 addSection("UNITÉ");
                 addRow("Type",     u.getDisplayName(), C_TEXT_PRI);
                 liveUnitPosLabel = addRow("Position", "(" + u.getGX() + ", " + u.getGY() + ")", C_TEXT_SEC);
+                
+                // HP bar
+                liveUnitHpBar = new HPBar(u.getHP(), u.getHPMax());
+                add(liveUnitHpBar);
+                addSpacer(4);
+
+
                 addRow("Vitesse",  String.valueOf(u.getSpeed()), C_BLUE);
                 liveUnitStockageLabel = addRow("Stockage", String.valueOf(u.getStockage()), C_AMBER);
                 addSpacer(8);
+                
+                addSection("COMMANDE");
+                liveCommandLabel = addRow("Commande en cours", commandLabel(u), C_TEXT_PRI);
+                addSpacer(8);
+
                 revalidate(); return;
             }
 
@@ -404,15 +419,21 @@ public class MenuPanel extends JPanel {
 
         /** Mise à jour légère : met à jour seulement les valeurs qui changent à runtime */
         private void updateLiveStats(Batiment b) {
-            if (liveCapBar        != null) liveCapBar.updateValues(b.getStockage(), b.getCapaciteMax());
-            if (liveHpBar         != null) liveHpBar.updateValues(b.getHP(), b.getHPMax());
+            if (liveCapBar != null) liveCapBar.updateValues(b.getStockage(), b.getCapaciteMax());
+            if (liveHpBar != null) liveHpBar.updateValues(b.getHP(), b.getHPMax());
             if (liveStockageLabel != null) liveStockageLabel.setText(String.valueOf(b.getStockage()));
         }
         private void updateUnitInfo(Unite u) {
             if (liveUnitPosLabel != null) liveUnitPosLabel.setText("(" + u.getGX() + ", " + u.getGY() + ")");
             if (liveUnitStockageLabel != null) liveUnitStockageLabel.setText(String.valueOf(u.getStockage()));
+            if (liveUnitHpBar != null) liveUnitHpBar.updateValues(u.getHP(), u.getHPMax());
+            if (liveCommandLabel != null) liveCommandLabel.setText(commandLabel(u));
         }
 
+        private String commandLabel(Unite u) {
+            String name = u.getCurrentCommandName();
+            return name != null ? name : "Aucune";
+        }
         // ── Helpers de construction ───────────────────────────────────────
 
         private void addSection(String text) {
@@ -471,8 +492,8 @@ public class MenuPanel extends JPanel {
         private Color  bar;
 
         CapacityBar(int stock, int cap) {
-            setPreferredSize(new Dimension(0, 28));
-            setMaximumSize(new Dimension(Integer.MAX_VALUE, 28));
+            setPreferredSize(new Dimension(0, 40));
+            setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
             setBackground(C_BASE);
             updateValues(stock, cap);
         }
@@ -492,12 +513,18 @@ public class MenuPanel extends JPanel {
             super.paintComponent(g);
             Graphics2D g2 = (Graphics2D) g; hint(g2);
             int w = getWidth(), h = getHeight(), f = (int)(w * ratio);
-            g2.setColor(new Color(bar.getRed(), bar.getGreen(), bar.getBlue(), 40)); g2.fillRect(0, 0, w, h);
-            g2.setColor(new Color(bar.getRed(), bar.getGreen(), bar.getBlue(), 100)); g2.fillRect(0, 0, f, h);
+            // Header label
+            g2.setFont(F_SMALL); g2.setColor(C_TEXT_DIM);
+            g2.drawString("▪ STOCKAGE", 8, 10);
+
+            // Bar drawn below label
+            int barY = 13;
+            g2.setColor(new Color(bar.getRed(), bar.getGreen(), bar.getBlue(), 40)); g2.fillRect(0, barY, w, h - barY);
+            g2.setColor(new Color(bar.getRed(), bar.getGreen(), bar.getBlue(), 100)); g2.fillRect(0, barY, f, h - barY);
             g2.setColor(bar); g2.fillRect(0, h-3, f, 3);
-            g2.setFont(F_SMALL); g2.setColor(C_TEXT_SEC);
+            g2.setColor(C_TEXT_SEC);
             FontMetrics fm = g2.getFontMetrics();
-            g2.drawString(label, (w - fm.stringWidth(label))/2, (h + fm.getAscent() - fm.getDescent())/2);
+            g2.drawString(label, (w - fm.stringWidth(label))/2, barY + (h-barY+fm.getAscent() - fm.getDescent())/2);
         }
     }
 
@@ -510,8 +537,8 @@ public class MenuPanel extends JPanel {
         private Color  bar;
 
         HPBar(int hp, int maxHP) {
-            setPreferredSize(new Dimension(0, 28));
-            setMaximumSize(new Dimension(Integer.MAX_VALUE, 28));
+            setPreferredSize(new Dimension(0,40));
+            setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
             setBackground(C_BASE);
             updateValues(hp, maxHP);
         }
@@ -531,12 +558,18 @@ public class MenuPanel extends JPanel {
             super.paintComponent(g);
             Graphics2D g2 = (Graphics2D) g; hint(g2);
             int w = getWidth(), h = getHeight(), f = (int)(w * ratio);
-            g2.setColor(new Color(bar.getRed(), bar.getGreen(), bar.getBlue(), 40)); g2.fillRect(0, 0, w, h);
-            g2.setColor(new Color(bar.getRed(), bar.getGreen(), bar.getBlue(), 100)); g2.fillRect(0, 0, f, h);
+
+            // Header label
+            g2.setFont(F_SMALL); g2.setColor(C_TEXT_DIM);
+            g2.drawString("♥ SANTÉ", 8, 10);
+            int barY = 13;
+
+            g2.setColor(new Color(bar.getRed(), bar.getGreen(), bar.getBlue(), 40)); g2.fillRect(0, barY, w, h - barY);
+            g2.setColor(new Color(bar.getRed(), bar.getGreen(), bar.getBlue(), 100)); g2.fillRect(0, barY, f, h - barY);
             g2.setColor(bar); g2.fillRect(0, h-3, f, 3);
-            g2.setFont(F_SMALL); g2.setColor(C_TEXT_SEC);
+            g2.setColor(C_TEXT_SEC);
             FontMetrics fm = g2.getFontMetrics();
-            g2.drawString(label, (w - fm.stringWidth(label))/2, (h + fm.getAscent() - fm.getDescent())/2);
+            g2.drawString(label, (w - fm.stringWidth(label))/2, barY + (h-2*barY + fm.getAscent() - fm.getDescent())/2);
         }
     }
 
@@ -584,7 +617,7 @@ public class MenuPanel extends JPanel {
             add(hdr);
 
             // ── Actions pour les unités ───────────────────────────────────
-            if (s instanceof Unite u) {
+            if ((s instanceof Unite u) && (u.getType() == TypeUnite.OUVRIER)) {
                 addBtn("DÉPLACER",  C_BLUE,  () -> {
                     if (unitCallback != null) {
                         unitCallback.onDeplacer(u);
@@ -598,7 +631,7 @@ public class MenuPanel extends JPanel {
                 }); // TODO
                 addBtn("DÉFENDRE",  C_GREEN, () -> {
                     if (unitCallback != null) unitCallback.onDefendre(u);
-                }); // TODO
+                });
             }
 
             // ── Actions pour les cases ────────────────────────────────────

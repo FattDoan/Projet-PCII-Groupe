@@ -67,9 +67,16 @@ public class Unite implements Selectable, Runnable {
     public void ajouterCommande(Commande c) {
         commandQueue.addLast(c); 
     }
+
+    // Only for CommandeDefendre
+    public void addToFrontCommande(Commande c) {
+        commandQueue.addFirst(c); 
+    }
+
     public void annulerCommandes() { 
         commandQueue.clear(); 
     }
+
 
     /** Vérifie si le stockage est plein */
     public boolean StockagePlein() {
@@ -103,6 +110,20 @@ public class Unite implements Selectable, Runnable {
     public float getDestinationPX() { return destinationPX; }
     public float getDestinationPY() { return destinationPY; }
     public int getStockage() { return stockage; }
+    public int getHP() { return hp; }
+    public int getHPMax() {
+        switch (typeUnite) {
+            case OUVRIER -> { return Ouvrier.HP_INITIAL; }
+            case ENNEMI -> { return Ennemi.HP_INITIAL; }
+            default -> { return 0; }
+        }
+    }
+    public String getCurrentCommandName() {
+        if (commandQueue.isEmpty()) return "Aucune";
+        Commande c = commandQueue.peek();
+        return c.getNom(); 
+    }
+
 
     // Appellee par CommandeDeplacement pour avancer en pixels
     public void avancer(float dx, float dy) { 
@@ -110,11 +131,14 @@ public class Unite implements Selectable, Runnable {
         py += dy; 
     }
 
-    public void recevoirDegats(int degats) {
+    public synchronized void receiveDamage(int degats) {
         hp -= degats;
-        //TODO quand on ajoute ennemi
-        //if (hp <= 0) mourir();
     }
+
+    public boolean isDestroyed() {
+        return hp <= 0;
+    }
+
 
     @Override
     public String getDisplayName() {

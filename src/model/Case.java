@@ -73,14 +73,33 @@ public class Case implements Selectable {
       return y;
    }
 
+    /** Renvoie la coordonnée x en pixels */
     public float getPX() {
-        return x * Case.TAILLE;
+        return x * Case.TAILLE + Case.TAILLE / 2; // Centre de la case
     }
 
+    /** Renvoie la coordonnée y en pixels */
     public float getPY() {
-        return y * Case.TAILLE;
+        return y * Case.TAILLE + Case.TAILLE / 2; // Centre de la case
     }
-    
+
+    public boolean isDestroyed() {
+        if (batiment != null) {
+            return batiment.isDestroyed();
+        }
+        return false; // Une case sans bâtiment n'est pas détruite
+    }
+
+    public void receiveDamage(int damage) {
+        if (batiment != null) {
+            batiment.receiveDamage(damage);
+        }
+        else {
+            System.out.println("[CRITICAL] La case (" + x + ", " + y + ") a reçu des dégâts mais n'a pas de bâtiment pour les absorber !");
+        }
+    }
+
+
    /** Renvoi vrai si il a pas de batiment */
    public boolean estAccessible() {
       return this.batiment == null;

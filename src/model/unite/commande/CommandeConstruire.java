@@ -25,4 +25,9 @@ public class CommandeConstruire extends Commande {
         progression = 0; // reset pour le prochain tick de construction
         return false; // terminé
     }
+
+    @Override
+    public String getNom() {
+        return "Construire";
+    }
 }

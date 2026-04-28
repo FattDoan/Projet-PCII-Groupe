@@ -40,4 +40,8 @@ public class CommandeMiner extends Commande {
         return false;
     }
 
+    @Override 
+    public String getNom() {
+        return "Miner";
+    }
 }

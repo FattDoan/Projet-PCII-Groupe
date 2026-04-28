@@ -95,6 +95,16 @@ public abstract class Batiment{
         return hp == hpMax;
     }
 
+    /** Vérifie si le bâtiment est détruit (points de vie à zéro ou moins). */
+    public boolean isDestroyed() {
+        return hp <= 0;
+    }
+
+    /** Applique des dégâts au bâtiment, réduisant ses points de vie. */
+    public synchronized void receiveDamage(int degats) {
+        hp -= degats;
+    }
+    
     /**
      * Vérifie si le bâtiment est vide (aucun minerai stocké).
      * 

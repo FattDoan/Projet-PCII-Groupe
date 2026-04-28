@@ -29,6 +29,10 @@ public class Main {
         // ajoute une unite en ce moment pour tester 
         terrain.addUnite(new Ouvrier(terrainSize/2 + 5, terrainSize/2 + 5, terrain));
 
+        // ajoute un ennemi pour tester 
+        // TODO: add automatic spawning of enemies in the future
+        terrain.addUnite(new Ennemi(5, 5, terrain));
+        
 
         // Le shutdown hook garantit l'arrêt des threads asynchrones même
         // si la fenêtre est fermée brutalement.
@@ -36,6 +40,7 @@ public class Main {
 
         // Construction de la carte de démo (foreuses + routes + stockages).
         DemoScenarioBuilder.apply(terrain);
+
 
         // Toute construction Swing doit se faire sur l'EDT pour éviter les
         // problèmes de concurrence UI.

@@ -9,5 +9,9 @@ public interface Selectable {
 
     float getPX(); // Position en pixels
     float getPY();
+    
+    boolean isDestroyed(); // Indique si l'élément est détruit (pour les unités)
+                           // ou pour les cases ayant un bâtiment détruit
 
+    void receiveDamage(int damage); // Permet de recevoir des dégâts (pour les unités et les bâtiments)
 }

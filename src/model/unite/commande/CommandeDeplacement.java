@@ -25,4 +25,8 @@ public class CommandeDeplacement extends Commande {
         return false;
     }
 
+    @Override
+    public String getNom() {
+        return "Deplacement";
+    }
 }

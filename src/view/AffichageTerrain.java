@@ -154,6 +154,11 @@ public class AffichageTerrain extends JPanel {
                 hx -= unitSize/2;
                 hy -= unitSize/2;
             }
+            else {
+                hx -= cellSize/2;
+                hy -= cellSize/2;
+            }
+
 
             g2.setColor(new Color(255, 255, 255, 45)); 
             g2.fillRect(hx, hy, size, size);
@@ -168,12 +173,15 @@ public class AffichageTerrain extends JPanel {
         if (selectedElement != null) {
             int sx = (int)selectedElement.getPX();
             int sy = (int)selectedElement.getPY();
- 
             int size = cellSize;
+            
             if (selectedElement instanceof Unite) {
                 size = size/2; 
                 sx -= size/2;
                 sy -= size/2;
+            } else {
+                sx -= cellSize/2;
+                sy -= cellSize/2;
             }
 
             g2.setColor(new Color(C_AMBER.getRed(), C_AMBER.getGreen(), C_AMBER.getBlue(), 60));
