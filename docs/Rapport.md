@@ -297,7 +297,24 @@ classDiagram
 
 ### 5.1.3 : Coordonnées des unités et ennemis (mouvement continu)
 
-TODO
+(TODO a refaire c'est un broiuilon pour aide)
+
+Les unités et les ennemis utilisent des coordonnées continues en pixels pour leur déplacement. La classe `Unite` gère les positions `px` et `py` (pixels) et les convertit en coordonnées de grille (`getGX()`, `getGY()`) pour interagir avec le terrain. Les déplacements sont gérés via des commandes (ex: `CommandeDeplacement`) qui mettent à jour les positions en pixels à chaque tick.
+
+```mermaid
+classDiagram
+    class Unite {
+        -px: float
+        -py: float
+        +getGX(): int
+        +getGY(): int
+        +avancer(float dx, float dy)
+    }
+    class CommandeDeplacement {
+        +executer(Unite unite, double dt): boolean
+    }
+    Unite --> CommandeDeplacement : utilise
+```
 
 ## 5.2 : Affichage des objets (unités, minerai, bâtiments)
 
@@ -399,7 +416,17 @@ classDiagram
 
 ### 5.2.2 : Affichage des unités
 
-TODO
+La classe `AffichageUnites` gère l'affichage des unités sur la grille. Chaque unité est dessinée sous forme de cercle centré sur ses coordonnées en pixels. La couleur et la taille sont définies pour distinguer les types d'unités (ex: magenta pour les ouvriers).
+
+```mermaid
+classDiagram
+    class AffichageUnites {
+        +TAILLE_UNITE: int
+        +afficheUnite(Graphics g, Unite u)
+        +afficheOuvrier(Graphics g, Unite u)
+    }
+    AffichageUnites --> Unite : affiche
+```
 
 ### 5.2.4 : Animation du minerai sur les routes (effet visuel)
 
@@ -435,11 +462,31 @@ classDiagram
 
 ### 5.3.1 : Usine
 
-TODO
+La classe `Usine` produit des unités à partir de minerai. Elle fonctionne en arrière-plan via un thread qui consomme des minerais et crée des unités à intervalles réguliers. L'usine peut être mise en pause ou arrêtée.
+
+```mermaid
+classDiagram
+    class Usine {
+        -running: boolean
+        -paused: boolean
+        +run()
+        +togglePause()
+    }
+    Usine --> Terrain : ajoute des unités
+```
 
 ### 5.3.2 : Stockage des minerais
 
-TODO
+La classe `Stockage` permet de stocker des minerais avec une capacité fixe. Elle hérite de `Batiment` et gère les opérations d'ajout et de retrait de minerais.
+
+```mermaid
+classDiagram
+    class Stockage {
+        -CAPACITE: int
+        +Stockage(int x, int y, Terrain terrain)
+    }
+    Stockage --|> Batiment
+```
 
 ### 5.3.3 : Mine (extraction automatique de minerai via des threads)
 
@@ -595,23 +642,23 @@ classDiagram
     Minerai --> BatimentMaitre : depose le minerai
 ```
 
-## 5.4 : Création, déplacements et actions des ennemis
+## 5.4 : Création, déplacements et actions des ennemis (TODO a refaire c'est un broiuilon pour aide)
 
 ### 5.4.1 : Génération automatique des ennemis par vagues
 
-TODO
+Les ennemis sont générés automatiquement et se déplacent vers le bâtiment maître. Leur comportement est géré par la classe `CommandeDeplacementEnnemi`, qui utilise un algorithme de recherche pour cibler les bâtiments ou unités ennemies.
 
 ### 5.4.2 : Déplacement des ennemis vers le bâtiment maître
 
-TODO
+Les ennemis se déplacent en ligne droite vers le bâtiment maître en utilisant des coordonnées continues. La classe `CommandeDeplacementEnnemi` calcule la direction et la distance pour ajuster leur position à chaque tick.
 
 ### 5.4.3 : Actions des ennemis (destruction des bâtiments et unités à portée)
 
-TODO
+Les ennemis peuvent détruire les bâtiments et unités à portée. Cette fonctionnalité est partiellement implémentée dans `CommandeDeplacementEnnemi` mais nécessite des améliorations pour gérer les collisions et les dégâts.
 
 ### 5.4.4 : Mort des ennemis au contact des unités de défense
 
-TODO
+Les ennemis meurent au contact des unités de défense. Cette fonctionnalité est prévue mais pas encore implémentée dans le code actuel.
 
 ## 5.5 : Génération du terrain en début de partie
 
@@ -743,15 +790,27 @@ classDiagram
 
 ### 5.6.3 : Transport du minerai
 
-TODO
+Les unités peuvent transporter du minerai entre les bâtiments. La classe `CommandeDeposit` gère le dépôt de minerai dans le bâtiment maître, tandis que `CommandeMiner` gère la collecte de minerai depuis les gisements.
 
-### 5.6.4 : Défense (tourelle)
+### 5.6.4 : Défense (tourelle) (TODO a refaire c'est un broiuilon pour aide)
 
-TODO
+Les unités peuvent être mises en mode défense pour protéger les bâtiments. Cette fonctionnalité est prévue mais pas encore implémentée dans le code actuel.
 
 ### 5.6.5 : Attribution d'ordres aux unités
 
-TODO
+Les ordres sont attribués aux unités via des commandes (ex: `CommandeMiner`, `CommandeDeplacement`). Ces commandes sont exécutées séquentiellement par l'unité.
+
+```mermaid
+classDiagram
+    class Unite {
+        -commandQueue: Deque<Commande>
+        +ajouterCommande(Commande c)
+    }
+    class Commande {
+        +executer(Unite unite, double dt): boolean
+    }
+    Unite --> Commande : exécute
+```
 
 ## 5.7 : Menus et interface utilisateur
 
@@ -916,7 +975,20 @@ Ce diagramme représente l'essentiel de la logique du jeu et suit le patron **MV
 
 ### 5.7.2 : Menu pour les unités
 
-TODO
+Le `MenuPanel` affiche les actions disponibles pour les unités sélectionnées. Il permet de donner des ordres comme déplacer, miner, construire, ou défendre. Les actions sont gérées via des callbacks définis dans `UnitActionCallback`.
+
+```mermaid
+classDiagram
+    class MenuPanel {
+        -unitCallback: UnitActionCallback
+        +setUnitCallback(UnitActionCallback cb)
+    }
+    class UnitActionCallback {
+        +onDeplacer(Unite u)
+        +onMiner(Unite u)
+    }
+    MenuPanel --> UnitActionCallback : utilise
+```
 
 ### 5.7.3 : Menu des bâtiments (affichage des quantités de minerai)
 
@@ -1029,50 +1101,86 @@ Case --> Batiment
 
 TODO
 
-## 6\. Résultats
+## 6. Résultats
 
-TODO (1 page, ou plus s’il y a beaucoup de copies d’écran)
+Le projet a permis de développer un jeu de stratégie solo en temps réel avec les fonctionnalités suivantes :
+- Gestion des coordonnées pour les bâtiments et les unités.
+- Affichage des objets (unités, minerais, bâtiments).
+- Gestion des bâtiments (usine, stockage, mine, routes).
+- Actions et déplacements des unités (miner, construire, transporter).
+- Menus et interface utilisateur pour interagir avec le jeu.
+
+(TODO metre des captures d'écran)
+
+### Validation et Tests
+
+La classe `Validation` permet de valider les arguments et les états du jeu. Elle est configurable via une propriété JVM (`-Dpcii.validation.strict=false`).
+
+Des tests unitaires ont été implémentés pour valider les fonctionnalités critiques :
+- `ForeuseThreadTest` : Vérifie que la foreuse extrait correctement du minerai.
+- `MineraiTest` : Vérifie le transport du minerai.
+- `ReactionClicTest` : Vérifie la gestion des clics utilisateur.
+
+Ces tests garantissent la robustesse du code et facilitent la maintenance.
 
 ## 7. Documentation utilisateur
 
-TODO 
+### Prérequis
+- Java JDK 17 ou supérieur.
+- Un environnement de développement (ex: IntelliJ IDEA, VS Code).
 
-(1 page ou plus si bcp d'instructions
+### Installation
+1. Cloner le dépôt GitHub.
+2. Compiler le projet avec la commande :
+   ```bash
+   javac -d target/classes $(find src -name "*.java")
+   ```
+3. Exécuter le jeu avec la commande :
+   ```bash
+   java -cp target/classes main.Main
+   ```
 
-C’est le mode d’emploi de votre code :
+### Utilisation (TODO a detailler)
+- Cliquez sur une case pour sélectionner un bâtiment ou une unité.
+- Utilisez le menu à droite pour donner des ordres (ex: construire, miner, déplacer).
+- Utilisez la molette de la souris pour zoomer/dézoomer.
+- Utilisez le clic gauche pour déplacer la caméra.
 
-- Que faut-il faire pour que ça marche ?
-- Quels sont les logiciels à installer ?
-- Sur quel bouton faut-il appuyer pour qu’il se passe quelque chose ?
-- etc.
+## 8. Documentation développeur
 
-)
+### Classes principales
+- `Main` : Point d'entrée du jeu.
+- `Terrain` : Gère la grille de jeu et les entités.
+- `Unite` : Gère les unités et leurs commandes.
+- `Batiment` : Classe de base pour tous les bâtiments.
+- `MenuPanel` : Gère l'interface utilisateur et les actions.
 
-## 8. Documentation développeur 
+### Constantes modifiables
+- `Foreuse.DELAI_EXTRACTION_MS` : Délai entre deux extractions de minerai.
+- `Minerai.DELAI_TRANSPORT_MS` : Délai de transport du minerai.
+- `Usine.DELAI_PRODUCTION_MS` : Délai de production des unités.
 
-TODO (1 à 2 pages)
+### Fonctionnalités à implémenter
+- **Défense des unités** : Implémenter la logique de combat pour les unités en mode défense.
+- **Gestion des ennemis** : Finaliser la logique de destruction des bâtiments et unités par les ennemis.
+- **Animation du minerai** : Ajouter des effets visuels pour le transport du minerai sur les routes.
 
-(Imaginez que quelqu’un reprenne votre code pour faire une version améliorée du projet…
+## 9. Conclusion et perspectives
 
-    Quelles sont les classes qu’il ou elle doit regarder en premier ? Où est la classe qui contient la méthode main ?
+### Réalisation
+Nous avons développé un jeu de stratégie solo en temps réel avec une architecture MVC. Les principales fonctionnalités incluent la gestion des bâtiments, des unités, et des ressources, ainsi qu'une interface utilisateur interactive.
 
-    Quelles sont les principales constantes qu’il ou elle peut modifier pour changer le fonctionnement du code ?
+### Difficultés et solutions
+- **Gestion des threads** : Utilisation de `volatile` et de mécanismes d'interruption pour gérer les threads de manière sécurisée.
+- **Synchronisation** : Utilisation de files de commandes pour gérer les actions des unités de manière séquentielle.
+- **Affichage** : Utilisation de `Graphics2D` pour dessiner les entités et optimisation des performances avec des caches d'images.
 
-    Quelles sont les fonctionnalités que vous n’avez pas encore pu implémenter et qui mériteraient d’être développées en premier ? Comment auriez-vous fait ?
-)
+### Apprentissage (TODO a refaire c'est un broiuilon pour aide)
+- Maîtrise de la programmation concurrente en Java.
+- Conception d'une architecture MVC pour un jeu.
+- Gestion des interactions utilisateur avec Swing.
 
-
-## 9. Conclusion et perspectives (1/2 page)
-
-TODO
-
-    Qu’avez-vous réalisé ?
-
-    Quelles étaient les difficultés et, surtout, comment les avez-vous résolues ?
-
-    Qu’avez-vous appris ?
-
-    Que voyez-vous comme évolution future de ce travail ?
-
-
-
+### Perspectives (TODO a refaire c'est un broiuilon pour aide)
+- Ajouter des niveaux de difficulté.
+- Implémenter un système de sauvegarde/chargement.
+- Améliorer les graphismes et les animations.
