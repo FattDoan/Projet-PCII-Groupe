@@ -126,6 +126,10 @@ public class AffichageTerrain extends JPanel {
         for (Unite u : unites) {
             AffichageUnites.afficheUnite(g2, u);
         }
+        
+        // Affichage des minerais en transit
+        List<model.Minerai> minerais = terrain.getMineraisEnTransit();
+        AffichageMinerais.afficheTousMinerais(g2, minerais);
 
         drawIndicatorForUnitPath(g2, cellSize);
 

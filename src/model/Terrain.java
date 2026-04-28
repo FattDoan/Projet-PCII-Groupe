@@ -38,6 +38,7 @@ public class Terrain {
    /** batiment maître */
    private BatimentMaitre batimentMaitre;
    private final List<Unite> unites = new CopyOnWriteArrayList<>();
+   private final List<Minerai> mineraisEnTransit = new CopyOnWriteArrayList<>();
 
    /**
     * Crée une nouvelle grille carrée de la taille spécifiée.
@@ -178,7 +179,22 @@ public class Terrain {
         }
     }
 
-    // (x,y) sont les coordonnées de la case ciblée, pas les coordonnées en pixels
+    // Gestion des minerais en transit
+    public void addMinerai(Minerai minerai) {
+        Validation.requireArgument(minerai != null, "minerai=null");
+        mineraisEnTransit.add(minerai);
+        AsyncExecutor.runAsync(minerai);
+    }
+    
+    public void removeMinerai(Minerai minerai) {
+        mineraisEnTransit.remove(minerai);
+    }
+    
+    public List<Minerai> getMineraisEnTransit() {
+        return List.copyOf(mineraisEnTransit);
+    }
+
+   // (x,y) sont les coordonnées de la case ciblée, pas les coordonnées en pixels
     public Selectable getSelectableAt(int x, int y) {
         if (x < 0 || y < 0 || x >= taille || y >= taille) {
             return null; // coordonnées hors limites

@@ -10,7 +10,7 @@ public class AffichageBatiments {
     private static final String BASE_ADRESSE_IMAGES = AffichageCases.BASE_ADRESSE_IMAGES;
 
     /** Image à placer sur la route lorsqu'elle transporte un minerai */
-    private static final String ADRESSE_MINERAL_INGOT   = BASE_ADRESSE_IMAGES + "sprite_crystal_terne.png";
+    private static final String ADRESSE_MINERAL_INGOT   = BASE_ADRESSE_IMAGES + "sprite_crystal_centre.png";
 
 
     /** Images de base pour les bâtiments */
@@ -225,10 +225,7 @@ public class AffichageBatiments {
             AffichageCases.afficheImageCase(g, c, imageName);
         }
 
-        if (route.estPlein()) {
-            // Si la route contient un minerai, on affiche la route puis on affiche un minerai par dessus pour représenter le minerai qui se déplace sur la route
-            AffichageCases.afficheImageCase(g, c, ADRESSE_MINERAL_INGOT); // Affiche le minerai par dessus la route
-        }
+
     }
 
 }

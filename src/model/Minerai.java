@@ -12,14 +12,31 @@ public class Minerai implements Runnable {
     // Référence immutable vers le terrain pour lire l'état du monde.
     private final Terrain terrain;
 
-    // Position courante du minerai dans la grille.
+    // Position courante du minerai dans la grille (case actuelle).
     private int x;
     private int y;
-
+    
+    // Position en pixels pour un affichage fluide.
+    // Quand le minerai se déplace d'une case à une autre, ces coordonnées
+    // passent progressivement d'une case à l'autre.
+    private float px;
+    private float py;
+    
+    // Position de départ et d'arrivée pour l animation de déplacement
+    private float startPX, startPY;
+    private float targetPX, targetPY;
+    
+    // Indicateur de progression du déplacement (0.0 = début, 1.0 = fin)
+    private float progression = 0.0f;
+    
     // Drapeau d'arrêt coopératif du thread.
     private volatile boolean running = true;
-    // Cadence de déplacement d'un minerai.
+    
+    // Temps total pour le déplacement d'une case à l'autre (en ms)
     public static final int DELAI_TRANSPORT_MS = 1000;
+    
+    // Étape de progression par tick (basé sur DELAI_TRANSPORT_MS)
+    private static final float STEP_PROGRESSION = 1.0f / 10; // 10 étapes pour un déplacement complet
 
     public int getX() {
         return x;
@@ -28,6 +45,27 @@ public class Minerai implements Runnable {
     public int getY() {
         return y;
     }
+    
+    /**
+     * Obtient la position X en pixels pour l'affichage.
+     */
+    public float getPX() {
+        return px;
+    }
+    
+    /**
+     * Obtient la position Y en pixels pour l'affichage.
+     */
+    public float getPY() {
+        return py;
+    }
+    
+    /**
+     * Obtient la progression du déplacement actuel (0.0 à 1.0).
+     */
+    public float getProgression() {
+        return progression;
+    }
 
     /** Constructeur d'un minerai avec une position et un terrain donnés. */
     public Minerai(int x, int y, Terrain terrain) {
@@ -35,38 +73,50 @@ public class Minerai implements Runnable {
         this.x = x;
         this.y = y;
         this.terrain = Objects.requireNonNull(terrain, "terrain ne doit pas etre null");
+        
+        // Initialiser les coordonnées pixels (centre de la case)
+        this.px = x * Case.TAILLE + Case.TAILLE / 2.0f;
+        this.py = y * Case.TAILLE + Case.TAILLE / 2.0f;
+        
+        // Initialiser les positions de départ et cible
+        this.startPX = px;
+        this.startPY = py;
+        this.targetPX = px;
+        this.targetPY = py;
     }
 
     @Override
     public void run() {
-         // Boucle de vie du minerai: tant qu'il n'est pas arrivé à destination
+        // Boucle de vie du minerai: tant qu'il n'est pas arrivé à destination
         // (stockage/HQ) et tant que le thread n'est pas interrompu.
         while (running && !Thread.currentThread().isInterrupted()) {
             try {
-                Thread.sleep(DELAI_TRANSPORT_MS);
-                // Un seul pas logique à chaque tick.
-                running = transporterUnPas();
+                Thread.sleep(DELAI_TRANSPORT_MS / 10); // Plus fréquent pour une animation fluide
+                
+                // Si on est en train d'animer un déplacement, continuer l'animation
+                if (progression > 0.0f && progression < 1.0f) {
+                    avancerAnimation();
+                } else {
+                    // Sinon, essayer de faire un pas logique
+                    running = transporterUnPas();
+                    
+                    // Si le minerai ne peut plus continuer et doit être détruit,
+                    // le retirer de la liste des minerais en transit
+                    if (!running) {
+                        terrain.removeMinerai(this);
+                        break;
+                    }
+                }
             } catch (InterruptedException e) {
                 // Respect du contrat d'interruption: on remet le flag puis on sort.
                 Thread.currentThread().interrupt();
+                terrain.removeMinerai(this);
                 break;
             }
         } 
-
-/*      // Si le thread est déjà interrompu ou que le minerai est marqué pour arrêt, 
-        // on ne fait rien
-        if (!running || Thread.currentThread().isInterrupted()) {
-            return;
-        }
-
-        // On fait un seul pas logique
-        running = transporterUnPas();
-
-        // Si le minerai n'est pas encore arrivé à destination finale
-        // on se reprogramme pour continuer le transport au prochain tick.
-        if (running) {
-            common.AsyncExecutor.schedule(this, DELAI_TRANSPORT_MS);
-        } */
+        
+        // Nettoyage final
+        terrain.removeMinerai(this);
     }
 
     /** Transporte le minerai d'une case à la suivante. Renvoie true si le minerai peut continuer à exister, false si on doit le détruire. */
@@ -139,12 +189,55 @@ public class Minerai implements Runnable {
             return true;
         }
 
-        // 7) Commit du déplacement.
+        // 7) Mettre à jour les coordonnées de grille IMMEDIATEMENT
+        // pour que la logique du prochain pas soit correcte
         x = nextX;
         y = nextY;
-
-        // 8) Fin de vie du minerai quand il atteint une destination finale.
-        return !(cible instanceof BatimentMaitre);
+        
+        // 8) Démarrer l'animation de déplacement visuelle
+        // Sauvegarder la position en pixels ACTUELLE comme point de départ
+        startPX = px;
+        startPY = py;
+        
+        // Calculer la position cible (centre de la case actuelle = destination)
+        targetPX = x * Case.TAILLE + Case.TAILLE / 2.0f;
+        targetPY = y * Case.TAILLE + Case.TAILLE / 2.0f;
+        
+        // Réinitialiser la progression
+        progression = 0.0f;
+        
+        // Avancer dans l'animation pour démarrer le mouvement
+        avancerAnimation();
+        
+        // 9) Fin de vie du minerai quand il atteint une destination finale (stockage ou bâtiment maître).
+        return !(cible instanceof BatimentMaitre || cible instanceof Stockage);
+    }
+    
+    /**
+     * Avance l'animation de déplacement d'une étape.
+     * Met à jour px et py par interpolation entre start et target.
+     */
+    private void avancerAnimation() {
+        if (progression >= 1.0f) {
+            // Animation terminée: px/py sont déjà à la position cible
+            px = targetPX;
+            py = targetPY;
+            startPX = px;
+            startPY = py;
+            targetPX = px;
+            targetPY = py;
+            progression = 0.0f;
+            return;
+        }
+        
+        progression += STEP_PROGRESSION;
+        if (progression > 1.0f) {
+            progression = 1.0f;
+        }
+        
+        // Interpolation linéaire entre start et target
+        px = startPX + (targetPX - startPX) * progression;
+        py = startPY + (targetPY - startPY) * progression;
     }
 
     public void arreter() {

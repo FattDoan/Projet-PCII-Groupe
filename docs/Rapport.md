@@ -430,7 +430,14 @@ classDiagram
 
 ### 5.2.4 : Animation du minerai sur les routes (effet visuel)
 
-TODO
+Les minerais en transit sont affichés de manière continue avec la classe `AffichageMinerais`. Chaque minerai utilise une image (`sprite_crystal_centre.png`) qui se déplace fluidement entre les cases de la grille. L'animation utilise des coordonnées en pixels (px, py) pour un rendu visuel fluide, avec interpolation linéaire entre la position de départ et la position cible à chaque étape de progression.
+
+**Caractéristiques :**
+- Image : `sprite_crystal_centre.png` (taille réduite à la moitié d'une case)
+- Pas de barre de progression jaune (supprimée pour un rendu plus épuré)
+- Le minerai disparaît automatiquement lorsqu'il atteint une destination finale (bâtiment maître ou stockage)
+
+La méthode `afficheMinerai(Graphics g, Minerai minerai)` gère l'affichage de chaque minerai en fonction de sa position actuelle et de son état de progression.
 
 ## 5.3 : Gestion des bâtiments (usine, stockage, mine, routes)
 
@@ -634,7 +641,7 @@ Le transport est lancé de manière asynchrone par la foreuse via l'exécuteur c
 6. Si la prochaine case est hors limites, le minerai attend et retente au cycle suivant.
 7. La case cible doit contenir un bâtiment terminé (`estFini()`) et avec de la capacité disponible.
 8. Si les conditions source/cible sont valides, le minerai est transféré (ajout en cible puis retrait en source, avec rollback en cas d'échec).
-9. Si la cible est le bâtiment maître, le transport se termine pour ce minerai.
+9. Si la cible est le bâtiment maître ou un stockage, le transport se termine pour ce minerai.
 
 #### Conditions limites à respecter
 
@@ -643,6 +650,7 @@ Le transport est lancé de manière asynchrone par la foreuse via l'exécuteur c
 - Le retrait du minerai depuis la case précédente doit rester cohérent avec l'ajout sur la case suivante.
 - Le déplacement ne doit jamais sortir des bornes de la grille.
 - L'arrêt doit être sûr même en contexte concurrent (flag `running` + interruption).
+- **Le minerai disparaît visuellement lorsqu'il atteint le bâtiment maître OU un stockage** (modification récente).
 
 #### Complexité
 
@@ -665,9 +673,15 @@ classDiagram
     class Minerai {
         -x: int
         -y: int
+        -px: float
+        -py: float
+        -progression: float
         -running: boolean
         +run()
         +arreter()
+        +getPX()
+        +getPY()
+        +getProgression()
     }
 
     class Route {
@@ -683,16 +697,36 @@ classDiagram
         +getBatiment()
     }
 
+    class Terrain {
+        -mineraisEnTransit: List<Minerai>
+        +addMinerai(Minerai)
+        +removeMinerai(Minerai)
+        +getMineraisEnTransit()
+    }
+
     class AsyncExecutor {
         +runAsync(Runnable)
     }
 
-    Foreuse --> AsyncExecutor : lance
+    class AffichageMinerais {
+        +afficheMinerai(Graphics, Minerai)
+        +afficheTousMinerais(Graphics, List)  
+    }
+
+    Foreuse --> Terrain : addMinerai()
+    Terrain --> Minerai : stocke
     Foreuse --> Minerai : cree
     Minerai --> Case : lit les cases
     Minerai --> Route : suit la direction
     Minerai --> BatimentMaitre : depose le minerai
+    AffichageMinerais --> Minerai : affiche
 ```
+
+**Implémentation améliorée :**
+- Les minerais ont maintenant des coordonnées en **pixels** (`px`, `py`) pour un déplacement fluide
+- Une **animation de déplacement** avec interpolation linéaire entre les cases
+- Un **indicateur de progression circulaire** s'affiche autour des minerais en mouvement
+- La liste `mineraisEnTransit` dans `Terrain` permet à `AffichageTerrain` de tous les afficher
 
 ## 5.4 : Création, déplacements et actions des ennemis
 
