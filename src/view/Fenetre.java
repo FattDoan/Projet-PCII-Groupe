@@ -28,6 +28,10 @@ public class Fenetre extends JFrame {
         super(titre);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
+        // Add font anti-aliasing for smoother text rendering
+        System.setProperty("awt.useSystemAAFontSettings", "on");
+        System.setProperty("swing.aatext", "true");
+
         this.terrain = terrain;
         
         // Utiliser un BorderLayout pour organiser les composants
@@ -45,7 +49,6 @@ public class Fenetre extends JFrame {
 
         // Si la fenetre est redimensionnee, on met a jour les composants
         // pour s'adapter a la nouvelle taille (notamment MenuPanel)
-
         this.addComponentListener(new java.awt.event.ComponentAdapter() {
             @Override
             public void componentResized(java.awt.event.ComponentEvent evt) {

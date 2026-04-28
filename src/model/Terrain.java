@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 
 import common.Validation;
 
@@ -39,6 +40,9 @@ public class Terrain {
    private BatimentMaitre batimentMaitre;
    private final List<Unite> unites = new CopyOnWriteArrayList<>();
    private final List<Minerai> mineraisEnTransit = new CopyOnWriteArrayList<>();
+
+    /** La liste des batiments qui n'ont pas hp plein, pour que les ouvriers puissent les réparer. */
+    private final Set<Batiment> batimentsEndommages = ConcurrentHashMap.newKeySet();
 
    /**
     * Crée une nouvelle grille carrée de la taille spécifiée.
@@ -91,7 +95,9 @@ public class Terrain {
 
    }
 
-
+   public boolean isPositionValide(int x, int y) {
+      return x >= 0 && y >= 0 && x < taille && y < taille;
+   }
 
    /***** GETTER *****/
 
@@ -134,6 +140,10 @@ public class Terrain {
       grille[x][y] = nouvelle;
    }
 
+
+    public Set<Batiment> getBatimentsEndommages() {
+        return Set.copyOf(batimentsEndommages);
+    }
 
    /***** SETTER *****/
 
@@ -194,6 +204,19 @@ public class Terrain {
         return List.copyOf(mineraisEnTransit);
     }
 
+    public Unite getUniteAt(int x, int y) {
+        if (x < 0 || y < 0 || x >= taille || y >= taille) {
+            return null; // coordonnées hors limites
+        }
+
+        for (Unite u : unites) {
+            if (u.getGX() == x && u.getGY() == y) {
+                return u;
+            }
+        }
+        return null; // Aucune unité trouvée à cette position
+    }
+
    // (x,y) sont les coordonnées de la case ciblée, pas les coordonnées en pixels
     public Selectable getSelectableAt(int x, int y) {
         if (x < 0 || y < 0 || x >= taille || y >= taille) {
@@ -214,6 +237,15 @@ public class Terrain {
         }
 
         return null; // Aucun selectable trouvé à cette position
+    }
+
+    public void notifyBatimentUpdated(Batiment b) {
+        Validation.requireArgument(b != null, "batiment=null");
+        if (b.isDestroyed() || b.atFullHP()) {
+            batimentsEndommages.remove(b);
+        } else if (!b.atFullHP()) {
+            batimentsEndommages.add(b);
+        }
     }
 
 }

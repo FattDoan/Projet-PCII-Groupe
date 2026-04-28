@@ -4,11 +4,11 @@ package model;
 public class Usine extends Batiment implements Runnable {
 
     public static final int COUT_CONSTRUCTION = 200;
-    public static final int HP_MAX = 30;
+    public static final int HP_MAX = 25;
     public static final int CAPACITE = 20; // Stockage interne pour minerais
 
-    public static final int COUT_PRODUCTION = 5; // Minerais requis par unité produite
-    public static final int DELAI_PRODUCTION_MS = 2500; // Cadence de production
+    public static final int COUT_PRODUCTION = 10; // Minerais requis par unité produite
+    public static final int DELAI_PRODUCTION_MS = 3000; // Cadence de production
 
     private volatile boolean running = true;
     private volatile boolean paused = false;
@@ -43,7 +43,7 @@ public class Usine extends Batiment implements Runnable {
                 if (!essayerRetirerMinerai(COUT_PRODUCTION)) {
                     continue; // Pas assez de minerais au moment de produire
                 }
-                getTerrain().addUnite(new model.unite.Ouvrier(spawn[0], spawn[1], getTerrain()));
+                getTerrain().addUnite(new model.unite.Ouvrier(spawn[0] + Case.TAILLE/2, spawn[1] + Case.TAILLE/2, getTerrain()));
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 break;
@@ -54,21 +54,24 @@ public class Usine extends Batiment implements Runnable {
     private int[] trouverCaseSpawn() {
         int x0 = getX();
         int y0 = getY();
-
-        for (int dx = -1; dx <= 1; dx++) {
-            for (int dy = -1; dy <= 1; dy++) {
-                if (dx == 0 && dy == 0) continue;
-                int x = x0 + dx;
-                int y = y0 + dy;
-                if (x < 0 || y < 0 || x >= getTerrain().getTaille() || y >= getTerrain().getTaille()) {
-                    continue;
-                }
-                Case c = getTerrain().getCase(x, y);
-                if (c != null && c.estAccessible()) {
-                    return new int[]{x, y};
+        
+        // Spawn spirally outwards from the center of the building
+        // ideally not on top of the building itself, 
+        // but also not on top of other units
+        for (int r = 1; r <= 2; r++) { // Check a radius of 2 around the building
+            for (int dx = -r; dx <= r; dx++) {
+                for (int dy = -r; dy <= r; dy++) {
+                    int x = x0 + dx;
+                    int y = y0 + dy;
+                    if (getTerrain().isPositionValide(x, y) && 
+                        getTerrain().getCase(x, y).getBatiment() == null && 
+                        getTerrain().getUniteAt(x, y) == null) {
+                        return new int[]{x, y};
+                    }
                 }
             }
         }
+ 
         return null;
     }
 

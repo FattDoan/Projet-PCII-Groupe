@@ -108,10 +108,18 @@ public class MenuPanel extends JPanel {
         actions.afficher(selectedElement);
     }
 
+    // just JPanel but with anti-aliasing hints
+    private class Panel extends JPanel {
+        Panel() { super(); setOpaque(false); }
+        @Override protected void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g; hint(g2);
+            super.paintComponent(g);
+        }
+    }
     // ═════════════════════════════════════════════════════════════════════
     // HeaderPanel — icône + titre + description + bouton ×
     // ═════════════════════════════════════════════════════════════════════
-    private class HeaderPanel extends JPanel {
+    private class HeaderPanel extends Panel {
 
         private static final int ICON_SIZE = 52;
         private static final int H         = 80;
@@ -173,9 +181,13 @@ public class MenuPanel extends JPanel {
             } else if (s instanceof Unite u) {
                 title  = u.getDisplayName();
                 desc   = new String[]{ u.getDescription() };
-                accent = C_GREEN;
-                icon   = ICON_CACHE.computeIfAbsent("UNITE", k -> buildUnitIcon());
-
+                if (u.getType() == TypeUnite.OUVRIER) {
+                    accent = C_GREEN;
+                    icon   = ICON_CACHE.computeIfAbsent("OUVRIER", k -> buildUnitIcon(u.getType()));
+                } else {
+                    accent = C_RED;
+                    icon   = ICON_CACHE.computeIfAbsent("ENNEMI", k -> buildUnitIcon(u.getType()));
+                }
             } else if (s instanceof Case c) {
                 title = c.getDisplayName();
                 desc  = new String[]{ c.getDescription() };
@@ -205,12 +217,20 @@ public class MenuPanel extends JPanel {
 
         // ── Constructeurs d'icônes ────────────────────────────────────────
 
-        private static BufferedImage buildUnitIcon() {
+        private static BufferedImage buildUnitIcon(TypeUnite type) {
             int s = ICON_SIZE;
             BufferedImage img = new BufferedImage(s, s, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g = img.createGraphics(); hint(g);
-            g.setColor(new Color(150, 100, 255));
-            g.fillOval(4, 4, s-8, s-8);
+
+            if (type == TypeUnite.OUVRIER) {
+                g.setColor(new Color(150, 100, 255));
+                g.fillOval(4, 4, s-8, s-8);
+            }
+            else {  // draw a red triangle for ennemis
+                g.setColor(new Color(255, 100, 100));
+                int[] xp={s/2, s-6, 6}, yp={6, s-6, s-6};
+                g.fillPolygon(xp, yp, 3);
+            }
             g.dispose(); return img;
         }
 
@@ -299,7 +319,7 @@ public class MenuPanel extends JPanel {
     // ═════════════════════════════════════════════════════════════════════
     // StatsPanel
     // ═════════════════════════════════════════════════════════════════════
-    private class StatsPanel extends JPanel {
+    private class StatsPanel extends Panel {
 
         // Références live pour les mises à jour légères (même case, stockage change)
         private CapacityBar liveCapBar = null;
@@ -576,7 +596,7 @@ public class MenuPanel extends JPanel {
     // ═════════════════════════════════════════════════════════════════════
     // ActionsPanel
     // ═════════════════════════════════════════════════════════════════════
-    private class ActionsPanel extends JPanel {
+    private class ActionsPanel extends Panel {
 
         // Suivi pour éviter les reconstructions inutiles
         private Selectable lastElement  = null;
@@ -693,14 +713,91 @@ public class MenuPanel extends JPanel {
             MenuPanel.this.refresh();
         }
 
+
         private Direction demanderDirectionRoute() {
-            Direction[] options = {Direction.NORD, Direction.EST, Direction.SUD, Direction.OUEST};
-            return (Direction) JOptionPane.showInputDialog(
-                MenuPanel.this, "Choisissez la direction de la route :",
-                "Construction route", JOptionPane.QUESTION_MESSAGE,
-                null, options, Direction.NORD
-            );
+            final Direction[] selected = new Direction[1];
+
+            JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(MenuPanel.this), "Construction route", Dialog.ModalityType.APPLICATION_MODAL);
+            dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+
+            JPanel root = new JPanel(new BorderLayout(10, 10)) {
+                // anti-aliasing pour les boutons
+                @Override protected void paintComponent(Graphics g) {
+                    Graphics2D g2 = (Graphics2D) g; hint(g2);
+                    super.paintComponent(g);
+                }
+            };
+            root.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+            root.setBackground(new Color(30, 30, 35));
+
+            JLabel title = new JLabel("Choisissez une direction");
+            title.setForeground(Color.WHITE);
+            title.setFont(new Font("Arial", Font.BOLD, 16));
+            title.setHorizontalAlignment(SwingConstants.CENTER);
+            root.add(title, BorderLayout.NORTH);
+
+            JPanel grid = new JPanel(new GridLayout(3, 3, 10, 10));
+            grid.setBackground(new Color(30, 30, 35));
+
+            // Row 1
+            grid.add(new JLabel()); // empty
+            grid.add(createDirectionButton("↑", Direction.NORD, selected, dialog));
+            grid.add(new JLabel()); // empty
+
+            // Row 2
+            grid.add(createDirectionButton("←", Direction.OUEST, selected, dialog));
+            grid.add(new JLabel()); // center empty
+            grid.add(createDirectionButton("→", Direction.EST, selected, dialog));
+
+            // Row 3
+            grid.add(new JLabel()); // empty
+            grid.add(createDirectionButton("↓", Direction.SUD, selected, dialog));
+            grid.add(new JLabel()); // empty
+
+            root.add(grid, BorderLayout.CENTER);
+
+            dialog.setContentPane(root);
+            dialog.pack();
+            dialog.setLocationRelativeTo(MenuPanel.this);
+            dialog.setResizable(false);
+            dialog.setVisible(true);
+
+            return selected[0];
         }
+
+        private JButton createDirectionButton(String text, Direction dir, Direction[] selected, JDialog dialog) {
+            Color base = new Color(80, 80, 90);
+            Color hover = new Color(110, 110, 125);
+
+            JButton button = new JButton(text);
+            button.setFocusPainted(false);
+            button.setBorderPainted(false);
+            button.setContentAreaFilled(true);
+            button.setOpaque(true);
+            button.setBackground(base);
+            button.setForeground(Color.WHITE);
+            button.setFont(new Font("Dialog", Font.BOLD, 24));
+            button.setFocusPainted(false);
+            button.setBorder(BorderFactory.createLineBorder(new Color(120,120,130), 1));
+            button.setPreferredSize(new Dimension(50, 50));
+            button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+            button.addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override public void mouseEntered(java.awt.event.MouseEvent e) {
+                    button.setBackground(hover);
+                }
+                @Override public void mouseExited(java.awt.event.MouseEvent e) {
+                    button.setBackground(base);
+                }
+            });
+
+            button.addActionListener(e -> {
+                selected[0] = dir;
+                dialog.dispose();
+            });
+
+            return button;
+        }  
 
         // ── Bouton HUD ────────────────────────────────────────────────────
 

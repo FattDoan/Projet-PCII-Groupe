@@ -5,7 +5,7 @@ import model.unite.commande.CommandeDeplacementEnnemi;
 
 public class Ennemi extends Unite {
     public static final int HP_INITIAL = 8; // Points de vie initiaux
-    public static final float VITESSE = 0.25f; // Vitesse de déplacement
+    public static final float VITESSE = 0.15f; // Vitesse de déplacement
     public static final int DEGATS = 2; // Dégâts infligés par l'ennemi
     public static final float ATTACK_RANGE = Case.TAILLE; // Portée d'attaque de l'ennemi 
     public Ennemi(int GX, int GY, Terrain terrain) {

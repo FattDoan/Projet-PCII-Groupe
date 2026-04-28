@@ -69,11 +69,18 @@ public class CommandeDefendre extends Commande {
                 progression = 0; // reset pour le prochain tick d'attaque
                 return false; // pas encore terminé, continue à attaquer jusqu'à ce que la cible soit détruite
             } else {
-                // Move towards the target
+                // Move/follow towards the target
                 // but the new position should be at the attack range from the target
                 float newX = cibleEnnemi.getPX() - (dx / dist) * Ouvrier.DEFENSE_RANGE;
                 float newY = cibleEnnemi.getPY() - (dy / dist) * Ouvrier.DEFENSE_RANGE;
-                unite.addToFrontCommande(new CommandeDeplacement(newX, newY)); // move towards the target but stop at attack range 
+                
+                float dX = newX - unite.getPX();
+                float dY = newY - unite.getPY();
+                float d = (float) Math.hypot(dX, dY);
+                float step = unite.getSpeed() * (float) dt;
+
+                unite.avancer((dX / d) * step, (dY / d) * step);
+                return false;
             }
         }  
         
@@ -85,8 +92,15 @@ public class CommandeDefendre extends Commande {
         if (dist == 0) {
             return false; // already at the position, just wait for enemies to come
         }
-        unite.addToFrontCommande(new CommandeDeplacement(defensePX, defensePY)); // move towards the defense position
-        return false; // pas encore terminé, continue à se déplacer vers la position de défense           
+        float step = unite.getSpeed() * (float) dt;
+        if (dist <= step) {
+            unite.avancer(dx, dy); // ajuste exactement sur la position de défense
+            return false;
+        }
+        unite.avancer((dx / dist) * step, (dy / dist) * step);
+
+        return false; // Commande de défense continue tant que 
+                      // l'unité n'est pas détruite ou qu'une nouvelle commande n'est pas donnée   
     }
 
     @Override

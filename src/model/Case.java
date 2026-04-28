@@ -44,7 +44,7 @@ public class Case implements Selectable {
       this.x = x;
       this.y = y;
       this.type = type;
-      this.batiment = null;
+      this.batiment = null; 
    }
 
 
@@ -96,9 +96,6 @@ public class Case implements Selectable {
             if (batiment.isDestroyed()) {
                 detruireBatiment();
             }
-        }
-        else {
-            System.out.println("[CRITICAL] La case (" + x + ", " + y + ") a reçu des dégâts mais n'a pas de bâtiment pour les absorber !");
         }
     }
 

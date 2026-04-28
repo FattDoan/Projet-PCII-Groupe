@@ -48,6 +48,7 @@ public abstract class Batiment{
         } else {
             this.hp = 1; // construction en cours, hp initial à 1 (peut être ajusté selon les besoins)
         }
+        terrain.notifyBatimentUpdated(this);
     }
 
 
@@ -103,6 +104,7 @@ public abstract class Batiment{
     /** Applique des dégâts au bâtiment, réduisant ses points de vie. */
     public synchronized void receiveDamage(int degats) {
         hp -= degats;
+        terrain.notifyBatimentUpdated(this);
     }
     
     /**
@@ -135,8 +137,6 @@ public abstract class Batiment{
     public synchronized boolean estEnConstruction() {
         return !fini && hp > 0;
     }
-
-
 
     /***** SETTERS *****/
 
@@ -210,6 +210,7 @@ public abstract class Batiment{
     public synchronized void ajouterHP() {
         if (hp < hpMax) {
             hp += 1;
+            terrain.notifyBatimentUpdated(this);
             if (hp == hpMax) {
                 fini = true; // construction terminée quand hp atteint le max
             }

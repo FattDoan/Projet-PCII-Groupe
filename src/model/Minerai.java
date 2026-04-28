@@ -210,7 +210,7 @@ public class Minerai implements Runnable {
         avancerAnimation();
         
         // 9) Fin de vie du minerai quand il atteint une destination finale (stockage ou bâtiment maître).
-        return !(cible instanceof BatimentMaitre || cible instanceof Stockage);
+        return !(cible instanceof BatimentMaitre || cible instanceof Stockage || (cible instanceof Usine));
     }
     
     /**
