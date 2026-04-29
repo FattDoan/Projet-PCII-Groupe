@@ -25,7 +25,10 @@ public final class DemoScenarioBuilder {
         placeBatimentTermine(terrain, new Route(Direction.EST, mid - 3, mid - 5, terrain));
         placeBatimentTermine(terrain, new Route(Direction.SUD, mid - 2, mid - 5, terrain));
         placeBatimentTermine(terrain, new Route(Direction.SUD, mid - 2, mid - 4, terrain));
-        placeBatimentTermine(terrain, new Stockage(mid - 2, mid - 3, terrain));
+
+        Stockage stockage1 = new Stockage(mid - 2, mid - 3, terrain);
+        placeBatimentTermine(terrain, stockage1);
+        AsyncExecutor.runAsync(stockage1);
 
         for (int y = mid - 4; y < mid; y++) {
             placeBatimentTermine(terrain, new Route(Direction.SUD, mid - 5, y, terrain));
@@ -40,7 +43,10 @@ public final class DemoScenarioBuilder {
         placeBatimentTermine(terrain, new Route(Direction.SUD, mid + 3, mid - 5, terrain));
         placeBatimentTermine(terrain, new Route(Direction.SUD, mid + 3, mid - 4, terrain));
         placeBatimentTermine(terrain, new Route(Direction.EST, mid + 3, mid - 3, terrain));
-        placeBatimentTermine(terrain, new Stockage(mid + 4, mid - 3, terrain));
+       
+        Stockage stockage2 = new Stockage(mid + 4, mid - 3, terrain);
+        placeBatimentTermine(terrain, stockage2);
+        AsyncExecutor.runAsync(stockage2);
 
         // --- Forme en U vers le QG ---
         setupForeuse(terrain, mid + 1, mid - 2);

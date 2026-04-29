@@ -94,7 +94,7 @@ public class Terrain {
       // On place le bâtiment maître au centre de la grille
       this.grille[centre][centre].setBatiment(new BatimentMaitre(centre, centre, this));
       this.batimentMaitre = (BatimentMaitre) this.grille[centre][centre].getBatiment();
-
+      AsyncExecutor.runAsync(this.batimentMaitre);
    }
 
    public boolean isPositionValide(int x, int y) {
@@ -277,4 +277,25 @@ public class Terrain {
         return nearest;
     }
 
+    public boolean existeRouteSortante(int x, int y) {
+        // Vérifie s'il existe une route adjacente et SORTANTE à la position (x, y)
+        int[][] directions = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}}; // Droite, Gauche, Bas, Haut
+        Direction[] dirSortante = {Direction.EST, Direction.OUEST, Direction.SUD, Direction.NORD}; // Correspondance des directions entrantes
+        for (int i = 0; i < directions.length; i++) {
+            int nx = x + directions[i][0];
+            int ny = y + directions[i][1];
+            if (isPositionValide(nx, ny)) {
+                Case c = getCase(nx, ny);
+                if (c.getBatiment() == null) continue;
+                Batiment b = c.getBatiment();
+                if (b.getType() == TypeBatiment.ROUTE
+                    && ((Route)b).getDirection() == dirSortante[i]
+                    && b.estFini()
+                    && !b.estPlein()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }

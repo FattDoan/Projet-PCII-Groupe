@@ -136,7 +136,7 @@ public class Minerai implements Runnable {
 
         // 2) Déterminer la direction:
         // - Sur route: direction imposée par la route.
-        // - Sur foreuse: meilleure sortie disponible.
+        // - Sur foreuse/batiment de stockage: meilleure sortie disponible.
         Direction direction = (currentBatiment instanceof Route route)
             ? route.getDirection()
             : trouverMeilleurDirection();
@@ -280,7 +280,7 @@ public class Minerai implements Runnable {
                     return d; 
                 }
                 // Priorité 2: route non alignée mais acceptable comme repli.
-                dir = d;
+                //dir = d;
             } else if (adj.aBatiment() && (adj.getBatiment() instanceof Stockage || adj.getBatiment() instanceof BatimentMaitre)
                         && !adj.getBatiment().estPlein()) {
                 // Priorité maximale: destination finale atteignable immédiatement.

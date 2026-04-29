@@ -30,13 +30,13 @@ public class AffichageCases {
     // Divers
     private static final String ADRESSE_MINERAL_DEPOSIT = BASE_ADRESSE_IMAGES + "sprite_gisement_minerai.png";
     private static final String ADRESSE_EN_CONSTRUCTION = BASE_ADRESSE_IMAGES + "sprite_en_construction.png";
-
+    private static final String ADRESSE_FOND = BASE_ADRESSE_IMAGES + "sprite_fond.png";
 
     /****** FONCTIONS D'AFFICHAGE *******/
 
     /** Fonction de base à partir de laquelle on appelle toutes les autres fonctions d'affichage */
     public static void afficheCase(Graphics g, Case c) {
-        afficheCaseVide(g, c);
+        afficheCaseVide(g, c, ADRESSE_FOND);
         if (c.aMinerai()) {
             afficheImageCase(g, c, ADRESSE_MINERAL_DEPOSIT);
         }
@@ -82,14 +82,36 @@ public class AffichageCases {
     }
 
     /** Affiche une case vide à la position (x, y) sur la fenêtre */
-    private static void afficheCaseVide(Graphics g, Case c) {
+    private static void afficheCaseVide(Graphics g, Case c, String adress) {
         int cellSize = Case.TAILLE;
         int x = c.getX() * cellSize; // conversion des coordonnées de la case en pixels pour l'affichage
         int y = c.getY() * cellSize;
 
-        // Choix visuel: vert foncé pour évoquer l'herbe.
+/*         // Choix visuel: vert foncé pour évoquer l'herbe.
         g.setColor(DARK_GREEN); // Couleur d'une case vide, ici vert pour faire de l'herbe
-        g.fillRect(x, y, cellSize, cellSize); // Dessine un carré dans la case correspondante
+        g.fillRect(x, y, cellSize, cellSize); // Dessine un carré dans la case correspondante */
+
+        java.awt.Image img;
+
+        try {
+            if (IMAGES_CACHE.containsKey(adress)) {
+                // Récupère l'image depuis le cache si elle a déjà été chargée
+                img = IMAGES_CACHE.get(adress);
+            } else {
+                // Chargement de l'image depuis le fichier
+                img = javax.imageio.ImageIO.read(new java.io.File(adress));
+                IMAGES_CACHE.put(adress, img); // Stocke l'image dans le cache pour les futurs affichages
+            }
+            // Make the sprite bit darker?
+            g.drawImage(img, x, y, cellSize, cellSize, null); // Dessine l'image de la case vide dans la case correspondante
+
+        } catch (IOException e) {
+            // Si l'image n'a pas pu être chargée, on affiche une case vide avec la couleur définie précédemment et on logue l'erreur pour pouvoir la corriger plus tard
+            System.err.println("Erreur lors du chargement de l'image: " + adress + ". Vérifiez que le projet a été lancé depuis sa racine (Projet-PCII-Groupe) et que le dossier images est bien présent.");
+            e.printStackTrace(System.err);
+            g.setColor(DARK_GREEN); // Couleur d'une case vide, ici vert pour faire de l'herbe
+            g.fillRect(x, y, cellSize, cellSize); // Dessine un carré dans la case correspondante
+        }
     }
 
     /** Affiche l'image passée en paramètre à la position de la case */

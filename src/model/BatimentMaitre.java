@@ -10,12 +10,13 @@ package model;
  * IMPORTANT : Si le bâtiment maître est détruit par les ennemis, le joueur perd la partie.
  * Les ennemis se déplacent en ligne droite vers le bâtiment maître depuis les bords de la carte.
  */
-public class BatimentMaitre extends Batiment {
+public class BatimentMaitre extends Batiment implements Runnable {
     /** Capacité de stockage du bâtiment maître */
     private static final int CAPACITE = 100;
     public static final int COUT_CONSTRUCTION = 50;
     private static final int HP_MAX = 100; // Points de vie maximum du bâtiment maître
-
+    private volatile boolean running = true; // Indique si le thread doit continuer à fonctionner
+    private static final int DELAI_ENVOI_MINERAI_MS = 1000; // Délai entre l'envoi de minerais vers le bâtiment maître (simule le temps de transport)
     /**
      * Crée un nouveau bâtiment maître avec la capacité par défaut de 100 minerais.
      * Ce constructeur est utilisé une seule fois lors de la génération initiale du terrain. 
@@ -50,4 +51,37 @@ public class BatimentMaitre extends Batiment {
         return COUT_CONSTRUCTION;
     }
 
+    @Override
+    public void run() {
+        while (running && !Thread.currentThread().isInterrupted()) {
+            try {
+                // Simule le temps d'extraction du minerai
+                Thread.sleep(DELAI_ENVOI_MINERAI_MS);
+
+                // Extraction du minerai
+                // Parce que on est pas foreuse, on suppose que le bâtiment maître reçoit les minerais acheminés par les routes
+                // If theres exist an out bound route from this stockage, 
+                // and if the stockage is not empty, 
+                // and if the stockage is finished, then we can send a minerai to the building master
+                if (!estVide() && this.estFini() && getTerrain().existeRouteSortante(getX(), getY())) {
+                    this.retirerMinerai(1); // Retire un minerai du stockage (simule la réception d'un minerai acheminé par une route)
+                    Minerai nouveauMinerai = new Minerai(getX(), getY(), getTerrain());
+
+                    // Ajouter le minerai à la liste des minerais en transit pour affichage
+                    // et démarrer son thread de transport
+                    getTerrain().addMinerai(nouveauMinerai);
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
+    }
+
+    /**
+     * Méthode pour arrêter proprement le thread
+     */
+    public void arreter() {
+        running = false;
+    }
 }

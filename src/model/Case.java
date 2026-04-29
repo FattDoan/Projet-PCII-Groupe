@@ -166,7 +166,9 @@ public class Case implements Selectable {
 
    public void construireStockage(Terrain terrain) {
       if (this.getBatiment() != null) return;
-      this.setBatiment(new Stockage(this.getX(), this.getY(), terrain));
+      Stockage stockage = new Stockage(this.getX(), this.getY(), terrain);
+      this.setBatiment(stockage);
+      AsyncExecutor.runAsync(stockage); 
    }
 
    public void construireForeuse(Terrain terrain) {
