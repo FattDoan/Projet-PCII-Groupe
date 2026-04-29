@@ -5,6 +5,17 @@ import model.unite.commande.*;
 import java.util.Deque;
 import java.util.ArrayDeque;
 
+/**
+ * Représente une unité dans le jeu, qui peut être un ouvrier ou un ennemi.
+ * Chaque unité a des coordonnées continues (en pixels), une vitesse, des points de vie,
+ * et une file de commandes à exécuter séquentiellement.
+ * 
+ * Les unités sont mises à jour à chaque tick par le terrain, qui appelle leur méthode update(dt).
+ * Elles exécutent leurs commandes une par une, en fonction du temps écoulé.
+ * 
+ * Les unités peuvent être détruites si leurs points de vie tombent à zéro ou moins, 
+ * ce qui arrête leur thread et les retire du terrain.
+ */
 public class Unite implements Selectable, Runnable {
 
     private static final int DELAI_THREAD_MS = 16;

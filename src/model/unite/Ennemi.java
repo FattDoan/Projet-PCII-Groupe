@@ -3,6 +3,10 @@ package model.unite;
 import model.*;
 import model.unite.commande.CommandeDeplacementEnnemi;
 
+/**
+ * Classe représentant les unités ennemies dans le jeu. 
+ * Les ennemis se déplacent automatiquement vers le bâtiment maître ennemi et attaquent les unités ou bâtiments alliés à proximité.
+ */
 public class Ennemi extends Unite {
     public static final int HP_INITIAL = 8; // Points de vie initiaux
     public static final float VITESSE = 0.15f; // Vitesse de déplacement

@@ -2,6 +2,10 @@ package model.unite.commande;
 
 import model.unite.Unite;
 
+/**
+ * Commande de déplacement pour une unité. L'unité se déplace vers une destination spécifiée en coordonnées pixels.
+ * La commande est terminée lorsque l'unité atteint la destination.
+ */
 public class CommandeDeplacement extends Commande {
     private final float finalPX, finalPY; // destination en coordonnées pixels
 

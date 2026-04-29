@@ -5,27 +5,32 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Petite bulle d'avertissement qui s'affiche brièvement près du curseur.
+ * Utilisée pour les messages d'erreur (ex: "Case cible invalide")
+ * Se ferme automatiquement après un délai, ou via le bouton X.
+ */
 public class WarningBubble {
 
-    // ── Dimensions ─────────────────────────────────────────────────────
+    // Dimensions
     private static final int W       = 230;
     private static final int PAD     = 12;
     private static final int RADIUS  = 8;
     private static final int LINE_H  = 17;
     private static final int MAX_TEXT_W = W - PAD * 2 - 26; // reserve pour le bouton X
 
-    // ── Palette ───────────────────────────────────────────────────────────
+    // Palette 
     private static final Color BG     = new Color( 40,  30,  30, 235);
     private static final Color BORDER = new Color(200,  70,  60, 210);
     private static final Color FG     = new Color(240, 200, 195);
     private static final Color X_COL  = new Color(160, 130, 130);
     private static final Color X_HOV  = new Color(220,  80,  70);
 
-    // ── Polices ───────────────────────────────────────────────────────
+    // Polices
     private static final Font FONT   = new Font("Dialog", Font.PLAIN, 12);
     private static final Font FONT_X = new Font("Dialog", Font.BOLD,  13);
 
-    // ── Etat ───────────────────────────────────────────────────────────
+    // Etat
     private String       message    = "";
     private List<String> lines      = new ArrayList<>();
     private int          screenX, screenY;
@@ -34,7 +39,6 @@ public class WarningBubble {
     private boolean      xHovered   = false;
     private Timer        timer;
 
-    // ── API publique ──────────────────────────────────────────────────
 
     public boolean isVisible() { return visible; }
 
@@ -92,20 +96,20 @@ public class WarningBubble {
         lines = wrapText(fm, message);
         currentH = PAD + lines.size() * LINE_H + PAD;
 
-        // ── Fond ───────────────────────────────────────────────────────
+        // Fond
         g2.setColor(BG);
         g2.fillRoundRect(screenX, screenY, W, currentH, RADIUS, RADIUS);
 
-        // ── Bordure ───────────────────────────────────────────────────
+        // Bordure
         g2.setColor(BORDER);
         g2.setStroke(new BasicStroke(1.2f));
         g2.drawRoundRect(screenX, screenY, W, currentH, RADIUS, RADIUS);
 
-        // ── Barre d'accent a gauche ────────────────────────────────────
+        // Barre d'accent a gauche
         g2.setColor(BORDER);
         g2.fillRoundRect(screenX, screenY, 3, currentH, 3, 3);
 
-        // ── Lignes de message ──────────────────────────────────────────
+        // Lignes de message 
         g2.setFont(FONT);
         g2.setColor(FG);
         int textY = screenY + PAD + fm.getAscent() - 1;
@@ -114,7 +118,7 @@ public class WarningBubble {
             textY += LINE_H;
         }
 
-        // ── Bouton X ───────────────────────────────────────────────────
+        // Bouton X 
         Rectangle xr = getCloseRect();
         if (xHovered) {
             g2.setColor(X_HOV);
@@ -125,8 +129,7 @@ public class WarningBubble {
         g2.drawString("×", xr.x + 3, xr.y + fm.getAscent());
     }
 
-    // ── Aides ─────────────────────────────────────────────────────────
-
+    // Fonction de wrapping qui respecte les retours a la ligne explicites (\n) et les limites de largeur.
     private List<String> wrapText(FontMetrics fm, String text) {
         List<String> result = new ArrayList<>();
         // Respecte d'abord les retours a la ligne explicites

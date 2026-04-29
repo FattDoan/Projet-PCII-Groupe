@@ -7,7 +7,11 @@ import model.Selectable;
 import java.util.List;
 import javax.swing.*;
 import java.awt.*;
- 
+
+/**
+ * JPanel principal qui contient à la fois l'affichage du terrain et le menu contextuel superposé.
+ * Gère la disposition des composants, les interactions de base, et la conversion pixel <-> grille.
+ */
 public class Affichage extends JPanel {
  
     public static final int    MAX_VIEW_W         = 1300;

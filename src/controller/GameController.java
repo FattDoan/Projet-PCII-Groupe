@@ -4,7 +4,11 @@ import view.Camera;
 import model.Terrain;
 import model.Case;
 import view.Affichage;
- 
+
+/**
+ * Point d'entrée du package controller.
+ * Orchestration des interactions utilisateur (clic, hover, drag) et de la caméra.
+ */
 public class GameController {
  
     // Caméra unique de la session de jeu.

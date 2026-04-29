@@ -9,6 +9,10 @@ import java.awt.geom.AffineTransform;
 import java.util.List;
 import model.unite.Unite;
 
+/**
+ * JPanel responsable de l'affichage du terrain de jeu, des cases, unités, et minerais.
+ * Gère aussi les survols, sélections, et le mode de sélection de destination pour les unités.
+ */
 public class AffichageTerrain extends JPanel {
 
     private final Terrain terrain;

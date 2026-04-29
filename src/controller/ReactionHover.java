@@ -6,7 +6,11 @@ import model.Selectable;
 import view.AffichageTerrain;
 import view.Affichage;
 import java.awt.event.*;
- 
+
+/**
+ * Gère le survol de la souris pour mettre en surbrillance les éléments du terrain.
+ * Utilise Camera.screenToGridX/Y pour tenir compte du pan ET du zoom.
+ */
 public class ReactionHover implements MouseMotionListener {
  
     private final Affichage affichage;

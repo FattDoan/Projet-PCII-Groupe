@@ -36,8 +36,7 @@ public class CameraController implements MouseListener, MouseMotionListener, Mou
     /** Utilisé par ReactionClic pour ignorer un clic après un glisser. */
     public boolean isDragging() { return dragging; }
  
-    // ── Gestion du glisser souris ─────────────────────────────────────────
- 
+    // Gestion du glisser souris 
     @Override
     public void mousePressed(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
@@ -66,7 +65,7 @@ public class CameraController implements MouseListener, MouseMotionListener, Mou
         dragging   = false;
     }
  
-    // ── Gestion clavier ────────────────────────────────────────────────────
+    // Gestion clavier
     @Override
     public void keyPressed(KeyEvent e) {
         int dx = 0, dy = 0;

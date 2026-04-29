@@ -3,6 +3,11 @@ package model.unite.commande;
 import model.*;
 import model.unite.Unite;
 
+/**
+ * Commande pour récupérer du minerai d'un bâtiment. L'unité doit être à proximité du bâtiment pour exécuter cette commande.
+ * La commande est terminée lorsque le bâtiment n'a plus de minerai ou que l'unité a son stockage plein.
+ * Cette commande est utilisée principalement par CommandeConstuire, et n'est pas destinée à être utilisée directement par les joueurs.
+ */
 public class CommandeRetrieve extends Commande {
     private static final int TEMPS = 500;  
     private int progression = 0; 

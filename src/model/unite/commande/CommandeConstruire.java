@@ -4,6 +4,14 @@ import model.*;
 import model.unite.Unite;
 import java.util.Set;
 
+/**
+ * Commande pour construire un bâtiment. 
+ * L'unité doit être à proximité du bâtiment en construction et avoir des matériaux en stock pour construire.
+ * La construction se fait progressivement, avec un certain nombre de points de vie ajoutés au bâtiment à chaque tick de construction, 
+ * jusqu'à ce que le bâtiment soit entièrement construit (atteint son HP max). 
+ * Si l'unité n'a plus de matériaux, 
+ * elle doit retourner au bâtiment de stockage le plus proche pour se réapprovisionner avant de continuer la construction.
+ */
 public class CommandeConstruire extends Commande {
     private static final int TEMPS = 500;
     private int progression = 0; // nombre de ticks déjà passés à miner le minerai actuel

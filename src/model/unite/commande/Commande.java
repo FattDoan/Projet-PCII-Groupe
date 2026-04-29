@@ -2,6 +2,10 @@ package model.unite.commande;
 
 import model.unite.Unite;
 
+/**
+ * Classe abstraite représentant une commande pour une unité.
+ * Chaque commande doit implémenter la méthode executer, qui est appelée à chaque tick de jeu tant que la commande n'est pas terminée (retourne false).
+ */
 public abstract class Commande {
     // Appelee a chaque tick de jeu tant que la commande n'est pas terminee (retourne false).
     public abstract boolean executer(Unite unite, double deltaTime);

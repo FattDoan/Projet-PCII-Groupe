@@ -3,6 +3,11 @@ package model.unite.commande;
 import model.*;
 import model.unite.Unite;
 
+/**
+ * Commande pour déposer du minerai d'une unité au bâtiment maître. 
+ * L'unité doit être à proximité du bâtiment maître pour déposer le minerai. 
+ * Si l'unité n'a plus de minerai, elle retourne à la mine pour en miner davantage.
+ */
 public class CommandeDeposit extends Commande {
     private static final int TEMPS = 1000;  // chaque second on dépose une unité de minerai au batiment maitre
     private int progression = 0; // nombre de ticks déjà passés à miner le minerai actuel

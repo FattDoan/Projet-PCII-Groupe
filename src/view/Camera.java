@@ -1,5 +1,10 @@
 package view;
 
+/**
+ * Gère la position et le zoom de la caméra, ainsi que les conversions entre coordonnées écran et monde.
+ * Implémentée en singleton pour un accès global facile.
+ * Le zoom est centré sur le point sous le curseur pour une expérience utilisateur fluide.
+ */
 public class Camera {
  
     private int offsetX = 0;
@@ -28,8 +33,8 @@ public class Camera {
     public static Camera getInstance() {
         return INSTANCE;
     }
-    // ── Déplacement caméra ────────────────────────────────────────────────
- 
+
+    // Déplacement caméra 
     public void move(int dx, int dy) {
         setOffset(offsetX + dx, offsetY + dy);
     }
@@ -41,8 +46,7 @@ public class Camera {
         offsetY  = clamp(y, 0, maxY);
     }
  
-    // ── Conversion écran -> grille ────────────────────────────────────────
- 
+    // Conversion écran -> grille
     public float screenToWorldX(int screenX) {
         return (screenX + offsetX) / zoom;
     }
@@ -67,13 +71,11 @@ public class Camera {
         return Math.round(worldY * zoom - offsetY);
     }
 
-    // ── Accesseurs ─────────────────────────────────────────────────────
- 
+    // Getters
     public int getOffsetX()      { return offsetX; }
     public int getOffsetY()      { return offsetY; }
  
-    // ── Utilitaires internes ───────────────────────────────────────────────
- 
+    // Utilitaires internes
     private static float clamp(float v, float min, float max) {
         return Math.max(min, Math.min(max, v));
     }
@@ -87,6 +89,7 @@ public class Camera {
         setOffset(offsetX, offsetY); // re-borne avec les nouvelles limites
     }
 
+    // Zoom
     public static final float ZOOM_MIN  = 0.8f;
     public static final float ZOOM_MAX  = 3.0f;
     public static final float ZOOM_STEP = 0.2f;

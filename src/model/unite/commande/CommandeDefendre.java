@@ -5,7 +5,11 @@ import model.unite.Ennemi;
 import model.unite.Ouvrier;
 import model.unite.Unite;
 
-// Attack either a unit or a building (Selectable given)
+/**
+ * Commande pour défendre une position spécifique. 
+ * L'unité se déplace vers la position de défense, puis attaque automatiquement les ennemis à proximité (dans un certain rayon) tant qu'elle est en vie.
+ * Si des ennemis sont présents, l'unité attaque jusqu'à ce que les ennemis soient détruits, puis retourne à la position de défense et attend de nouveaux ennemis.
+ */
 public class CommandeDefendre extends Commande {
     private static final int TEMPS = 1000; // temps nécessaire pour infliger des dégâts significatifs
                                            // (x point de dégâts par seconde, 

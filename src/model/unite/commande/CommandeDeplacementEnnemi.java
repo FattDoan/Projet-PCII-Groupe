@@ -4,6 +4,10 @@ import model.unite.Ennemi;
 import model.unite.Unite;
 import model.*;
 
+/**
+ * Commande de déplacement pour les unités ennemies. 
+ * Les ennemis se déplacent automatiquement vers le bâtiment maître ennemi et attaquent les unités ou bâtiments alliés à proximité.
+ */
 public class CommandeDeplacementEnnemi extends Commande {
     private Terrain terrain; // référence au terrain pour trouver les batiments ennemis
     

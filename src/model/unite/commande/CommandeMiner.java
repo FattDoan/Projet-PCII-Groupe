@@ -3,7 +3,11 @@ package model.unite.commande;
 import model.*;
 import model.unite.Unite;
 
-
+/**
+ * Commande pour miner un minerai. L'unité doit être positionnée sur une case contenant du minerai pour que la commande soit exécutée.
+ * L'unité mine pendant un certain temps (TEMPS) et ajoute le minerai à son stockage. 
+ * Si le stockage est plein, l'unité retourne au bâtiment maître pour déposer le minerai avant de continuer à miner.
+ */
 public class CommandeMiner extends Commande {
     private static final int TEMPS = 1000;
     private int progression = 0; // nombre de ticks déjà passés à miner le minerai actuel

@@ -4,7 +4,11 @@ import model.*;
 import model.unite.Ennemi;
 import model.unite.Unite;
 
-// Attack either a unit or a building (Selectable given)
+/**
+ * Commande pour attaquer une cible (unité ou bâtiment). 
+ * L'unité attaquera la cible pendant un certain temps (TEMPS) avant d'infliger des dégâts, 
+ * puis recommencera le processus jusqu'à ce que la cible soit détruite.
+ */
 public class CommandeAttaquer extends Commande {
     private static final int TEMPS = 1000; // temps nécessaire pour infliger des dégâts significatifs
                                            // (x point de dégâts par seconde, 
