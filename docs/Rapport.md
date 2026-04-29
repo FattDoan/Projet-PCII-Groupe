@@ -508,9 +508,7 @@ classDiagram
         +afficheRoute(Graphics g, Case c, Route route)
     }
 
-    note for AffichageCases
-        récupère les images dans ./images/
-    end note
+    note for AffichageCases "récupères les images dans ./images/"
 
     JFrame <|-- Fenetre : hérite de
     JPanel <|-- Affichage : hérite de
