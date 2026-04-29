@@ -297,21 +297,72 @@ classDiagram
 
 ### 5.1.3 : Coordonnées des unités et ennemis (mouvement continu)
 
-Les unités et les ennemis utilisent des coordonnées continues en pixels pour leur déplacement. La classe `Unite` gère les positions `px` et `py` (pixels) et les convertit en coordonnées de grille (`getGX()`, `getGY()`) pour interagir avec le terrain. Les déplacements sont gérés via des commandes (ex: `CommandeDeplacement`) qui mettent à jour les positions des unités à chaque tick, en fonction de l'action demandée.
+**Structures de données utilisées**
+
+- **Classe `Unite`** : Base pour toutes les unités (ouvriers, ennemis), stocke les coordonnées continues en pixels (`px`, `py`) et la vitesse de déplacement (`speed`).
+- **Classe `Ennemi`** : Étend `Unite` avec des constantes spécifiques (HP_INITIAL, VITESSE, DEGATS, ATTACK_RANGE).
+- **Classe `CommandeDeplacement`** : Gère le déplacement vers une destination en pixels. Calcule le vecteur de direction et applique un pas de déplacement proportionnel à la vitesse et au temps écoulé.
+- **Classe `CommandeDeplacementEnnemi`** : Spécialisation pour les ennemis, implémente un scan de la zone régulière (SCAN_RADIUS) pour détecter des cibles et ajuster la trajectoire.
+
+**Constantes du modèle**
+
+- `Unite,VITESSE` : 0.2f pour les ouvriers, 0.15f pour les ennemis
+- `Case.TAILLE` : Taille d'une case en pixels, utilisée pour la conversion grille ↔ pixels via `getGX()`, `getGY()`
+- `Ennemi.ATTACK_RANGE` : Case.TAILLE (portée d'attaque)
+- `CommandeDeplacementEnnemi.SCAN_RADIUS` : 1 (rayon de détection de 2 cases)
+
+**Algorithme abstrait**
+
+1. **Initialisation** : Une unité est créée avec des coordonnées initiales en pixels (`px = GX * Case.TAILLE`, `py = GY * Case.TAILLE`).
+2. **Conversion des coordonnées** : `getGX()` et `getGY()` convertissent les pixels en coordonnées de grille par division par `Case.TAILLE`.
+3. **Déplacement** : `CommandeDeplacement.executer()` calcule la distance vers la destination et applique un pas (`step = speed * dt`). Si la distance est inférieure au pas, l'unité atteint directement la destination. Sinon, elle avance proportionnellement.
+4. **Détection et poursuite (ennemis)** : `CommandeDeplacementEnnemi` scanne un rayon de 2 cases autour de l'ennemi. Si une cible (bâtiment ou unité allié) est détectée, l'ennemi ajuste sa trajectoire pour maintenir une distance d'attaque optimale, puis déclenche une `CommandeAttaquer`.
+
+**Conditions limites à respecter**
+
+- La conversion pixels ↔ grille doit être cohérente pour éviter les erreurs de positionnement.
+- Les déplacements doivent respecter les limites du terrain.
+- Les ennemis ne doivent pas se bloquer mutuellement (pas de gestion de collision entre ennemis dans la version actuelle).
+
+**Interactions avec les autres fonctionnalités**
+
+- **Terrain** : Fournit les dimensions et les obstacles pour le calcul des trajectories.
+- **Système de commandes** : Les déplacements sont gérés via une file de commandes séquentielles (Deque<Commande>).
+- **Affichage** : Les coordonnées pixels sont directement utilisées par `AffichageUnites` pour dessiner les unités.
 
 ```mermaid
 classDiagram
     class Unite {
         -px: float
         -py: float
+        -speed: float
         +getGX(): int
         +getGY(): int
         +avancer(float dx, float dy)
     }
+    class Ennemi {
+        +HP_INITIAL: int
+        +VITESSE: float
+        +ATTACK_RANGE: float
+        +DEGATS: int
+    }
     class CommandeDeplacement {
+        -finalPX: float
+        -finalPY: float
         +executer(Unite unite, double dt): boolean
     }
+    class CommandeDeplacementEnnemi {
+        -terrain: Terrain
+        -SCAN_RADIUS: int
+        +scanNearby(Unite): Selectable
+        +executer(Unite unite, double dt): boolean
+    }
+    Unite <|-- Ennemi
+    Commande <|-- CommandeDeplacement
+    Commande <|-- CommandeDeplacementEnnemi
+    CommandeDeplacementEnnemi --> Terrain : scanne
     Unite --> CommandeDeplacement : utilise
+    Ennemi --> CommandeDeplacementEnnemi : utilise
 ```
 
 ## 5.2 : Affichage des objets (unités, minerai, bâtiments)
@@ -868,7 +919,47 @@ classDiagram
 
 ### 5.5.3 Création de l'unité de base initiale
 
-TODO
+```mermaid
+classDiagram
+    class Terrain {
+        -unites: List~Unite~
+        +addUnite(Unite)
+    }
+
+    class Unite {
+        -px: float
+        -py: float
+        -hp: int
+        -speed: float
+        +getPX()
+        +getPY()
+    }
+
+    class Ouvrier {
+        +HP_INITIAL: int
+        +VITESSE: float
+        +DEFENSE_RANGE: float
+        +DEGATS: int
+    }
+
+    Terrain "1" o-- "0..*" Unite : contient
+    Unite <|-- Ouvrier
+```
+
+Au lancement du jeu dans `Main.main()`, une unité initiale de type `Ouvrier` est automatiquement créée et positionnée sur le terrain. Cette initialisation se fait via la ligne :
+
+```java
+terrain.addUnite(new Ouvrier(terrainSize/2 + 5, terrainSize/2 + 5, terrain));
+```
+
+L'ouvrier est placé légèrement décalé (5 cases) par rapport au centre du terrain pour éviter de se superposer avec le bâtiment maître. La classe `Ouvrier` étend `Unite` et définit ses caractéristiques :
+
+- **Points de vie initiaux** : `HP_INITIAL = 10`
+- **Vitesse de déplacement** : `VITESSE = 0.2f`
+- **Portée de défense** : `DEFENSE_RANGE = Case.TAILLE`
+- **Dégâts infligés** : `DEGATS = 2`
+
+Cette unité permet au joueur de commencer immédiatement à récolter du minerai et à construire des bâtiments.
 
 ## 5.6 : Actions et déplacements des unités
 
@@ -1416,13 +1507,28 @@ Nous avons développé un jeu de stratégie solo en temps réel avec une archite
 - **Synchronisation** : Utilisation de files de commandes pour gérer les actions des unités de manière séquentielle.
 - **Affichage** : Utilisation de `Graphics2D` pour dessiner les entités et optimisation des performances avec des caches d'images.
 
-### Apprentissage (TODO a refaire c'est un broiuilon pour aide)
-- Maîtrise de la programmation concurrente et des threads en Java.
-- Conception d'une architecture MVC pour un jeu.
-- Gestion des interactions utilisateur avec Swing.
+### Apprentissage
 
-### Perspectives (TODO a refaire c'est un broiuilon pour aide)
-- Ajouter des niveaux de difficulté.
-- Implémenter un système de sauvegarde/chargement.
-- Améliorer les graphismes et les animations.
-- Utiliser des mutex pour éviter les problèmes de synchronisation lorsque plusieurs threads accèdent à des ressources partagées (ex: stockage de la foreuse).
+La réalisation de ce projet nous a permis de développer plusieurs compétences clés en programmation concurrente et en développement d'interfaces interactives :
+
+- **Programmation concurrente** : Maîtrise des threads en Java, utilisation des flags `volatile`, gestion des interruptions et synchronisation entre processus concurrents.
+- **Architecture MVC** : Séparation claire entre le modèle (.logique métier), la vue (affichage graphique) et le contrôleur (gestion des interactions), appliquée à un jeu en temps réel.
+- **Gestion des interactions utilisateur** : Implémentation d'une interface graphique réactive avec Swing, gestion des événements clavier et souris, mise à jour dynamique de l'affichage.
+- **Pattern de conception** : Utilisation du pattern Command pour encapsuler les actions des unités dans des objets, permettant une exécution séquentielle et facile à étendre.
+- **Gestion de projet** : Travail collaboratif avec Git, organisation des tâches, résolution de bugs complexes liés à la synchronisation.
+- **Modélisation objet** : Conception d'une hiérarchie de classes cohérente pour représenter les entités du jeu (unités, bâtiments, terrain) et leurs interactions.
+
+### Perspectives
+
+Plusieurs axes d'amélioration ont été identifiés pour les versions futures du projet :
+
+- **Système de niveaux** : Ajouter des niveaux de difficulté progressifs avec des configurations de terrain, de ressources et d'ennemis différentes.
+- **Sauvegarde/chargement** : Implémenter un système de sauvegarde de la partie (sérialisation) pour permettre aux joueurs de reprendre une partie ultérieurement.
+- **Améliorations graphiques** : Intégrer des sprites animés pour les unités et bâtiments, ajouter des effets visuels (particules, animations fluides), implémenter un système de caméra raisonnable.
+- **Synchronisation avancée** : Utiliser des verrous (`ReentrantLock`) ou des sémaphores pour protéger les accès concurrents aux ressources partagées (ex: stockage des foreuses, liste des unités).
+- **Équilibrage du jeu** : Ajuster les paramètres (vitesse, dégâts, coûts) pour un gameplay plus équilibré et amusant.
+- **Nouveaux types d'unités** : Implémenter des unités spécialisées avec des capacités uniques (ex: soldats avec portées étendues, collecteurs plus rapides).
+- **Interface utilisateur améliorée** : Ajouter un menu de configuration, des indicateurs visuels (barres de vie, de stockage), un système d'aide contextuelle.
+- **Mode multijoueur** : Étendre l'architecture pour supporter le jeu en réseau avec plusieurs joueurs contrôlant chacun leur colonie.
+- **Intelligence artificielle** : Améliorer le comportement des ennemis avec des stratégies plus sophistiquées (ex: attaque coordonnée, ciblage prioritaire).
+- **Tests automatisés** : Ajouter une suite de tests unitaires pour valider la logique métier et prévenir les régressions.
