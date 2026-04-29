@@ -2,8 +2,7 @@ package model;
 
 /** Un bâtiment qui produit des unités à partir de minerai */
 public class Usine extends Batiment implements Runnable {
-
-    public static final int COUT_CONSTRUCTION = 20;
+    public static final int COUT_CONSTRUCTION = 25;
     public static final int HP_MAX = 25;
     public static final int CAPACITE = 20; // Stockage interne pour minerais
 
@@ -43,7 +42,7 @@ public class Usine extends Batiment implements Runnable {
                 if (!essayerRetirerMinerai(COUT_PRODUCTION)) {
                     continue; // Pas assez de minerais au moment de produire
                 }
-                getTerrain().addUnite(new model.unite.Ouvrier(spawn[0] + Case.TAILLE/2, spawn[1] + Case.TAILLE/2, getTerrain()));
+                getTerrain().addUnite(new model.unite.Ouvrier(spawn[0], spawn[1], getTerrain()));
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 break;

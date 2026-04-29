@@ -10,8 +10,7 @@ public class Ouvrier extends Unite {
                                         
     public Ouvrier(int GX, int GY, Terrain terrain) {
         super(GX * Case.TAILLE, GY * Case.TAILLE, VITESSE, HP_INITIAL, TypeUnite.OUVRIER, terrain); 
-    }
-    
+    }    
 }
 
 
