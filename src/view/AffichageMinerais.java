@@ -34,7 +34,7 @@ public class AffichageMinerais {
     public static void afficheMinerai(Graphics g, Minerai minerai) {
         float px = minerai.getPX();
         float py = minerai.getPY();
-        float progression = minerai.getProgression();
+        // float progression = minerai.getProgression();
         
         Graphics2D g2 = (Graphics2D) g;
         
@@ -81,35 +81,35 @@ public class AffichageMinerais {
      * Affiche une barre de progression circulaire autour du minerai
      * pour indiquer l'état du déplacement.
      */
-    private static void afficherBarreProgression(Graphics2D g2, float centerX, float centerY, int size, float progression) {
-        int radius = size / 2 + 4; // Rayon légèrement plus grand que l'image
-        int diameter = radius * 2;
+    // private static void afficherBarreProgression(Graphics2D g2, float centerX, float centerY, int size, float progression) {
+    //     int radius = size / 2 + 4; // Rayon légèrement plus grand que l'image
+    //     int diameter = radius * 2;
         
-        // Dessiner l'arrière-plan de la barre (arc gris)
-        g2.setColor(new Color(60, 60, 60, 180));
-        g2.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-        g2.drawArc(
-            Math.round(centerX - radius),
-            Math.round(centerY - radius),
-            diameter,
-            diameter,
-            0,
-            360
-        );
+    //     // Dessiner l'arrière-plan de la barre (arc gris)
+    //     g2.setColor(new Color(60, 60, 60, 180));
+    //     g2.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+    //     g2.drawArc(
+    //         Math.round(centerX - radius),
+    //         Math.round(centerY - radius),
+    //         diameter,
+    //         diameter,
+    //         0,
+    //         360
+    //     );
         
-        // Dessiner l'arc de progression (arc orange/jaune)
-        int arcAngle = Math.round(progression * 360);
-        g2.setColor(new Color(255, 200, 50, 200));
-        g2.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-        g2.drawArc(
-            Math.round(centerX - radius),
-            Math.round(centerY - radius),
-            diameter,
-            diameter,
-            -90, // Commencer à 12h (haut)
-            arcAngle
-        );
-    }
+    //     // Dessiner l'arc de progression (arc orange/jaune)
+    //     int arcAngle = Math.round(progression * 360);
+    //     g2.setColor(new Color(255, 200, 50, 200));
+    //     g2.setStroke(new BasicStroke(2, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+    //     g2.drawArc(
+    //         Math.round(centerX - radius),
+    //         Math.round(centerY - radius),
+    //         diameter,
+    //         diameter,
+    //         -90, // Commencer à 12h (haut)
+    //         arcAngle
+    //     );
+    // }
     
     /**
      * Affiche tous les minerais en transit sur le terrain.

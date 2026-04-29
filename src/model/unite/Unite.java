@@ -1,12 +1,9 @@
 package model.unite;
 
-import view.Affichage;
 import model.*;
 import model.unite.commande.*;
-import java.util.List;
 import java.util.Deque;
 import java.util.ArrayDeque;
-import view.Camera;
 
 public class Unite implements Selectable, Runnable {
 

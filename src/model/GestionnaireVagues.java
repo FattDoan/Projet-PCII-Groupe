@@ -1,7 +1,6 @@
 package model;
 
 import model.unite.Ennemi;
-import common.AsyncExecutor;
 import java.util.Timer;
 import java.util.TimerTask;
 

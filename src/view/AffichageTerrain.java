@@ -1,6 +1,5 @@
 package view;
 
-import view.Camera;
 import model.Case;
 import model.Terrain;
 import model.Selectable;
@@ -20,7 +19,6 @@ public class AffichageTerrain extends JPanel {
     // Mode selection de destination (apres "Deplacer" dans le menu unite)
     private boolean awaitingDestination = false;
     private int[] destinationPreview = null; // coordonnees grille [gx, gy] survolee
-    private float previewWorldPX, previewWorldPY; // coordonnees monde pour positionner le warning
 
     // Avertissement affiché temporairement en cas d'action interdite (ex: déplacement hors portée).
     private final WarningBubble warning = new WarningBubble();
@@ -202,8 +200,6 @@ public class AffichageTerrain extends JPanel {
 
     public void setDestinationPreview(int gx, int gy, float worldPX, float worldPY) {
         destinationPreview = new int[]{gx, gy};
-        previewWorldPX = worldPX;
-        previewWorldPY = worldPY;
         repaint();
     }
     public void clearDestinationPreview() { destinationPreview = null; repaint(); }

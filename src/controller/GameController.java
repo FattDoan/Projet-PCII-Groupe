@@ -4,7 +4,6 @@ import view.Camera;
 import model.Terrain;
 import model.Case;
 import view.Affichage;
-import view.AffichageTerrain;
  
 public class GameController {
  

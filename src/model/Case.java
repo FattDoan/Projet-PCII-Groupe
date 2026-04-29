@@ -2,8 +2,6 @@ package model;
 
 import common.AsyncExecutor;
 import common.Validation;
-import view.Camera;
-import view.Affichage;
 
 /**
  * Représente une case de la grille de jeu.

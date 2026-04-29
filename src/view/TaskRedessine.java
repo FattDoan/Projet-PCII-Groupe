@@ -3,7 +3,6 @@ package view;
 import model.Terrain;
 import model.BatimentMaitre;
 import javax.swing.SwingUtilities;
-import javax.swing.JOptionPane;
 
 /** Une TimerTask qui redessine la fenêtre principale */
 public class TaskRedessine extends java.util.TimerTask {

@@ -1,7 +1,5 @@
 package model;
 
-import common.AsyncExecutor;
-
 /**
  * Représente une foreuse qui extrait automatiquement les minerais.
  * Une foreuse doit être placée sur une case contenant un filon de minerai.
