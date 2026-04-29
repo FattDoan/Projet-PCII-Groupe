@@ -23,14 +23,14 @@ public class VagueInfoPanel extends JPanel {
         this.gestionnaireVagues = gestionnaireVagues;
                 
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-        setPreferredSize(new Dimension(width, 40)); 
+        setPreferredSize(new Dimension(width, 40));
         setBackground(new Color(30, 30, 35));
         add(Box.createHorizontalGlue());
 
         // Label d'information
         infoLabel = new JLabel();
         infoLabel.setForeground(Color.WHITE);
-        infoLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        infoLabel.setFont(new Font("Dialog", Font.BOLD, 16));
         infoLabel.setAlignmentY(Component.CENTER_ALIGNMENT);
         add(infoLabel);
         
@@ -45,7 +45,7 @@ public class VagueInfoPanel extends JPanel {
                 super.paintComponent(g);
             }
         };
-        skipButton.setFont(new Font("Arial", Font.PLAIN, 14));
+        skipButton.setFont(new Font("Dialog", Font.PLAIN, 16));
         skipButton.setBackground(new Color(80, 80, 90));
         skipButton.setForeground(Color.WHITE);
         skipButton.setFocusPainted(false);

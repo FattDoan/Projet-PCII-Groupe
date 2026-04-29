@@ -22,7 +22,10 @@ public abstract class Batiment{
 
     /** hp */
     private final int hpMax;
-    private int hp;
+    
+    // On utilise un float pour les hp pour permettre une progression plus fluide de la construction,
+    // en fonction du nombre de minéraux ajoutés, plutôt que d'avoir des sauts brutaux de 1 hp à chaque minerai ajouté.
+    private float hp;
 
     /**
      * Crée un nouveau bâtiment avec une capacité de stockage définie.
@@ -46,7 +49,7 @@ public abstract class Batiment{
         if (fini) {
             this.hp = hpMax; // batiment déjà construit, donc hp au max
         } else {
-            this.hp = 1; // construction en cours, hp initial à 1 (peut être ajusté selon les besoins)
+            this.hp = 1.f; // construction en cours, hp initial à 1 (peut être ajusté selon les besoins)
         }
         terrain.notifyBatimentUpdated(this);
     }
@@ -83,17 +86,23 @@ public abstract class Batiment{
         return terrain;
     }
 
-    /** Le nombre de PV actuel du bâtiment */
+    /** Le nombre de PV actuel du bâtiment (principalemnt pour l'affichage)*/
     public int getHP() {
+        return (int)hp;
+    }
+
+    /** Le nombre de PV actuel du bâtiment en float (pour la logique de construction plus fluide) */
+    public float getHPFloat() {
         return hp;
     }
+
     /** Le nombre de PV maximum du bâtiment */
     public int getHPMax() {
         return hpMax;
     }
     /** Renvoie vrai si le bâtiment est à son maximum de PV */
     public boolean atFullHP() {
-        return hp == hpMax;
+        return hp >= hpMax;
     }
 
     /** Vérifie si le bâtiment est détruit (points de vie à zéro ou moins). */
@@ -207,13 +216,18 @@ public abstract class Batiment{
         return false;
     }
 
-    public synchronized void ajouterHP() {
+    public synchronized boolean ajouterHP(float quantite) {
         if (hp < hpMax) {
-            hp += 1;
+            hp += quantite + 0.001f; // On ajoute une petite quantité pour éviter les problèmes 
+                                     // d'arrondi qui pourraient empêcher d'atteindre exactement hpMax
             terrain.notifyBatimentUpdated(this);
-            if (hp == hpMax) {
+            if (hp >= hpMax) {
+                hp = hpMax; // Evite de dépasser le maximum
                 fini = true; // construction terminée quand hp atteint le max
             }
+            return true;
         }
+        return false;
     }
+
 }

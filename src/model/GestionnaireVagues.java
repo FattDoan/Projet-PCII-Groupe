@@ -17,7 +17,7 @@ import java.util.TimerTask;
 public class GestionnaireVagues {
     
     /** Délai entre chaque vague (en millisecondes) */
-    private static final long DELAI_ENTRE_VAGUES_MS = 3 * 60 * 1000; // 3 minutes
+    public static final long DELAI_ENTRE_VAGUES_MS = 3 * 60 * 1000; // 3 minutes
     
     private final Terrain terrain;
     private int numeroVague = 0;

@@ -13,7 +13,7 @@ package model;
 public class BatimentMaitre extends Batiment {
     /** Capacité de stockage du bâtiment maître */
     private static final int CAPACITE = 100;
-    private static final int COUT_CONSTRUCTION = Integer.MAX_VALUE; // Coût de construction infini pour le bâtiment maître, car il est déjà présent au début du jeu.
+    public static final int COUT_CONSTRUCTION = 50;
     private static final int HP_MAX = 100; // Points de vie maximum du bâtiment maître
 
     /**

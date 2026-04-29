@@ -11,7 +11,7 @@ import java.awt.image.BufferedImage;
 /** Panneau du menu contenant toutes les données relatives à la case sélectionnée */
 public class MenuPanel extends JPanel {
 
-    // ── Palette ───────────────────────────────────────────────────────────
+    // Palette
     private static final Color C_BASE       = new Color(18,  18,  20);
     private static final Color C_SURFACE    = new Color(26,  27,  30);
     private static final Color C_RAISED     = new Color(38,  39,  45);
@@ -25,7 +25,7 @@ public class MenuPanel extends JPanel {
     private static final Color C_RED        = new Color(225,  75,  65);
     private static final Color C_BLUE       = new Color( 90, 160, 255);
 
-    // ── Polices ───────────────────────────────────────────────────────────
+    // Polices 
     private static final Font F_TITLE = new Font("Dialog", Font.BOLD,  18);
     private static final Font F_DESC  = new Font("Dialog", Font.PLAIN, 14);
     private static final Font F_SECT  = new Font("Dialog", Font.BOLD,  13);

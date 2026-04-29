@@ -34,8 +34,6 @@ public class Terrain {
    /** Tableau 2D contenant toutes les cases de la grille */
    private final Case[][] grille;
 
-   /** Extension future: unités présentes sur le terrain. */
-   // DOTO: ajouter une liste d'unités (mineurs, camions) présentes sur le terrain pour pouvoir les gérer plus facilement.
    /** batiment maître */
    private BatimentMaitre batimentMaitre;
    private final List<Unite> unites = new CopyOnWriteArrayList<>();
@@ -44,6 +42,10 @@ public class Terrain {
     /** La liste des batiments qui n'ont pas hp plein, pour que les ouvriers puissent les réparer. */
     private final Set<Batiment> batimentsEndommages = ConcurrentHashMap.newKeySet();
 
+    /** La liste de tous les bâtiments présents sur le terrain, pour itérer facilement dessus. */
+    // NOTE: on n'ajoute pas les routes à cette liste, car cette liste servira principalement pour
+    // savoir les minerais stockés dans les bâtiments, et les routes ne stockent pas de minerai.
+    private final Set<Batiment> batiments = ConcurrentHashMap.newKeySet();
    /**
     * Crée une nouvelle grille carrée de la taille spécifiée.
     * Toutes les cases sont initialisées comme cases vides.
@@ -241,11 +243,38 @@ public class Terrain {
 
     public void notifyBatimentUpdated(Batiment b) {
         Validation.requireArgument(b != null, "batiment=null");
-        if (b.isDestroyed() || b.atFullHP()) {
+        if (b.isDestroyed()) {
             batimentsEndommages.remove(b);
-        } else if (!b.atFullHP()) {
+            batiments.remove(b);
+            return;
+        }
+        if (b.atFullHP()) {
+            batimentsEndommages.remove(b);
+        } else {
             batimentsEndommages.add(b);
         }
+        
+        if (!batiments.contains(b) && 
+            (b.getType() == TypeBatiment.STOCKAGE || b.getType() == TypeBatiment.BATIMENT_MAITRE)) {
+            batiments.add(b);
+        }
+    }
+
+    public Batiment getNearestBatimentStockage(int x, int y) {
+        Batiment nearest = null;
+        double minDistance = Double.MAX_VALUE;
+
+        for (Batiment b : batiments) {
+            if (b.getType() == TypeBatiment.STOCKAGE || b.getType() == TypeBatiment.BATIMENT_MAITRE) {
+                double distance = Math.sqrt(Math.pow(b.getX() - x, 2) + Math.pow(b.getY() - y, 2));
+                if (distance < minDistance && b.getStockage() > 0) { // On vérifie aussi que le bâtiment a du minerai à stocker
+                    minDistance = distance;
+                    nearest = b;
+                }
+            }
+        }
+
+        return nearest;
     }
 
 }
