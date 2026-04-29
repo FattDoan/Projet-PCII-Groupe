@@ -6,7 +6,6 @@ import javax.swing.JLabel;
 
 import model.Terrain;
 import model.GestionnaireVagues;
-import java.awt.Dimension;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -103,7 +102,7 @@ public class Fenetre extends JFrame {
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 // Fond rouge semi-transparent
-                g.setColor(new Color(180, 0, 0, 200));
+                g.setColor(new Color(180, 0, 0, 150));
                 g.fillRect(0, 0, getWidth(), getHeight());
             }
         };

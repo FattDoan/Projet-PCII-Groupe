@@ -9,10 +9,6 @@ public class AffichageBatiments {
     /** Adresse de base pour les images, récupérée depuis AffichageCases */
     private static final String BASE_ADRESSE_IMAGES = AffichageCases.BASE_ADRESSE_IMAGES;
 
-    /** Image à placer sur la route lorsqu'elle transporte un minerai */
-    private static final String ADRESSE_MINERAL_INGOT   = BASE_ADRESSE_IMAGES + "sprite_crystal_centre.png";
-
-
     /** Images de base pour les bâtiments */
 
     private static final String[] ADRESSES_ROUTE = {

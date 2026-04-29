@@ -12,19 +12,20 @@ import model.Case;
  * Classe qui contient les méthodes d'affichage des minerais en transit sur les routes.
  */
 public class AffichageMinerais {
-    
+
     /** Taille d'affichage d'un minerai (en pixels) */
-    public static final int TAILLE_MINERAI = Case.TAILLE / 2; // Plus petit
-    
+    public static final int TAILLE_MINERAI = Case.TAILLE; // On utilise une image où le minerai est déjà à la bonne position par rapport à la route (pas exactement centré)
+    // Donc l'image du minerai fait la même taille que la case
+
     // Cache pour stocker les images déjà chargées
     private static final HashMap<String, java.awt.Image> IMAGES_CACHE = new HashMap<>();
-    
+
     // Adresse de base pour les images
     public static final String BASE_ADRESSE_IMAGES = FileSystems.getDefault().getPath("").toAbsolutePath().toString() + "/images/";
-    
+
     // Adresse de l'image du minerai en transit
-    private static final String ADRESSE_MINERAI_TRANSPORT = BASE_ADRESSE_IMAGES + "sprite_crystal_centre.png";
-    
+    private static final String ADRESSE_MINERAI_TRANSPORT = BASE_ADRESSE_IMAGES + "sprite_crystal_terne.png";
+
     /**
      * Affiche un minerai en transit sur le terrain.
      * @param g le contexte graphique
