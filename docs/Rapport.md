@@ -170,7 +170,7 @@ Les unités assurent l'exécution des ordres du joueur : récolte du minerai, co
     — Priorité : 2
     — Temps estimé : 30 min
 
-4. **Défense (tourelle)**
+4. **Défense**
     — Difficulté : Élevée
     — Priorité : 3
     — Temps estimé : 1h
@@ -1313,12 +1313,53 @@ Ces tests garantissent la robustesse du code et facilitent la maintenance.
    ```
 
 ### Utilisation
-- Cliquez sur un objet (batiment, unité) pour voir ses détails.
-- Pour construire un bâtiment, sélectionnez une case vide et choisissez le type de bâtiment dans le menu à droite. Ensuite, sélectionnez une unité et ordonnez-lui de contruire le bâtiment.
-- Pour défendre une zone, sélectionnez une unité et ordonnez-lui de se mettre en mode défense. Les ennemis à portée seront attaqués automatiquement.
-- De manière générale, utilisez le menu à droite pour modifier l'état du jeu (ex: construire, miner, déplacer les unités...).
-- Pour zoomer/dézoomer, utilisez la molette de la souris ou les boutons + et -.
-- Pour déplacer la caméra, maintenez le clic gauche et déplacez la souris.
+
+#### **Contrôles de base**
+| Action                               | Contrôle                       |
+|--------------------------------------|--------------------------------|
+| Sélectionner une case/bâtiment/unité | Clic gauche                    |
+| Déplacer la caméra                   | Clic gauche + glisser          |
+| Zoomer/Dézoomer                      | Molette de la souris ou + et - |
+| Ouvrir le menu d'actions             | Clic sur une case sélectionnée |
+
+---
+
+#### **Comment jouer ?**
+
+**1. Récolter du minerai**
+- Sélectionnez un **Ouvrier**
+- Déplacez-le sur un **filon de minerai** (case grise)
+- Cliquez sur **"Miner"** dans le menu
+- L'Ouvrier remplit son stockage (max 5 minerais)
+- Déplacez-le vers un **Bâtiment Maître** ou **Stockage** et cliquez sur **"Déposer"**
+
+**2. Construire des bâtiments**
+- Sélectionnez une **case vide**
+- Dans le menu, choisissez un bâtiment :
+
+  **Foreuse** (10 minerais) :
+  - **Rôle** : Extraire **automatiquement** du minerai d'un filon
+  - **Fonctionnement** :
+    - Doit être posée **sur une case avec du minerai** (sinon ne produit rien)
+    - Extraire **1 minerai toutes les 2 secondes**
+    - **Stockage limité à 1 minerai** → doit être vidée régulièrement
+    - **Automatisation** : Connectez-la avec des **Routes** pour acheminer le minerai vers un Stockage ou le Bâtiment Maître
+  - **Astuce** : Plus vous avez de Foreuses, plus vous récoltez rapidement !
+
+  - **Route** (1 minerai) : Transport du minerai (choisir une direction ↑↓←→)
+  - **Stockage** (10 minerais) : Stocke jusqu'à 10 minerais
+  - **Usine** (200 minerais) : Produit des Ouvriers automatiquement
+
+**3. Se défendre**
+- Placez un **Ouvrier** près de votre Bâtiment Maître
+- Cliquez sur **"Défendre"**
+- L'Ouvrier attaquera automatiquement les ennemis à proximité (portée : 2 cases)
+
+---
+#### **Astuces**
+- **Vagues d'ennemis** : Arrivent toutes les 3 minutes. Utilisez le bouton **"Sauter le temps"** en haut pour tester rapidement.
+- **Direction des Routes** : Le minerai suit la flèche. Vérifiez le sens !
+- **Bâtiment Maître** : **À protéger absolument** (100 PV). Sa destruction = Game Over.
 
 ## 8. Documentation développeur
 
