@@ -259,15 +259,53 @@ flowchart BT
     Controleur -.->|déplace| Vue
 ```
 
-
-
 ## 5. Conception détaillée
 
 ## 5.1 : Gestion des coordonnées (grille discrète vs mouvement continu)
 
 ### 5.1.1 : Gestion des collisions entre ennemis/unités et bâtiments
 
-TODO
+**Structures de données et classes utilisées**
+
+- **Interface `Selectable`** : représente tout élément pouvant être ciblé ou détecté par le système de jeu, qu’il s’agisse d’une unité ou d’un bâtiment.
+- **Classe `CommandeDeplacementEnnemi`** : gère le comportement de déplacement des ennemis. Elle scanne les cases autour de l’unité pour repérer une cible proche et ajuste la trajectoire en fonction de la distance d’attaque.
+- **Classe `CommandeDefendre`** : gère le comportement défensif des ouvriers. Elle recherche les ennemis dans une zone de proximité, puis choisit entre déplacement et attaque selon la distance.
+- **Classe `Batiment` / `BatimentMaitre`** : les bâtiments sont des cibles attaquables. Le bâtiment maître constitue une cible prioritaire dans le comportement des ennemis.
+
+**Principe de gestion**
+
+La version actuelle ne repose pas sur une collision physique au sens strict, mais sur une **gestion par proximité et par sélection de cible**. Les unités et les ennemis ne “rebondissent” pas sur les bâtiments ; à la place, ils détectent les éléments proches, choisissent une cible, puis s’arrêtent à une distance d’attaque adaptée avant de lancer une commande d’attaque.
+
+**Algorithme abstrait**
+
+1. **Détection de proximité** :
+   - Les ennemis utilisent `CommandeDeplacementEnnemi.scanNearby(...)` pour inspecter les cases autour d’eux dans un rayon de `SCAN_RADIUS = 1`.
+   - Les ouvriers en défense utilisent `CommandeDefendre.scanForEnemies(...)` pour repérer les ennemis proches dans une zone de deux cases environ.
+2. **Sélection de la cible** :
+   - Le système choisit la cible la plus proche parmi les éléments détectés.
+   - Les ennemis ignorent les autres ennemis et ne ciblent que les éléments adverses détectables.
+3. **Gestion de la distance d’attaque** :
+   - Si la cible est trop loin, l’unité se déplace vers elle jusqu’à atteindre la portée d’attaque.
+   - L’ennemi se positionne de manière à rester à `Ennemi.ATTACK_RANGE` de la cible avant d’attaquer.
+   - L’ouvrier défensif applique la même logique avec `Ouvrier.DEFENSE_RANGE`.
+4. **Attaque de la cible** :
+   - Une fois la distance correcte atteinte, une commande d’attaque est ajoutée ou exécutée.
+   - Dans le cas de la défense, la cible ennemie subit des dégâts périodiques après une phase de progression temporelle (`TEMPS`).
+
+**Conditions limites à respecter**
+
+- Il n’y a pas de véritable gestion de collision entre plusieurs unités mobiles. Elles peuvent donc se retrouver proches les unes des autres sans résolution de blocage.
+- Le bâtiment maître est une cible particulière, traitée comme priorité dans la logique ennemie.
+
+**Interactions avec les autres fonctionnalités**
+
+- **Déplacement continu** : les coordonnées en pixels sont utilisées pour calculer les distances et adapter le déplacement des unités.
+- **Affichage** : les positions des unités et bâtiments sont exploitées par le rendu pour afficher correctement les entités sur la grille.
+- **Système de commandes** : la collision comportementale est intégrée au système de commandes séquentielles, ce qui permet aux unités de passer naturellement du déplacement à l’attaque.
+
+**Remarque de conception**
+
+Nous avons décidé de mettre en œuvre cette stratégie simple pour les unités, car notre jeu peut comporter des centaines d'entités en mouvement qui modifient toutes simultanément l'état du jeu (`Terrain`). En effet, cela constituerait un véritable cauchemar en termes de performances si chacune d'entre elles devait constamment vérifier les collisions et exécuter des algorithmes de calcul d'itinéraire.
 
 ### 5.1.2 : Coordonnées sur la grille (bâtiments et minerais)
 
@@ -378,7 +416,6 @@ classDiagram
   - Attribut : `terrain` (référence au terrain à afficher)
   - Méthode `paintComponent(Graphics g)` : surcharge pour dessiner les éléments du terrain (minerais, bâtiments, etc.) en fonction de leur position et de leur type. Appelle les fonctions d'affichage spécifiques dans `AffichageMinerais` et `AffichageBâtiments`. Garde un espace pour afficher le menu à droite de la grille.
 
-
 ### 5.2.2 : Affichage des unités
 
 La classe `AffichageUnites` gère l'affichage des unités (ennemis et ouvriers) sur la grille. Chaque unité est dessinée sous forme de cercle centré sur ses coordonnées en pixels. 
@@ -415,32 +452,33 @@ classDiagram
     Unite <|-- Ennemi
 ```
 
-
 ### 5.2.3 : Affichage des filons de minerai et des bâtiments
 
 La classe `AffichageCases` contient des méthodes statiques pour afficher les différents types de cases (vide, minerai, bâtiment) à une position donnée sur la fenêtre. Les images utilisées sont chargées depuis le dossier `./images/`.
 
 - Méthodes statiques :
+  
   - `afficheCase(Graphics g, Case c)` : affiche une case en fonction de son type (vide, minerai, bâtiment) en appelant la méthode d'affichage correspondante.
   - `afficheImageCase(Graphics g, Case c, String adresse)` : affiche l'image à l'emplacement `adresse` sur la case `c`. Récupère l'image dans le cache si on l'a déjà chargée.
   - `afficheImageBatiment(Graphics g, Case c)` : affiche une image correspondant au bâtiment contenu dans la case `c` en appelant la méthode correspondante dans `AffichageBatiments`.
 
 - Variables statiques : 
+  
   - `BASE_ADRESSE_IMAGES` : l'adresse correspondant au dossier `images/` pour l'ordinateur de l'utilisateur.
   - `ADRESSE_MINERAL_DEPOSIT`, `ADRESSE_EN_CONSTRUCTION` : les adresses des sprites utilisés pour l'affichage.
-
 
 La classe `AffichageBatiments` contient les méthodes et les adresses d'images spécifiques à l'affichage des bâtiments. En plus du type de batiment, l'affichage dépend de la quantité de PV que le bâtiment a, son état de fonctionnement (usine et foreuse), et la quantité de minerai qu'il contient (stockage et batiment maitre). 
 
 - Méthodes statiques :
+  
   - `affiche{nom du batiment}(Graphics g, Case c, {type du batiment} b)` : affiche une image du batiment en question à la position de la case sur la fenêtre.
 
 - Variables statiques :
+  
   - `ADRESSES_{nom du batiment}` : tableau d'adresses des sprites du batiment en question en fonction de son état, et un sprite du bâtiment détruit.
   - `ADRESSES_{nom du batiment}_DAMAGED` : tableau d'adresses des sprites de dégâts du bâtiment en question, à superposer à l'image de base en fonction de la quantité de PV restante du bâtiment.
 
 Les adresse des images utilisées sont stockées dans différentes variables statiques, dans `AffichageBatiments` pour celles spécifiques à chaque batiments et dans `AffichageCases` pour les autres. On utilise un HashMap comme cache afin d'éviter de recharger la même image plusieurs fois.
-
 
 ```mermaid
 classDiagram
@@ -470,7 +508,9 @@ classDiagram
         +afficheRoute(Graphics g, Case c, Route route)
     }
 
-    note for AffichageCases "récupères les images dans ./images/"
+    note for AffichageCases
+        récupère les images dans ./images/
+    end note
 
     JFrame <|-- Fenetre : hérite de
     JPanel <|-- Affichage : hérite de
@@ -480,12 +520,12 @@ classDiagram
     AffichageCases <-- AffichageBatiments : utilise la fonction afficheImageCase
 ```
 
-
 ### 5.2.4 : Animation du minerai sur les routes (effet visuel)
 
 Les minerais en transit sont affichés de manière continue avec la classe `AffichageMinerais`. Chaque minerai utilise une image (`sprite_crystal_centre.png`) qui se déplace fluidement entre les cases de la grille. L'animation utilise des coordonnées en pixels (px, py) pour un rendu visuel fluide, avec interpolation linéaire entre la position de départ et la position cible à chaque étape de progression.
 
 **Caractéristiques :**
+
 - Image : `sprite_crystal_centre.png` (taille réduite à la moitié d'une case)
 - Pas de barre de progression jaune (supprimée pour un rendu plus épuré)
 - Le minerai disparaît automatiquement lorsqu'il atteint une destination finale (bâtiment maître ou stockage)
@@ -525,6 +565,7 @@ classDiagram
 Le jeu se termine automatiquement lorsque le bâtiment maître est détruit (HP atteignant 0). Un écran de Game Over s'affiche alors par-dessus l'interface du jeu sans Fermer l'application.
 
 #### Structures de données et constantes
+
 - **Classe `BatimentMaitre`** : Gère les points de vie du bâtiment principal
   - `HP_MAX`: points de vie maximum (100 par défaut)
   - `isDestroyed()`: méthode héritée de `Batiment` pour vérifier si HP ≤ 0
@@ -536,6 +577,7 @@ Le jeu se termine automatiquement lorsque le bâtiment maître est détruit (HP 
   - Utilise le GlassPane de JFrame pour superposer l'écran de Game Over
 
 #### Algorithme
+
 1. À chaque cycle de rendu (16ms), `TaskRedessine.run()` vérifie l'état du bâtiment maître
 2. Si le bâtiment maître est détruit (`isDestroyed() == true`) et que le Game Over n'a pas encore été affiché :
    - Appelle `Fenetre.afficherEcranGameOver()`
@@ -544,6 +586,7 @@ Le jeu se termine automatiquement lorsque le bâtiment maître est détruit (HP 
 4. Le jeu continue de s'exécuter en arrière-plan (les threads ne sont pas arrêtés)
 
 #### Utilisation
+
 - La destruction du bâtiment maître peut être déclenchée par :
   - `batimentMaitre.receiveDamage(X)`: inflige X dégâts au bâtiment
   - `batimentMaitre.detruire()`: détruit immédiatement le bâtiment (met HP à 0)
@@ -556,17 +599,17 @@ classDiagram
         +isDestroyed()
         +receiveDamage(int)
     }
-    
+
     class Fenetre {
         -gameOver: boolean
         +afficherEcranGameOver()
     }
-    
+
     class TaskRedessine {
         -gameOverDisplayed: boolean
         +run()
     }
-    
+
     TaskRedessine --> BatimentMaitre : vérifie isDestroyed()
     TaskRedessine --> Fenetre : afficherEcranGameOver()
     BatimentMaitre --|> Batiment
@@ -774,6 +817,7 @@ classDiagram
 ```
 
 **Implémentation améliorée :**
+
 - Les minerais ont maintenant des coordonnées en **pixels** (`px`, `py`) pour un déplacement fluide
 - Une **animation de déplacement** avec interpolation linéaire entre les cases
 - Un **indicateur de progression circulaire** s'affiche autour des minerais en mouvement
@@ -786,6 +830,7 @@ classDiagram
 Le jeu implémente un système de **vagues d'ennemis** qui attaquent le bâtiment maître à intervalles réguliers.
 
 #### Structures de données et constantes
+
 - **Classe `GestionnaireVagues`** : Gère la génération périodique des vagues d'ennemis
   - `DELAI_ENTRE_VAGUES_MS`: 3 minutes (180 000 ms) entre chaque vague
   - `numeroVague`: compte le nombre de vagues écoulées
@@ -801,6 +846,7 @@ Le jeu implémente un système de **vagues d'ennemis** qui attaquent le bâtimen
   - Un bouton "Sauter le temps" pour déclencher manuellement la prochaine vague
 
 #### Algorithme
+
 1. **Initialisation** : Le `GestionnaireVagues` est créée et démarrée dans `Main`
 2. **Déclenchement des vagues** : Toutes les 3 minutes, une nouvelle vague est déclenchée
 3. **Nombre d'ennemis par vague** : La vague n°N contient N ennemis (vague 1 = 1 ennemi, vague 2 = 2 ennemis, etc.)
@@ -811,6 +857,7 @@ Le jeu implémente un système de **vagues d'ennemis** qui attaquent le bâtimen
 8. **Bouton de saut** : L'utilisateur peut cliquer sur "Sauter le temps" pour déclencher immédiatement la prochaine vague
 
 #### Diagramme de classes
+
 ```mermaid
 classDiagram
     class GestionnaireVagues {
@@ -825,35 +872,35 @@ classDiagram
         -declencherVague()
         -genererPositionBord()
     }
-    
+
     class Ennemi {
         -HP_INITIAL: int
         -VITESSE: float
         -DEGATS: int
         +Ennemi(int GX, int GY, Terrain terrain)
     }
-    
+
     class Terrain {
         +addUnite(Unite u)
     }
-    
+
     class CommandeDeplacementEnnemi {
         +executer(Unite unite, double dt): boolean
     }
-    
+
     class VagueInfoPanel {
         -gestionnaireVagues: GestionnaireVagues
         -infoLabel: JLabel
         -skipButton: JButton
         +majAffichage()
     }
-    
+
     class Fenetre {
         -vagueInfoPanel: VagueInfoPanel
         +setGestionnaireVagues(GestionnaireVagues)
         +afficherEcranGameOver()
     }
-    
+
     GestionnaireVagues --> Terrain : addUnite()
     GestionnaireVagues --> Ennemi : crée
     Ennemi --> CommandeDeplacementEnnemi : utilise
@@ -1050,6 +1097,7 @@ classDiagram
 Les unités peuvent transporter du minerai entre les bâtiments. La classe `CommandeDeposit` gère le dépôt de minerai dans le bâtiment maître, tandis que `CommandeMiner` gère la collecte de minerai depuis les gisements.
 
 ### 5.6.4 : Défense
+
 Les unités peuvent être mises en mode défense pour protéger les bâtiments. Lorsqu'une unité est en mode défense, elle attaque automatiquement les ennemis à portée. La classe `CommandeDefendre` gère l'activation du mode défense pour une unité.
 
 Lorsqu'une unité est mise en mode défense par le joueur, elle scan toutes les unités présentes sur le terrain avec `scanForEnemies`. La première unité ennemie détectée dans un rayon définit devient sa cible. Tant que la cible est vivante et à portée, l'unité de défense inflige des dégâts à intervalles réguliers. Si la cible est hors de portée, l'unité se déplace pour la rattraper. Si la cible meurt ou qu'aucune n'est détectée, l'unité se replace à l'endroit qu'elle défendait et se remet à chercher une nouvelle cible.
@@ -1238,7 +1286,6 @@ classDiagram
     %% Controllers update view
     ReactionClic --> Affichage : met à jour (menu)
     ReactionHover --> Affichage : met à jour (hover)
-   
 ```
 
 Ce diagramme représente l'essentiel de la logique du jeu et suit le patron **MVC** (Model-View-Controller). Le modèle (`Terrain`) contient les données du jeu, la vue (`Affichage`) gère l'affichage en fonction du modèle, et les contrôleur (`ReactionClic` , `ReactionHover `, `CameraController` et `Camera`) gère le modèle tout en mettant également à jour directement la vue pour fournir un retour visuel.
@@ -1300,11 +1347,13 @@ Si la case sélectionnée change :
 **Si la case sélectionnée reste la même :**
 
 1. Ne pas reconstruire l’interface
+
 2. Mettre à jour uniquement :
+   
    - la barre (`CapacityBar.updateValues`)
    - les labels
-
- Cela permet d’éviter des recalculs inutiles, des re-layout coûteux et des effets visuels indésirables (en rafraîchissant constamment le menu)
+   
+   Cela permet d’éviter des recalculs inutiles, des re-layout coûteux et des effets visuels indésirables (en rafraîchissant constamment le menu)
 
 #### 4. Mise à jour de la barre de capacité
 
@@ -1370,12 +1419,14 @@ Case --> Batiment
 ### 5.7.4 : Vue d'ensemble des données (minerais, unités, bâtiments) (optionnel)
 
 Cette fonctionnalité n'a pas été implémentée dans la version actuelle. Cependant, l'interface actuelle permet déjà de visualiser :
+
 - Les bâtiments et leurs états (normal, en construction) via le menu contextuel à droite
 - La case sélectionnée avec un encadrement orange
 - La case survolée avec un surlignage blanc
 - L'écran de Game Over quand le bâtiment maître est détruit
 
 Une future version pourrait inclure un panneau d overview affichant :
+
 - Le nombre total de minerais collectés
 - Le nombre d'unités actives
 - L'état de tous les bâtiments (HP, production, stockage)
@@ -1383,6 +1434,7 @@ Une future version pourrait inclure un panneau d overview affichant :
 ## 6. Résultats
 
 Le projet a permis de développer un jeu de stratégie solo en temps réel avec les fonctionnalités suivantes :
+
 - Gestion des coordonnées pour les bâtiments et les unités.
 - Affichage des objets (unités, minerais, bâtiments).
 - Gestion des bâtiments (usine, stockage, mine, routes).
@@ -1398,6 +1450,7 @@ Le projet a permis de développer un jeu de stratégie solo en temps réel avec 
 La classe `Validation` permet de valider les arguments et les états du jeu. Elle est configurable via une propriété JVM (`-Dpcii.validation.strict=false`).
 
 Des tests unitaires ont été implémentés pour valider les fonctionnalités critiques :
+
 - `ForeuseThreadTest` : Vérifie que la foreuse extrait correctement du minerai.
 - `MineraiTest` : Vérifie le transport du minerai.
 - `ReactionClicTest` : Vérifie la gestion des clics utilisateur.
@@ -1409,16 +1462,20 @@ Ces tests garantissent la robustesse du code et facilitent la maintenance.
 ## 7. Documentation utilisateur
 
 ### Prérequis
+
 - Java JDK 17 ou supérieur.
 - Un environnement de développement (ex: IntelliJ IDEA, VS Code).
 
 ### Installation
+
 1. Cloner le dépôt GitHub.
 2. Depuis le répertoire racine, compiler le projet avec la commande :
+   
    ```bash
    javac -d target/classes $(find src -name "*.java")
    ```
 3. Exécuter le jeu avec la commande :
+   
    ```bash
    java -cp target/classes main.Main
    ```
@@ -1426,8 +1483,9 @@ Ces tests garantissent la robustesse du code et facilitent la maintenance.
 ### Utilisation
 
 #### **Contrôles de base**
+
 | Action                               | Contrôle                              |
-|--------------------------------------|---------------------------------------|
+| ------------------------------------ | ------------------------------------- |
 | Sélectionner une case/bâtiment/unité | Clic gauche                           |
 | Déplacer la caméra                   | Clic gauche + glisser                 |
 | Zoomer/Dézoomer                      | Molette de la souris ou touches +/-   |
@@ -1438,6 +1496,7 @@ Ces tests garantissent la robustesse du code et facilitent la maintenance.
 #### **Comment jouer ?**
 
 **1. Récolter du minerai**
+
 - Sélectionnez un **Ouvrier**
 - Déplacez-le sur un **filon de minerai** (case grise)
 - Cliquez sur **"Miner"** dans le menu
@@ -1445,6 +1504,7 @@ Ces tests garantissent la robustesse du code et facilitent la maintenance.
 - Déplacez-le vers un **Bâtiment Maître** ou **Stockage** et cliquez sur **"Déposer"**
 
 **2. Construire des bâtiments**
+
 - Sélectionnez une **case vide**
 - Dans le menu, choisissez un bâtiment :
   - **Foreuse** (10 minerais) :
@@ -1467,42 +1527,119 @@ Ces tests garantissent la robustesse du code et facilitent la maintenance.
 - Cliquez sur un **Ouvrier** et choisissez **"Construire"** pour construire le bâtiment à l'emplacement sélectionné
 
 **3. Se défendre**
+
 - Sélectionnez un **Ouvrier**
 - Cliquez sur **"Défendre"**
 - Cliquez sur une **case à défendre** (ex: autour du bâtiment maître)
 - L'Ouvrier attaquera automatiquement les ennemis à proximité (portée : 2 cases)
 
 ---
+
 #### **Astuces**
+
 - **Vagues d'ennemis** : Arrivent toutes les 3 minutes. Utilisez le bouton **"Sauter le temps"** en haut pour tester rapidement.
 - **Direction des Routes** : Le minerai suit la flèche. Vérifiez le sens !
 - **Bâtiment Maître** : **À protéger absolument** (100 PV). Sa destruction = Game Over.
 
 ## 8. Documentation développeur
-
 ### Classes principales
+Voici une liste des classes principales du projet, organisées par package et rôle 
+qui pouvent être intéressantes à regarder en priorité pour comprendre le fonctionnement du jeu :
+
 - `Main` : Point d'entrée du jeu.
-- `Terrain` : Gère la grille de jeu et les entités.
-- `Unite` : Gère les unités et leurs commandes.
+- `AsyncExecutor` : Gère l'exécution des threads pour les unités et les bâtiments.
+
+#### Model
+- `Terrain` : Classe centrale du modèle, représente la grille de jeu et contient les cases, les unités et les bâtiments.
+
+- `Unite` : Classe de base pour `Ouvrier` et `Ennemi`. Gère les unités et leurs commandes.
+On peut ajouter des nouvelles types d'unités en créant une nouvelle classe qui étend `Unite` et en définissant ses caractéristiques (HP, vitesse, etc.) et 
+ses comportements (commandes) spécifiques (ex: attaque, défense, etc.).
+
+- Dossier `commande` : Contient les différentes commandes pour les unités (miner, déplacer, défendre, etc.).
+Si vous voulez ajouter une nouvelle action pour les unités, c'est ici que vous devez créer une nouvelle classe de commande
+et il faut respecter l'interface `Commande` (implémenter la méthode `executer(Unite u, double dt)` qui
+s'effectue chaque tick (`dt`) et retourne un boolean indiquant si la commande est terminée ou non).
+
 - `Batiment` : Classe de base pour tous les bâtiments.
+Les bâtiments spécifiques (Foreuse, Route, Stockage, Usine) étendent cette classe et définissent leurs propres caractéristiques et comportements.
+
+#### View
+- `Fenetre` : Gère la fenêtre principale du jeu.
+- `Affichage` : Gère le rendu graphique du terrain et des entités.
+- `AffichageTerrain` : Gère l'affichage spécifique du terrain et des cases.
 - `MenuPanel` : Gère l'interface utilisateur et les actions.
+- `Camera` : Gère la conversion des coordonnées écran <-> grille.
+
+#### Controller
+- `CameraController` : Gère les interactions liées à la caméra (drag, clavier).
+- `ReactionClic` : Gère les clics de l'utilisateur pour sélectionner des cases et afficher le menu.
+- `ReactionHover` : Gère le survol des cases pour un retour visuel en temps réel.
 
 ### Constantes modifiables
+
+#### Bâtiments
+
 - `Foreuse.DELAI_EXTRACTION_MS` : Délai entre deux extractions de minerai.
 - `Minerai.DELAI_TRANSPORT_MS` : Délai de transport du minerai.
 - `Usine.DELAI_PRODUCTION_MS` : Délai de production des unités.
 
+- `Foreuse.COUT_CONSTRUCTION` : Coût de construction d'une foreuse.
+- `Route.COUT_CONSTRUCTION` : Coût de construction d'une route.
+- `Stockage.COUT_CONSTRUCTION` : Coût de construction d'un stockage.
+- `Usine.COUT_CONSTRUCTION` : Coût de construction d'une usine.
+
+- `Stockage.CAPACITE` : Capacité maximale de stockage d'un stockage.
+- `Usine.CAPACITE` : Capacité maximale de stockage d'une usine.
+- `BâtimentMaitre.CAPACITE` : Capacité maximale du bâtiment maître.
+
+- `Usine.COUT_PRODUCTION` : Coût de production d'une unité dans l'usine.
+
+#### Unités
+
+- `Ennemi.VITESSE` : Vitesse de déplacement des ennemis.
+- `Ennemi.HP_INITIAL` : Points de vie initiaux des ennemis.
+- `Ennemi.DEGATS` : Dégâts infligés par les ennemis.
+
+- `Ouvrier.VITESSE` : Vitesse de déplacement des ouvriers.
+- `Ouvrier.HP_INITIAL` : Points de vie initiaux des ouvriers.
+- `Ouvrier.DEFENSE_RANGE` : Portée de défense des ouvriers.
+- `Ouvrier.DEGATS` : Dégâts infligés par les ouvriers en mode défense.
+
+- `GestionnaireVagues.DELAI_ENTRE_VAGUES_MS` : Délai entre chaque vague d'ennemis.
+
 ### Fonctionnalités à implémenter
-- **Visuels** : Améliorer les graphismes et l'interface utilisateur pour une meilleure expérience de jeu.
+Voici quelques fonctionnalités supplémentaires qui pourraient être implémentées pour améliorer le jeu :
+
+- **Visuels** : Améliorer les graphismes et l'interface utilisateur pour une meilleure expérience de jeu. 
+Par exemple, ajouter une vue d'ensemble des ressources, des unités et des bâtiments: on peut le faire en 
+ajouter les lignes des infos supplémentaires dans le `StatsPanel` (dans `MenuPanel`) pour BâtimentMaitre.
+
 - **Menu de pause/début de jeu** : Ajouter un menu de pause avec des options pour reprendre, redémarrer ou quitter le jeu.
-- **Système de sauvegarde** : Permettre aux joueurs de sauvegarder et charger leur progression.
+On peut le faire en ajoutant un listener pour la touche "P" (ou "Esc") dans le controlleur. Ensuite,
+tous les threads (unités, foreuses, vagues) doivent être mis en pause et on affiche un menu de pause avec des boutons pour reprendre, redémarrer ou quitter.
+
+- **Contrôle des unités en groupe**: Permettre au joueur de sélectionner plusieurs unités en même temps et de leur donner des ordres groupés 
+(ex: déplacer un groupe d'ouvriers vers une zone, les mettre tous en mode défense, etc.). 
+On peut implémenter cela en ajoutant une fonctionnalité de sélection multiple dans `ReactionClic` (ex: clic droit + glisser pour dessiner un rectangle de sélection). 
+Ensuite, les commandes données à une unité sélectionnée sont appliquées à toutes les unités du groupe.
+
+- **Options de difficulté/settings du jeu** : Ajouter différents niveaux de difficulté (ou des paramètres personnalisables) 
+pour ajuster la vitesse des ennemis, la fréquence des vagues, les ressources disponibles, etc. On peut le faire en ajoutant un menu de configuration 
+accessible depuis l'écran de début de jeu et quand on lance le jeu, on lit les paramètres choisis pour ajuster les constantes abordées auparavant (ex: `Ennemi.VITESSE`, `GestionnaireVagues.DELAI_ENTRE_VAGUES_MS`, etc.).
+
+- **Système de sauvegarde** : Permettre aux joueurs de sauvegarder et charger leur progression. On peut l'implementer en
+convertissant l'état du jeu (les infos sur toutes les cases sur le terrain et aussi des unités) en un format sérialisé (ex: JSON) 
+et en le sauvegardant dans un fichier. Ensuite, on peut ajouter des options dans le menu pour sauvegarder et charger une partie.
 
 ## 9. Conclusion et perspectives
 
 ### Réalisation
+
 Nous avons développé un jeu de stratégie solo en temps réel avec une architecture MVC. Les principales fonctionnalités incluent la gestion des bâtiments, des unités, et des ressources, ainsi qu'une interface utilisateur interactive.
 
 ### Difficultés et solutions
+
 - **Gestion des threads** : Utilisation de `volatile` et de mécanismes d'interruption pour gérer les threads de manière sécurisée.
 - **Synchronisation** : Utilisation de files de commandes pour gérer les actions des unités de manière séquentielle.
 - **Affichage** : Utilisation de `Graphics2D` pour dessiner les entités et optimisation des performances avec des caches d'images.
