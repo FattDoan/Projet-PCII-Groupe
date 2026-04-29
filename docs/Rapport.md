@@ -297,8 +297,6 @@ classDiagram
 
 ### 5.1.3 : Coordonnées des unités et ennemis (mouvement continu)
 
-(TODO a refaire c'est un broiuilon pour aide)
-
 Les unités et les ennemis utilisent des coordonnées continues en pixels pour leur déplacement. La classe `Unite` gère les positions `px` et `py` (pixels) et les convertit en coordonnées de grille (`getGX()`, `getGY()`) pour interagir avec le terrain. Les déplacements sont gérés via des commandes (ex: `CommandeDeplacement`) qui mettent à jour les positions des unités à chaque tick, en fonction de l'action demandée.
 
 ```mermaid
@@ -332,7 +330,11 @@ classDiagram
 
 ### 5.2.2 : Affichage des unités
 
-La classe `AffichageUnites` gère l'affichage des unités sur la grille. Chaque unité est dessinée sous forme de cercle centré sur ses coordonnées en pixels. La couleur et la taille sont définies pour distinguer les types d'unités (ex: magenta pour les ouvriers).
+La classe `AffichageUnites` gère l'affichage des unités (ennemis et ouvriers) sur la grille. Chaque unité est dessinée sous forme de cercle centré sur ses coordonnées en pixels. 
+
+Les `Ouvriers` sont des cercles initialement magenta, et deviennent de plus en plus violets à mesure qu'ils perdent des PV. Les `Ennemis` sont représentés sous la forme de triangles rouges.
+
+La fonction `afficheUnite(Graphics g, Unite u)` affiche une unité en fonction de son type (ouvrier ou ennemi) et de ses points de vie. Elle utilise les méthodes `afficheOuvrier` et `afficheEnnemi` pour différencier les types d'unités.
 
 ```mermaid
 classDiagram
@@ -340,8 +342,26 @@ classDiagram
         +TAILLE_UNITE: int
         +afficheUnite(Graphics g, Unite u)
         +afficheOuvrier(Graphics g, Unite u)
+        +afficheEnnemi(Graphics g, Unite u)
+    }
+    class Unite {
+        -px: float
+        -py: float
+        -hp: int
+        +getPX(): float
+        +getPY(): float
+        +getHP(): int
+        +getHPMax(): int
+    }
+    class Ouvrier {
+        +HP_INITIAL : int
+    }
+    class Ennemi {
+        +HP_INITIAL : int
     }
     AffichageUnites --> Unite : affiche
+    Unite <|-- Ouvrier
+    Unite <|-- Ennemi
 ```
 
 
