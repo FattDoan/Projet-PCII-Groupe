@@ -329,90 +329,6 @@ classDiagram
   - Attribut : `terrain` (référence au terrain à afficher)
   - Méthode `paintComponent(Graphics g)` : surcharge pour dessiner les éléments du terrain (minerais, bâtiments, etc.) en fonction de leur position et de leur type. Appelle les fonctions d'affichage spécifiques dans `AffichageMinerais` et `AffichageBâtiments`. Garde un espace pour afficher le menu à droite de la grille.
 
-### 5.2.3 : Affichage des filons de minerai et des bâtiments
-
-La classe `AffichageCases` contient des méthodes statiques pour afficher les différents types de cases (vide, minerai, bâtiment) à une position donnée sur la fenêtre. Chaque méthode prend en paramètre un objet Graphics et une Case pour dessiner l'élément correspondant à la position de la case sur la grille. Les coordonnées de la case sont converties en pixels pour l'affichage, et des images sont chargées depuis le fichier `images` pour différencier des cases.
-
-Pour chaque type de case et chaque type de bâtiment, on stocke l'adresse de l'image correspondante dans une variable statique. On utilise un HashMap comme cache pour éviter de recharger la même image plusieurs fois.
-
-- Méthodes statiques :
-  - `afficheCase(Graphics g, Case c)` : affiche une case en fonction de son type (vide, minerai, bâtiment) en appelant la méthode d'affichage correspondante.
-  - `afficheCaseVide(Graphics g, Case c)` : affiche une case vide à la position de la case sur la fenêtre.
-  - `afficheImageCase(Graphics g, Case c, String adresse)` : affiche l'image à l'emplacement `adresse` sur la case `c`. Récupère l'image dans le cache si on l'a déjà chargée.
-  - `afficheImageBatiment(Graphics g, Case c)` : affiche une image correspondant au bâtiment contenu dans la case `c` en appelant `afficheImageCase`.
-  - `afficheMineralIngot(Graphics g, Case c)` : affiche un minerai qui se déplace sur la route dans la case `c`.
-
-```mermaid
-classDiagram
-
-    class Fenetre {
-        +Fenetre(String titre, Terrain terrain)
-    }
-
-    class Affichage {
-        -terrain: Terrain
-        +paintComponent(Graphics g)
-    }
-
-    class AffichageCases {
-        +afficheCase(Graphics g, Case c)
-        +afficheCaseVide(Graphics g, Case c)
-        +afficheMinerai(Graphics g, Case c)
-    }
-
-    note for AffichageCases "récupères les images dans ./images/"
-
-    JFrame <|-- Fenetre : hérite de
-    JPanel <|-- Affichage : hérite de
-    Fenetre --> Affichage : contient
-    Affichage --> AffichageCases : utilisé pour afficher les cases
-```
-
-
-
-
-
-
-(`AffichageBatiments` : utilisée pour l'affichage temporaire, TODO !! à retirer dans la version finale du build !!)
-
-La classe `AffichageBatiments` contient des méthodes pour afficher les différents types de bâtiments (route, foreuse, etc.) à une position donnée sur la fenêtre. Chaque méthode prendra en paramètre un objet `Graphics` et une `Case` pour dessiner le bâtiment correspondant à la position de la case sur la grille. Ses méthodes sont appelées depuis `AffichageCases` en fonction du contenu de la case à afficher.
-
-- Méthodes statiques :
-  - `afficheBatiment(Graphics g, Case c)` : affiche un bâtiment en fonction de son type (route, foreuse, etc.) à la position de la case sur la fenêtre.
-  - `afficheRoute(Graphics g, Case c)` : affiche une route à la position de la case sur la fenêtre.
-  - `afficheForeuse(Graphics g, Case c)` : affiche une foreuse à la position de la case sur la fenêtre.
-  - de même pour les autres types de bâtiments.
-
-```mermaid
-classDiagram
-
-    class Fenetre {
-        +Fenetre(String titre, Terrain terrain)
-    }
-
-    class Affichage {
-        -terrain: Terrain
-        +paintComponent(Graphics g)
-    }
-
-    class AffichageCases {
-        +afficheCase(Graphics g, Case c)
-        +afficheCaseVide(Graphics g, Case c)
-        +afficheMinerai(Graphics g, Case c)
-    }
-
-    class AffichageBatiments {
-        +afficheBatiment(Graphics g, Case c)
-        +afficheRoute(Graphics g, Case c)
-        +afficheForeuse(Graphics g, Case c)
-    }
-
-    JFrame <|-- Fenetre : hérite de
-    JPanel <|-- Affichage : hérite de
-    Fenetre --> Affichage : contient
-    Affichage --> AffichageCases : utilisé pour afficher les cases
-    AffichageCases --> AffichageBatiments : utilisé pour afficher les bâtiments
-```
 
 ### 5.2.2 : Affichage des unités
 
@@ -427,6 +343,72 @@ classDiagram
     }
     AffichageUnites --> Unite : affiche
 ```
+
+
+### 5.2.3 : Affichage des filons de minerai et des bâtiments
+
+La classe `AffichageCases` contient des méthodes statiques pour afficher les différents types de cases (vide, minerai, bâtiment) à une position donnée sur la fenêtre. Les images utilisées sont chargées depuis le dossier `./images/`.
+
+- Méthodes statiques :
+  - `afficheCase(Graphics g, Case c)` : affiche une case en fonction de son type (vide, minerai, bâtiment) en appelant la méthode d'affichage correspondante.
+  - `afficheImageCase(Graphics g, Case c, String adresse)` : affiche l'image à l'emplacement `adresse` sur la case `c`. Récupère l'image dans le cache si on l'a déjà chargée.
+  - `afficheImageBatiment(Graphics g, Case c)` : affiche une image correspondant au bâtiment contenu dans la case `c` en appelant la méthode correspondante dans `AffichageBatiments`.
+
+- Variables statiques : 
+  - `BASE_ADRESSE_IMAGES` : l'adresse correspondant au dossier `images/` pour l'ordinateur de l'utilisateur.
+  - `ADRESSE_MINERAL_DEPOSIT`, `ADRESSE_EN_CONSTRUCTION` : les adresses des sprites utilisés pour l'affichage.
+
+
+La classe `AffichageBatiments` contient les méthodes et les adresses d'images spécifiques à l'affichage des bâtiments. En plus du type de batiment, l'affichage dépend de la quantité de PV que le bâtiment a, son état de fonctionnement (usine et foreuse), et la quantité de minerai qu'il contient (stockage et batiment maitre). 
+
+- Méthodes statiques :
+  - `affiche{nom du batiment}(Graphics g, Case c, {type du batiment} b)` : affiche une image du batiment en question à la position de la case sur la fenêtre.
+
+- Variables statiques :
+  - `ADRESSES_{nom du batiment}` : tableau d'adresses des sprites du batiment en question en fonction de son état, et un sprite du bâtiment détruit.
+  - `ADRESSES_{nom du batiment}_DAMAGED` : tableau d'adresses des sprites de dégâts du bâtiment en question, à superposer à l'image de base en fonction de la quantité de PV restante du bâtiment.
+
+Les adresse des images utilisées sont stockées dans différentes variables statiques, dans `AffichageBatiments` pour celles spécifiques à chaque batiments et dans `AffichageCases` pour les autres. On utilise un HashMap comme cache afin d'éviter de recharger la même image plusieurs fois.
+
+
+```mermaid
+classDiagram
+
+    class Fenetre {
+        +Fenetre(String titre, Terrain terrain)
+    }
+
+    class Affichage {
+        -terrain: Terrain
+        +paintComponent(Graphics g)
+    }
+
+    class AffichageCases {
+        +BASE_ADRESSE_IMAGES : String[]
+        +ADRESSE_MINERAL_DEPOSIT : String[]
+        +afficheCase(Graphics g, Case c)
+        +afficheImageCase(Graphics g, Case c, String adresse)
+        -afficheImageBatiment(Graphics g, Case c)
+    }
+
+    class AffichageBatiments {
+        +ADRESSES_USINE : String[]
+        +ADRESSES_USINE_DAMAGED : String[]
+        +afficheBatimentMaitre(Graphics g, Case c, BatimentMaitre maitre)
+        +afficheUsine(Graphics g, Case c, Usine usine)
+        +afficheRoute(Graphics g, Case c, Route route)
+    }
+
+    note for AffichageCases "récupères les images dans ./images/"
+
+    JFrame <|-- Fenetre : hérite de
+    JPanel <|-- Affichage : hérite de
+    Fenetre --> Affichage : contient
+    Affichage --> AffichageCases : utilisé pour afficher chaque case
+    AffichageCases --> AffichageBatiments : appelle les fonctions pour chaque bâtiment
+    AffichageCases <-- AffichageBatiments : utilise la fonction afficheImageCase
+```
+
 
 ### 5.2.4 : Animation du minerai sur les routes (effet visuel)
 
