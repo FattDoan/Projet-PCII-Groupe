@@ -45,11 +45,16 @@ public class AffichageUnites {
         int x = (int)u.getPX(); // conversion des coordonnées de l'unité en pixels pour l'affichage
         int y = (int)u.getPY();
 
-        // Choix visuel : magenta pour les ouvriers, a ajuster selon le design
-        g.setColor(java.awt.Color.MAGENTA); // Couleur de l'unite
+        // Les ouvriers sont en magenta losqu'ils ont tous leurs points de vie, et deviennent plus bleus à mesure qu'ils perdent des PV, à ajuster selon le design
+        int hp = u.getHP();
+        int maxHp = u.getHPMax();
+        int red = 100 + (int)(155 * ((double)hp / (double)maxHp)); // Plus les PV sont bas, plus le rouge diminue, rendant la couleur plus bleue
+        int green = 0;
+        int blue = 255;
+        g.setColor(new java.awt.Color(red, green, blue)); // Couleur de l'unité, ajustée en fonction de ses PV
 
         // Dessine un cercle centre sur la position de l'unite
-        g.fillOval(x - TAILLE_UNITE/2, y - TAILLE_UNITE/2, TAILLE_UNITE, TAILLE_UNITE); // Dessine un cercle centré sur les coordonnées de l'unité
+        g.fillOval(x - TAILLE_UNITE/2, y - TAILLE_UNITE/2, TAILLE_UNITE, TAILLE_UNITE);
    }
 
 

@@ -1279,6 +1279,7 @@ Le projet a permis de développer un jeu de stratégie solo en temps réel avec 
 - Menus et interface utilisateur pour interagir avec le jeu.
 
 ![Jeu](capture_ecran_jeu_en_marche.png)
+![Vague en cours](capture_ecran_ennemis.png)
 ![Game Over](capture_ecran_game_over.png)
 
 ### Validation et Tests
