@@ -890,9 +890,9 @@ Lorsque l'utilisateur sélectionne une case ne contenant aucun bâtiment, il peu
 
 La classe `ActionsPanel` dans `MenuPanel` affiche les boutons pour la construction de bâtiments. Lorsqu'un bouton est cliqué, elle vérifie d'abord que la case sélectionnée `selectedCase` est constructible (pas de bâtiment déjà présent, type de case compatible).
 
-Si l'utilisateur veut construire une route, un `JOptionPane` s'ouvre pour demander la direction. Ensuite, une instance du bâtiment correspondant (`Route`, `Foreuse`, `Stockage`) est créée et ajoutée à la case cible.
+Si l'utilisateur veut construire une route, un `JOptionPane` s'ouvre pour demander la direction. Ensuite, une instance du bâtiment correspondant (`Route`, `Foreuse`, `Stockage`, `Usine`) est créée et ajoutée à la case cible.
 
-Règle métier importante : un bâtiment n'est utilisable pour les autres actions (transport de minerai, interactions, etc.) que lorsqu'il est marqué comme terminé (`estFini() == true`). Tant qu'il n'est pas terminé, les actions qui dépendent de ce bâtiment sont bloquées et réévaluées au cycle suivant.
+Règle importante : un bâtiment n'est utilisable que lorsqu'il est marqué comme terminé (`estFini() == true`). Tant qu'il n'est pas terminé, les actions qui dépendent de ce bâtiment sont bloquées et réévaluées au cycle suivant. Afin de pouvoir marquer un bâtiment comme terminé, il doit d'abord être construit par une unité.
 
 En mode démonstration, les bâtiments posés par le scénario sont explicitement marqués terminés pour que la simulation démarre immédiatement.
 
@@ -938,9 +938,23 @@ classDiagram
 
 Les unités peuvent transporter du minerai entre les bâtiments. La classe `CommandeDeposit` gère le dépôt de minerai dans le bâtiment maître, tandis que `CommandeMiner` gère la collecte de minerai depuis les gisements.
 
-### 5.6.4 : Défense (tourelle) (TODO a refaire c'est un broiuilon pour aide)
+### 5.6.4 : Défense (tourelle)
 
-Les unités peuvent être mises en mode défense pour protéger les bâtiments. Cette fonctionnalité est prévue mais pas encore implémentée dans le code actuel.
+Les unités peuvent être mises en mode défense pour protéger les bâtiments. Lorsqu'une unité est en mode défense, elle attaque automatiquement les ennemis à portée. La classe `CommandeDefendre` gère l'activation du mode défense pour une unité.
+
+Lorsqu'une unité est mise en mode défense par le joueur, elle scan toutes les unités présentes sur le terrain avec `scanForEnemies`. La première unité ennemie détectée dans un rayon définit devient sa cible. Tant que la cible est vivante et à portée, l'unité de défense inflige des dégâts à intervalles réguliers. Si la cible est hors de portée, l'unité se déplace pour la rattraper. Si la cible meurt ou qu'aucune n'est détectée, l'unité se replace à l'endroit qu'elle défendait et se remet à chercher une nouvelle cible.
+
+```mermaid
+classDiagram
+    class CommandeDefendre {
+        -defensePX: int
+        -defensePY: int
+        -cibleEnnemi: Unite
+        -distance(Unite u1, Unite u2) double
+        +scanForEnemies(Unite unite, Terrain terrain) Unite
+        +executer(Unite unite, double dt) boolean
+    }
+```
 
 ### 5.6.5 : Attribution d'ordres aux unités
 
