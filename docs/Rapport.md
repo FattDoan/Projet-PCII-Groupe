@@ -526,7 +526,7 @@ classDiagram
         -CAPACITE: int
         +Stockage(int x, int y, Terrain terrain)
     }
-    Stockage --|> Batiment
+    Batiment <|-- Stockage
 ```
 
 ### 5.3.3 : Mine (extraction automatique de minerai via des threads)
@@ -590,8 +590,6 @@ classDiagram
 
     Batiment <|-- Foreuse
 ```
-
-Ce diagramme met en avant la relation d’héritage et les méthodes principales pour la gestion de l’extraction automatique.
 
 #### Côté Minerai
 
@@ -883,8 +881,6 @@ classDiagram
 
     Batiment <|-- Foreuse
 ```
-
-Ce diagramme met en avant la relation d’héritage et les méthodes principales pour la gestion de l’extraction automatique.
 
 ### 5.6.2 : Construction de bâtiments
 
@@ -1269,7 +1265,8 @@ Le projet a permis de développer un jeu de stratégie solo en temps réel avec 
 - Actions et déplacements des unités (miner, construire, transporter).
 - Menus et interface utilisateur pour interagir avec le jeu.
 
-(TODO metre des captures d'écran)
+![Jeu](capture_ecran_jeu_en_marche.png)
+![Game Over](capture_ecran_game_over.png)
 
 ### Validation et Tests
 
@@ -1292,7 +1289,7 @@ Ces tests garantissent la robustesse du code et facilitent la maintenance.
 
 ### Installation
 1. Cloner le dépôt GitHub.
-2. Compiler le projet avec la commande :
+2. Depuis le répertoire racine, compiler le projet avec la commande :
    ```bash
    javac -d target/classes $(find src -name "*.java")
    ```
@@ -1301,11 +1298,13 @@ Ces tests garantissent la robustesse du code et facilitent la maintenance.
    java -cp target/classes main.Main
    ```
 
-### Utilisation (TODO a detailler)
-- Cliquez sur une case pour sélectionner un bâtiment ou une unité.
-- Utilisez le menu à droite pour donner des ordres (ex: construire, miner, déplacer).
-- Utilisez la molette de la souris pour zoomer/dézoomer.
-- Utilisez le clic gauche pour déplacer la caméra.
+### Utilisation
+- Cliquez sur un objet (batiment, unité) pour voir ses détails.
+- Pour construire un bâtiment, sélectionnez une case vide et choisissez le type de bâtiment dans le menu à droite. Ensuite, sélectionnez une unité et ordonnez-lui de contruire le bâtiment.
+- Pour défendre une zone, sélectionnez une unité et ordonnez-lui de se mettre en mode défense. Les ennemis à portée seront attaqués automatiquement.
+- De manière générale, utilisez le menu à droite pour modifier l'état du jeu (ex: construire, miner, déplacer les unités...).
+- Pour zoomer/dézoomer, utilisez la molette de la souris ou les boutons + et -.
+- Pour déplacer la caméra, maintenez le clic gauche et déplacez la souris.
 
 ## 8. Documentation développeur
 
@@ -1322,9 +1321,9 @@ Ces tests garantissent la robustesse du code et facilitent la maintenance.
 - `Usine.DELAI_PRODUCTION_MS` : Délai de production des unités.
 
 ### Fonctionnalités à implémenter
-- **Défense des unités** : Implémenter la logique de combat pour les unités en mode défense.
-- **Gestion des ennemis** : Finaliser la logique de destruction des bâtiments et unités par les ennemis.
-- **Animation du minerai** : Ajouter des effets visuels pour le transport du minerai sur les routes.
+- **Visuels** : Améliorer les graphismes et l'interface utilisateur pour une meilleure expérience de jeu.
+- **Menu de pause/début de jeu** : Ajouter un menu de pause avec des options pour reprendre, redémarrer ou quitter le jeu.
+- **Système de sauvegarde** : Permettre aux joueurs de sauvegarder et charger leur progression.
 
 ## 9. Conclusion et perspectives
 
@@ -1337,7 +1336,7 @@ Nous avons développé un jeu de stratégie solo en temps réel avec une archite
 - **Affichage** : Utilisation de `Graphics2D` pour dessiner les entités et optimisation des performances avec des caches d'images.
 
 ### Apprentissage (TODO a refaire c'est un broiuilon pour aide)
-- Maîtrise de la programmation concurrente en Java.
+- Maîtrise de la programmation concurrente et des threads en Java.
 - Conception d'une architecture MVC pour un jeu.
 - Gestion des interactions utilisateur avec Swing.
 
@@ -1345,3 +1344,4 @@ Nous avons développé un jeu de stratégie solo en temps réel avec une archite
 - Ajouter des niveaux de difficulté.
 - Implémenter un système de sauvegarde/chargement.
 - Améliorer les graphismes et les animations.
+- Utiliser des mutex pour éviter les problèmes de synchronisation lorsque plusieurs threads accèdent à des ressources partagées (ex: stockage de la foreuse).
