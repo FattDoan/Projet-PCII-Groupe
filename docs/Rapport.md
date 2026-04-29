@@ -1361,6 +1361,14 @@ Ces tests garantissent la robustesse du code et facilitent la maintenance.
 - **Direction des Routes** : Le minerai suit la flèche. Vérifiez le sens !
 - **Bâtiment Maître** : **À protéger absolument** (100 PV). Sa destruction = Game Over.
 
+#### **Conseils supplémentaires**
+- Cliquez sur un objet (bâtiment, unité) pour voir ses détails.
+- Pour construire un bâtiment, sélectionnez une case vide et choisissez le type de bâtiment dans le menu à droite. Ensuite, sélectionnez une unité et ordonnez-lui de construire le bâtiment.
+- Pour défendre une zone, sélectionnez une unité et ordonnez-lui de se mettre en mode défense. Les ennemis à portée seront attaqués automatiquement.
+- De manière générale, utilisez le menu à droite pour modifier l'état du jeu (ex: construire, miner, déplacer les unités...).
+- Pour zoomer/dézoomer, utilisez la molette de la souris ou les boutons + et -.
+- Pour déplacer la caméra, maintenez le clic gauche et déplacez la souris.
+
 ## 8. Documentation développeur
 
 ### Classes principales
