@@ -299,7 +299,7 @@ classDiagram
 
 (TODO a refaire c'est un broiuilon pour aide)
 
-Les unités et les ennemis utilisent des coordonnées continues en pixels pour leur déplacement. La classe `Unite` gère les positions `px` et `py` (pixels) et les convertit en coordonnées de grille (`getGX()`, `getGY()`) pour interagir avec le terrain. Les déplacements sont gérés via des commandes (ex: `CommandeDeplacement`) qui mettent à jour les positions en pixels à chaque tick.
+Les unités et les ennemis utilisent des coordonnées continues en pixels pour leur déplacement. La classe `Unite` gère les positions `px` et `py` (pixels) et les convertit en coordonnées de grille (`getGX()`, `getGY()`) pour interagir avec le terrain. Les déplacements sont gérés via des commandes (ex: `CommandeDeplacement`) qui mettent à jour les positions des unités à chaque tick, en fonction de l'action demandée.
 
 ```mermaid
 classDiagram
@@ -1314,12 +1314,12 @@ Ces tests garantissent la robustesse du code et facilitent la maintenance.
 ### Utilisation
 
 #### **Contrôles de base**
-| Action                               | Contrôle                       |
-|--------------------------------------|--------------------------------|
-| Sélectionner une case/bâtiment/unité | Clic gauche                    |
-| Déplacer la caméra                   | Clic gauche + glisser          |
-| Zoomer/Dézoomer                      | Molette de la souris ou + et - |
-| Ouvrir le menu d'actions             | Clic sur une case sélectionnée |
+| Action                               | Contrôle                              |
+|--------------------------------------|---------------------------------------|
+| Sélectionner une case/bâtiment/unité | Clic gauche                           |
+| Déplacer la caméra                   | Clic gauche + glisser                 |
+| Zoomer/Dézoomer                      | Molette de la souris ou touches +/-   |
+| Ouvrir le menu d'actions             | Clic gauche sur une case sélectionnée |
 
 ---
 
@@ -1335,23 +1335,29 @@ Ces tests garantissent la robustesse du code et facilitent la maintenance.
 **2. Construire des bâtiments**
 - Sélectionnez une **case vide**
 - Dans le menu, choisissez un bâtiment :
-
-  **Foreuse** (10 minerais) :
-  - **Rôle** : Extraire **automatiquement** du minerai d'un filon
-  - **Fonctionnement** :
-    - Doit être posée **sur une case avec du minerai** (sinon ne produit rien)
-    - Extraire **1 minerai toutes les 2 secondes**
-    - **Stockage limité à 1 minerai** → doit être vidée régulièrement
-    - **Automatisation** : Connectez-la avec des **Routes** pour acheminer le minerai vers un Stockage ou le Bâtiment Maître
-  - **Astuce** : Plus vous avez de Foreuses, plus vous récoltez rapidement !
-
+  - **Foreuse** (10 minerais) :
+    - **Rôle** : Extraire **automatiquement** du minerai d'un filon
+    - **Fonctionnement** :
+      - Doit être posée **sur une case avec du minerai** (sinon ne produit rien)
+      - Extraire **1 minerai toutes les 2 secondes**
+      - **Stockage limité à 1 minerai** → doit être vidée régulièrement
+      - **Automatisation** : Connectez-la avec des **Routes** pour acheminer le minerai vers un Stockage ou le Bâtiment Maître
+    - **Astuce** : Plus vous avez de Foreuses, plus vous récoltez rapidement !
   - **Route** (1 minerai) : Transport du minerai (choisir une direction ↑↓←→)
+    - **Rôle** : Permet de déplacer automatiquement le minerai d'un bâtiment à un autre
+    - **Fonctionnement** :
+      - Le minerai suit la direction indiquée (ex: une route vers la droite → le minerai se déplace vers la case à droite)
+      - **Un seul minerai à la fois** : si une route est déjà occupée, le minerai attend que la route soit libre
+      - **Automatisation** : Connectez les routes entre les Foreuses, les Stockages et le Bâtiment Maître pour créer un réseau de transport efficace
+    - **Astuce** : Planifiez bien vos routes pour éviter les embouteillages !
   - **Stockage** (10 minerais) : Stocke jusqu'à 10 minerais
-  - **Usine** (200 minerais) : Produit des Ouvriers automatiquement
+  - **Usine** (50 minerais) : Produit des Ouvriers automatiquement
+- Cliquez sur un **Ouvrier** et choisissez **"Construire"** pour construire le bâtiment à l'emplacement sélectionné
 
 **3. Se défendre**
-- Placez un **Ouvrier** près de votre Bâtiment Maître
+- Sélectionnez un **Ouvrier**
 - Cliquez sur **"Défendre"**
+- Cliquez sur une **case à défendre** (ex: autour du bâtiment maître)
 - L'Ouvrier attaquera automatiquement les ennemis à proximité (portée : 2 cases)
 
 ---
@@ -1359,14 +1365,6 @@ Ces tests garantissent la robustesse du code et facilitent la maintenance.
 - **Vagues d'ennemis** : Arrivent toutes les 3 minutes. Utilisez le bouton **"Sauter le temps"** en haut pour tester rapidement.
 - **Direction des Routes** : Le minerai suit la flèche. Vérifiez le sens !
 - **Bâtiment Maître** : **À protéger absolument** (100 PV). Sa destruction = Game Over.
-
-#### **Conseils supplémentaires**
-- Cliquez sur un objet (bâtiment, unité) pour voir ses détails.
-- Pour construire un bâtiment, sélectionnez une case vide et choisissez le type de bâtiment dans le menu à droite. Ensuite, sélectionnez une unité et ordonnez-lui de construire le bâtiment.
-- Pour défendre une zone, sélectionnez une unité et ordonnez-lui de se mettre en mode défense. Les ennemis à portée seront attaqués automatiquement.
-- De manière générale, utilisez le menu à droite pour modifier l'état du jeu (ex: construire, miner, déplacer les unités...).
-- Pour zoomer/dézoomer, utilisez la molette de la souris ou les boutons + et -.
-- Pour déplacer la caméra, maintenez le clic gauche et déplacez la souris.
 
 ## 8. Documentation développeur
 

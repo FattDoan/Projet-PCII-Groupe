@@ -2,7 +2,8 @@ package model;
 
 /** Un bâtiment qui produit des unités à partir de minerai */
 public class Usine extends Batiment implements Runnable {
-    public static final int COUT_CONSTRUCTION = 25;
+
+    public static final int COUT_CONSTRUCTION = 50;
     public static final int HP_MAX = 25;
     public static final int CAPACITE = 20; // Stockage interne pour minerais
 
