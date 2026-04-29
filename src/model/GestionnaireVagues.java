@@ -49,7 +49,7 @@ public class GestionnaireVagues {
         }, DELAI_ENTRE_VAGUES_MS, DELAI_ENTRE_VAGUES_MS);
         
         // Timer pour mettre à jour le temps restant (toutes les secondes)
-        new Timer("GestionnaireVagues-TimerDisplay", true).scheduleAtFixedRate(new TimerTask() {
+        timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 if (tempsRestantMs > 0) {
@@ -83,7 +83,7 @@ public class GestionnaireVagues {
         // Réinitialiser le temps restant
         tempsRestantMs = DELAI_ENTRE_VAGUES_MS;
         
-        System.out.println("[VAUGE " + numeroVague + "] Déclenchement avec " + nombreEnnemis + " ennemi(s)");
+        System.out.println("[VAGUE " + numeroVague + "] Déclenchement avec " + nombreEnnemis + " ennemi(s)");
         
         // Créer et positionner les ennemis sur les bords de la carte
         for (int i = 0; i < nombreEnnemis; i++) {
@@ -127,16 +127,7 @@ public class GestionnaireVagues {
     public int getProchaineVague() {
         return numeroVague + 1;
     }
-    
-    /**
-     * Met à jour le temps restant avant la prochaine vague.
-     * Appelé par le timer à chaque tick.
-     */
-    public void majTempsRestant() {
-        // Mettre à jour le temps restant (approximation)
-        // Cette méthode pourrait être appelée plus fréquemment pour une meilleure précision
-    }
-    
+
     /**
      * Génère une position aléatoire sur les bords de la carte.
      * Les ennemis apparaissent en bordure et se déplacent vers le bâtiment maître.
