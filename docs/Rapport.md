@@ -790,7 +790,7 @@ classDiagram
     }
 
     class Terrain {
-        -mineraisEnTransit: List<Minerai>
+        -mineraisEnTransit: List~Minerai~
         +addMinerai(Minerai)
         +removeMinerai(Minerai)
         +getMineraisEnTransit()
@@ -1119,7 +1119,7 @@ Les ordres sont attribués aux unités via des commandes (ex: `CommandeMiner`, `
 ```mermaid
 classDiagram
     class Unite {
-        -commandQueue: Deque<Commande>
+        -commandQueue: Deque~Commande~
         +ajouterCommande(Commande c)
     }
     class Commande {
